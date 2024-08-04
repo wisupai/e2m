@@ -57,26 +57,15 @@ class PdfParser(BaseParser):
                     languages= self.config.langs,
                     extract_images_in_pdf=True,
                     extract_image_block_types=["Image"],
-                    starting_page_number=start_page,
+                    starting_page_number= start_page if start_page else 1,
                 )
             )
-
-        if not os.path.exists(image_dir):
-            os.makedirs(image_dir, exist_ok=True)
-
-        # mv figures to image_dir
-        for element in unstructured_elements:
-            if element.category == "Image":
-                image_path = element.metadata.image_path
-                image_name = image_path.split("/")[-1]
-                new_image_path = os.path.join(image_dir, image_name)
-                shutil.move(image_path, new_image_path)
-                element.metadata.image_path = new_image_path
 
         return self._unstructured_data_to_e2m_parsed_data(
             unstructured_elements,
             include_image_link_in_text=include_image_link_in_text,
             work_dir=work_dir,
+            image_dir=image_dir,
             relative_path=relative_path
         )
 
@@ -90,6 +79,10 @@ class PdfParser(BaseParser):
     def _parse_by_marker(self, file,
         start_page: int = None,
         end_page: int = None,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
         batch_multiplier: int = 1) -> E2MParsedData:
         """
         Parse the data using the marker engine
@@ -102,18 +95,32 @@ class PdfParser(BaseParser):
         :rtype: Tuple[str, List[Image], Dict]
         """
         from marker.convert import convert_single_pdf
-        full_text, images, out_meta = convert_single_pdf(
-            file,
-            self.marker_models,
-            start_page=start_page,
-            max_pages=end_page,
-            # langs=self.config.langs, # todo: lang map
-            batch_multiplier=batch_multiplier)
 
-        logger.info(f"images: {images}")
-        logging.info(f"out_meta: {out_meta}")
+        full_text, images, out_meta = "", [], {}  # Initialize variables
 
-        return E2MParsedData(text=full_text, attached_images=images, metadata=out_meta)
+        try:
+            full_text, images, out_meta = convert_single_pdf(
+                file,
+                self.marker_models,
+                start_page=start_page,
+                max_pages=end_page,
+                # langs=self.config.langs, # todo: lang map
+                batch_multiplier=batch_multiplier)
+
+            logger.info(f"images: {images}")
+            logging.info(f"out_meta: {out_meta}")
+        except Exception as e:
+            logger.error(f"Error parsing pdf with marker engine: {e}")
+
+        return self._marker_data_to_e2m_parsed_data(
+            text=full_text,
+            images=images,
+            metadata=out_meta,
+            include_image_link_in_text=include_image_link_in_text,
+            work_dir=work_dir,
+            image_dir=image_dir,
+            relative_path=relative_path
+        )
 
 
     def get_parsed_data(self, file: str,
@@ -145,7 +152,11 @@ class PdfParser(BaseParser):
         if self.config.engine == "surya_layout":
             return self._parse_by_surya_layout(file)
         elif self.config.engine == "marker":
-            return self._parse_by_marker(file, start_page, end_page)
+            return self._parse_by_marker(file, start_page, end_page,
+                include_image_link_in_text=include_image_link_in_text,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path)
         else:
             return self._parse_by_unstructured(
                 file,

@@ -1,8 +1,11 @@
 # e2m/parsers/base.py
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union, Dict
 from pydantic import BaseModel, Field
+from PIL import Image
+import shutil
+from pathlib import Path
 
 from e2m.configs.parsers.base import BaseParserConfig
 
@@ -12,7 +15,7 @@ logger = logging.getLogger(__name__)
 class E2MParsedData(BaseModel):
     text: Optional[str] = Field(None, description="Parsed text")
     images: Optional[List[str]] = Field([], description="Parsed image paths")
-    attached_images: Optional[List[str] | dict]= Field([], description="Attached image paths, like 1_0.png, 1_1.png, etc.")
+    attached_images: Optional[List[str]]= Field([], description="Attached image paths, like 1_0.png, 1_1.png, etc.")
     metadata: Optional[dict]= Field({}, description="Metadata of the parsed data")
 
     def to_dict(self):
@@ -123,6 +126,7 @@ class BaseParser(ABC):
         data,
         include_image_link_in_text: bool=True,
         work_dir: str = "./",
+        image_dir: str = "./figures",
         relative_path: bool=True
     ):
         """Convert unstructured data to E2MParsedData
@@ -140,12 +144,24 @@ class BaseParser(ABC):
 
         """
         import unstructured
-        from pathlib import Path
 
         work_dir = Path(work_dir)
+        image_dir = Path(image_dir)
+
+        image_dir.mkdir(parents=True, exist_ok=True)
 
         unstructured_data: List[unstructured.documents.elements.Element] = data
 
+        # mv figures to image_dir
+        for element in data:
+            if element.category == "Image":
+                image_path = element.metadata.image_path
+                image_name = Path(image_path).name
+                new_image_path = image_dir / image_name
+                shutil.move(str(image_path), str(new_image_path))
+                element.metadata.image_path = str(new_image_path.resolve())
+
+        # meerge text and image links
         text_chunks = []
         for element in unstructured_data:
             if element.category == "Image":
@@ -167,3 +183,57 @@ class BaseParser(ABC):
         ]
 
         return E2MParsedData(text=text, attached_images=attached_images)
+
+
+    def _marker_data_to_e2m_parsed_data(
+        self,
+        text: str,
+        images: Dict[str, Image.Image],
+        metadata: Dict[str, Any],
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool=True
+    ):
+        """Convert marker data to E2MParsedData
+
+        :param text: Full text
+        :type text: str
+        :param images: Images
+        :type images: Dict[str, Any]
+        :param metadata: Metadata
+        :type metadata: Dict[str, Any]
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+
+        work_dir = Path(work_dir)
+        image_dir = Path(image_dir)
+
+        attached_images = []
+
+        if not include_image_link_in_text and images:
+            # rm all !()[] like patterns
+            import re
+            pattern = r"!\[.*?\]\(.*?\)"
+            text = re.sub(pattern, "", text)
+
+        else:
+            if images: # save figures to image_dir
+                # images: {'3_image_0.png': <PIL.Image.Image image mode=RGB size=183x235 at 0x38AB55FC0>, '3_image_1.png': <PIL.Image.Image image mode=RGB size=104x192 at 0x38AB55D80>}
+                image_dir.mkdir(parents=True, exist_ok=True)
+
+                for image_name, image in images.items():
+                    image_path = image_dir / image_name
+                    image.save(str(image_path))
+                    logger.info(f"Saved image to {image_path}")
+                    if relative_path:
+                        link_name = str(image_path.relative_to(work_dir))
+                    else:
+                        link_name = str(image_path.resolve())
+
+                    # replace image path in text
+                    text = text.replace(image_name, link_name)
+                    attached_images.append(str(image_path.resolve()))
+
+        return E2MParsedData(text=text, attached_images=attached_images, metadata=metadata)
