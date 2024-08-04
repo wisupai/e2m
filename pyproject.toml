@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "e2m"
+name = "wisup_e2m"
 version = "0.1.0"
 description = "Everything to Markdown."
 authors = ["Wisup Team <team@wisup.a>"]
@@ -15,7 +15,7 @@ tomlkit = "0.12.0"
 surya-ocr = "^0.4.15"
 torch = "^2.4.0"
 marker-pdf = "^0.2.16"
-unstructured = {extras = ["all"], version = "^0.15.0"}
+unstructured = { extras = ["all"], version = "^0.15.0" }
 pdfminer-six = "^20240706"
 pillow-heif = "^0.18.0"
 matplotlib = "^3.9.1"
