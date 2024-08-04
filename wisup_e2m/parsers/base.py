@@ -1,13 +1,13 @@
 # e2m/parsers/base.py
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Union, Dict
+from typing import Any, List, Optional, Dict
 from pydantic import BaseModel, Field
 from PIL import Image
 import shutil
 from pathlib import Path
 
-from e2m.configs.parsers.base import BaseParserConfig
+from wisup_e2m.configs.parsers.base import BaseParserConfig
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from transformers.models.layoutxlm.tokenization_layoutxlm_fast import List
 

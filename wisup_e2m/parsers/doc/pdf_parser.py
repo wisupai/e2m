@@ -1,11 +1,9 @@
 # /e2m/parsers/pdf_parser.py
 import logging
 from typing import List, Optional
-import shutil
-import os
 
-from e2m.configs.parsers.base import BaseParserConfig
-from e2m.parsers.base import BaseParser, E2MParsedData
+from wisup_e2m.configs.parsers.base import BaseParserConfig
+from wisup_e2m.parsers.base import BaseParser, E2MParsedData
 
 
 logger = logging.getLogger(__name__)
