@@ -1,0 +1,10 @@
+{
+  "include": ["e2m"],
+  "exclude": ["**/node_modules", "**/__pycache__"],
+  "reportMissingImports": true,
+  "reportUnusedVariable": true,
+  "typeCheckingMode": "off",
+  "venv": "e2m",
+  "venvPath": "/Users/zephyr/anaconda3/envs",
+  "pythonVersion": "3.10"
+}
