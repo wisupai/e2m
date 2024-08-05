@@ -35,7 +35,14 @@ class BaseParser(ABC):
     Parser aims to turn every type of data or file into text + image
     """
 
-    SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker", "jina"]
+    SUPPORTED_ENGINES = [
+        "unstructured",
+        "surya_layout",
+        "marker",
+        "jina",
+        "openai-whisper",
+        "SpeechRecognition",
+    ]
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         """Initialize a base parser class
@@ -109,6 +116,8 @@ class BaseParser(ABC):
             self._load_unstructured_engine()
         elif self.config.engine == "jina":
             self._load_jina_engine()
+        elif self.config.engine == "openai-whisper":
+            self._load_openai_whisper_engine()
 
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
@@ -174,6 +183,31 @@ class BaseParser(ABC):
 
         self.jina_parse_func = _parse_url_by_jina
         logger.info("Jina engine loaded successfully.")
+
+    def _load_openai_whisper_engine(self):
+        # check ffmpeg
+        try:
+            # 在terminal中检查ffmpeg是否安装
+            # 在终端中使用 ffmpeg -version 命令检查是否安装了 ffmpeg
+            import subprocess
+
+            subprocess.run(["ffmpeg", "-version"], check=True)
+        except Exception as e:
+            logger.error(
+                "ffmpeg not installed. Please install ffmpeg. See https://github.com/openai/whisper#setup for more details."
+            )
+            raise e
+
+        try:
+            import whisper
+        except ImportError:
+            raise ImportError(
+                "Whisper not installed. Please install Whisper by `pip install openai-whisper`"
+            ) from None
+
+        logger.info("Loading OpenAI Whisper engine...")
+        self.openai_whisper = whisper.load_model(self.config.openai_whisper_model)
+        logger.info("OpenAI Whisper engine loaded successfully.")
 
     def _prepare_unstructured_data_to_e2m_parsed_data(
         self,

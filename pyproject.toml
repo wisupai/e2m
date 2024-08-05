@@ -13,7 +13,7 @@ litellm = "^1.42.12"
 pydantic = "^2.8.2"
 tomlkit = "0.12.0"
 surya-ocr = "^0.4.15"
-torch = "^2.4.0"
+torch = "2.3.1"
 marker-pdf = "^0.2.16"
 unstructured = { extras = ["all"], version = "^0.15.0" }
 pdfminer-six = "^20240706"
@@ -26,6 +26,9 @@ python-pptx = "^1.0.0"
 ebooklib = "^0.18"
 pypandoc = "^1.13"
 python-docx = "^1.1.2"
+speechrecognition = "^3.10.4"
+openai-whisper = {git = "https://github.com/openai/whisper.git"}
+setuptools-rust = "^1.10.1"
 
 
 [tool.poetry.group.test.dependencies]
