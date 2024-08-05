@@ -55,6 +55,7 @@ class VoiceParser(BaseParser):
         :return: Parsed data
         :rtype: E2MParsedData
         """
+
         if self.config.engine == "openai-whisper":
             return self._parse_by_openai_whisper(file)
         elif self.config.engine == "SpeechRecognition":

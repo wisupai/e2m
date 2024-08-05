@@ -104,6 +104,12 @@ class BaseParser(ABC):
             raise
         logger.info(f"Engine: {self.config.engine} is valid.")
 
+    def _validate_input_flie(self, file: str):
+        if not any(file.endswith(ext) for ext in self.SUPPERTED_FILE_TYPES):
+            raise ValueError(
+                f"File type not supported. Supported file types: {self.SUPPERTED_FILE_TYPES}"
+            )
+
     def _load_engine(self):
         """
         Load the specified engine.
@@ -187,8 +193,6 @@ class BaseParser(ABC):
     def _load_openai_whisper_engine(self):
         # check ffmpeg
         try:
-            # 在terminal中检查ffmpeg是否安装
-            # 在终端中使用 ffmpeg -version 命令检查是否安装了 ffmpeg
             import subprocess
 
             subprocess.run(["ffmpeg", "-version"], check=True)

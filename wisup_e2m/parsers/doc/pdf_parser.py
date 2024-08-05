@@ -168,6 +168,9 @@ class PdfParser(BaseParser):
         :return: Parsed data
         :rtype: E2MParsedData
         """
+        if file:
+            self._validate_input_flie(file)
+
         if self.config.engine == "surya_layout":
             return self._parse_by_surya_layout(file)
         elif self.config.engine == "marker":

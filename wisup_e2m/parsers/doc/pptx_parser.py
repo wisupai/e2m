@@ -133,6 +133,9 @@ class PptxParser(BaseParser):
         Parse the data and return the parsed data
 
         """
+        if file_name:
+            self._validate_input_flie(file_name)
+
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(
                 file_name=file_name,

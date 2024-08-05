@@ -25,7 +25,6 @@ class DocParser(DocxParser):
         Parse the data and return the parsed data
 
         """
-
         if not file_name:
             raise ValueError("file_name is required")
 
