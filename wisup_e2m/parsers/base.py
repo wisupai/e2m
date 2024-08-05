@@ -200,7 +200,7 @@ class BaseParser(ABC):
             import whisper
         except ImportError:
             raise ImportError(
-                "Whisper not installed. Please install Whisper by `pip install openai-whisper`"
+                "Whisper not installed. Please install Whisper by `pip install git+https://github.com/openai/whisper.git`"
             ) from None
 
         logger.info("Loading OpenAI Whisper engine...")

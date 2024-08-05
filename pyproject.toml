@@ -27,7 +27,6 @@ ebooklib = "^0.18"
 pypandoc = "^1.13"
 python-docx = "^1.1.2"
 speechrecognition = "^3.10.4"
-openai-whisper = {git = "https://github.com/openai/whisper.git"}
 setuptools-rust = "^1.10.1"
 
 
