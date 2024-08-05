@@ -1,39 +1,22 @@
-from abc import ABC
-from typing import Any, Dict
-
-from transformers.models.layoutxlm.tokenization_layoutxlm_fast import List
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 
 
-class BaseParserConfig(ABC):
+class BaseParserConfig(BaseModel):
     """
     Config for Parsers.
     """
 
-    def __init__(
-        self,
-        engine: str = "unstructured", # unstructured, surya_layout, marker
-        langs : List[str] = ["en", "zh"], # refer to https://xiaogliu.github.io/2019/10/11/i18n-locale-code/
-    ):
-        """
-        Initializes a configuration class instance for the Parsers.
-
-        :param engine: Parser engine to use, options are ["unstructured", "surya_layout", "marker"], defaults to unstructured
-        :type engine: Optional[str], optional
-        :param langs: Languages to use for parsing, defaults to ["en", "zh"]
-        :type langs: List[str], optional
-        """
-
-        self.engine = engine
-        self.langs = langs
-
-    def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert the configuration to a dictionary.
-
-        :return: A dictionary containing the configuration
-        :rtype: Dict[str, Any]
-        """
-        return {
-            "engine": self.engine,
-            "langs": self.langs,
-        }
+    # parser settings
+    engine: str = Field(
+        "unstructured",
+        description="Parser engine to use, options are ['unstructured', 'surya_layout', 'marker']",
+    )
+    langs: List[str] = Field(
+        ["en", "zh"],
+        description="Languages to use for parsing, refer to https://xiaogliu.github.io/2019/10/11/i18n-locale-code/",
+    )
+    # httpx client settings
+    client_timeout: int = Field(30, description="Client timeout")
+    client_max_redirects: int = Field(5, description="Client max redirects")
+    client_proxy: Optional[str] = Field(None, description="Client proxy")
