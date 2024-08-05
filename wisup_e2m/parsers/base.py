@@ -35,14 +35,8 @@ class BaseParser(ABC):
     Parser aims to turn every type of data or file into text + image
     """
 
-    SUPPORTED_ENGINES = [
-        "unstructured",
-        "surya_layout",
-        "marker",
-        "jina",
-        "openai-whisper",
-        "SpeechRecognition",
-    ]
+    SUPPORTED_ENGINES = []
+    SUPPERTED_FILE_TYPES = []
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         """Initialize a base parser class

@@ -142,19 +142,20 @@ class PdfParser(BaseParser):
 
     def get_parsed_data(
         self,
-        file: str,
+        file_name: str,
         start_page: int = None,
         end_page: int = None,
         include_image_link_in_text: bool = True,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data and return the parsed data
 
-        :param file: File to parse
-        :type file: str
+        :param file_name: File to parse
+        :type file_name: str
         :param start_page: Start page
         :type start_page: int
         :param end_page: End page
@@ -168,14 +169,14 @@ class PdfParser(BaseParser):
         :return: Parsed data
         :rtype: E2MParsedData
         """
-        if file:
-            self._validate_input_flie(file)
+        if file_name:
+            self._validate_input_flie(file_name)
 
         if self.config.engine == "surya_layout":
-            return self._parse_by_surya_layout(file)
+            return self._parse_by_surya_layout(file_name)
         elif self.config.engine == "marker":
             return self._parse_by_marker(
-                file,
+                file_name,
                 start_page,
                 end_page,
                 include_image_link_in_text=include_image_link_in_text,
@@ -185,7 +186,7 @@ class PdfParser(BaseParser):
             )
         else:
             return self._parse_by_unstructured(
-                file,
+                file_name,
                 start_page,
                 end_page,
                 include_image_link_in_text=include_image_link_in_text,

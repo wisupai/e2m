@@ -12,3 +12,6 @@ from wisup_e2m.parsers.doc.doc_parser import DocParser  # noqa
 
 # aud parser
 from wisup_e2m.parsers.aud.voice_parser import VoiceParser  # noqa
+
+# main
+from wisup_e2m.parsers.main import E2MParser  # noqa

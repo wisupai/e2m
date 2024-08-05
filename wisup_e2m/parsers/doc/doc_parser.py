@@ -20,6 +20,7 @@ class DocParser(DocxParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data and return the parsed data

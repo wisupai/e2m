@@ -45,20 +45,21 @@ class VoiceParser(BaseParser):
 
     def get_parsed_data(
         self,
-        file: str,
+        file_name: str,
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data and return the parsed data
 
-        :param file: File to parse
-        :type file: str
+        :param file_name: File to parse
+        :type file_name: str
         :return: Parsed data
         :rtype: E2MParsedData
         """
 
         if self.config.engine == "openai-whisper":
-            return self._parse_by_openai_whisper(file)
+            return self._parse_by_openai_whisper(file_name)
         elif self.config.engine == "SpeechRecognition":
-            return self._parse_by_speech_recognition(file)
+            return self._parse_by_speech_recognition(file_name)
         else:
             raise ValueError(f"Engine {self.config.engine} not supported")

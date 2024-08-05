@@ -1,7 +1,6 @@
 # e2m
-Everything to Markdown.
 
-# Demo
+Everything to Markdown.
 
 ## Install
 
@@ -12,20 +11,10 @@ pip install wisup_e2m
 ## Demo
 
 ```python
-from wisup_e2m import PdfParser
-from wisup_e2m.parsers.base import BaseParserConfig
+from wisup_e2m import E2MParser
 
-pdf_parser = PdfParser(
-    BaseParserConfig(engine="unstructured", langs=["en"])
-)
+ep = E2MParser.from_config("config.yaml")
+data = ep.parse(file_name="/path/to/file.pdf")
 
-parsed_data = pdf_parser.get_parsed_data(
-    "sample.pdf",
-    include_image_link_in_text=True,
-    work_dir="./out",
-    image_dir="./out/figures",
-    relative_path=True
-)
-
-print(parsed_data.text)
+print(data.to_dict())
 ```
