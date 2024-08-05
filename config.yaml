@@ -21,7 +21,4 @@ parsers:
     engine: "openai-whisper"
     langs: ["en", "zh"]
     openai_whisper_model: "large"
-  # not supported yet
-  # img_parser:
-  #   engine: "marker"
-  #   langs: ["en", "zh"]
+

@@ -11,7 +11,7 @@ install:
 	poetry install
 
 install_all:
-	poetry install
+	poetry install git+https://github.com/openai/whisper.git
 
 # Format code with ruff
 format:

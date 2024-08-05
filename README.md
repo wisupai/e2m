@@ -54,6 +54,35 @@ data = ep.parse(file_name="/path/to/file.pdf")
 print(data.to_dict())
 ```
 
+## Config Template
+
+```yaml
+parsers:
+  doc_parser:
+    engine: "unstructured"
+    langs: ["en", "zh"]
+  docx_parser:
+    engine: "unstructured"
+    langs: ["en", "zh"]
+  epub_parser:
+    engine: "unstructured"
+    langs: ["en", "zh"]
+  html_parser:
+    engine: "unstructured"
+    langs: ["en", "zh"]
+  pdf_parser:
+    engine: "marker"
+    langs: ["en", "zh"]
+  pptx_parser:
+    engine: "unstructured"
+    langs: ["en", "zh"]
+  voice_parser:
+    engine: "openai-whisper"
+    langs: ["en", "zh"]
+    openai_whisper_model: "large"
+
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
