@@ -253,6 +253,13 @@ class BaseParser(ABC):
         ]
 
         unstructured_metadata = [element.metadata.to_dict() for element in data]
+        for metadata_dict, element in zip(unstructured_metadata, data):
+            metadata_dict.update(
+                {
+                    "category": element.category,
+                    "text": element.text,
+                }
+            )
 
         metadata = {
             "engine": "unstructured",
