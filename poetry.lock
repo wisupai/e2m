@@ -3159,6 +3159,23 @@ files = [
 dev = ["atomicwrites (==1.4.1)", "attrs (==23.2.0)", "coverage (==7.4.1)", "hatch", "invoke (==2.2.0)", "more-itertools (==10.2.0)", "pbr (==6.0.0)", "pluggy (==1.4.0)", "py (==1.11.0)", "pytest (==8.0.0)", "pytest-cov (==4.1.0)", "pytest-timeout (==2.2.0)", "pyyaml (==6.0.1)", "ruff (==0.2.1)"]
 
 [[package]]
+name = "python-pptx"
+version = "1.0.0"
+description = "Create, read, and update PowerPoint 2007+ (.pptx) files."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python_pptx-1.0.0-py3-none-any.whl", hash = "sha256:e099cbcb370e97ae1cca2186ac757774a2c7bf1b5cb7e6ac3cb77061466713c5"},
+    {file = "python_pptx-1.0.0.tar.gz", hash = "sha256:5c0f9fbf564fccf825c03c8bb75af9245fbdfad75e2857d115f47fd94b65eae8"},
+]
+
+[package.dependencies]
+lxml = ">=3.1.0"
+Pillow = ">=3.3.2"
+typing-extensions = ">=4.9.0"
+XlsxWriter = ">=0.5.7"
+
+[[package]]
 name = "pytz"
 version = "2024.1"
 description = "World timezone definitions, modern and historical"
@@ -4734,6 +4751,17 @@ files = [
 ]
 
 [[package]]
+name = "xlsxwriter"
+version = "3.2.0"
+description = "A Python module for creating Excel XLSX files."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "XlsxWriter-3.2.0-py3-none-any.whl", hash = "sha256:ecfd5405b3e0e228219bcaf24c2ca0915e012ca9464a14048021d21a995d490e"},
+    {file = "XlsxWriter-3.2.0.tar.gz", hash = "sha256:9977d0c661a72866a61f9f7a809e25ebbb0fb7036baa3b9fe74afcfca6b3cb8c"},
+]
+
+[[package]]
 name = "yarl"
 version = "1.9.4"
 description = "Yet another URL library"
@@ -4854,4 +4882,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "fedb8abca987bee403d81bebeaf85cb137fa5591932d86979a5565d468f9aa01"
+content-hash = "177ebd7fda91d916d0312f3ccaae949be4bff276f9f8cae1b1c4d528cd3a3167"

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class PdfParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker"]
+    SUPPERTED_FILE_TYPES = ["pdf"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         super().__init__(config)

@@ -22,6 +22,7 @@ matplotlib = "^3.9.1"
 unstructured-inference = "^0.7.36"
 unstructured-pytesseract = "^0.3.12"
 pikepdf = "^9.1.0"
+python-pptx = "^1.0.0"
 
 
 [tool.poetry.group.test.dependencies]

@@ -61,6 +61,15 @@ class BaseParser(ABC):
 
     @classmethod
     def from_config(cls, config_dict: Dict[str, Any]):
+        """
+        e.g.
+        pdf_parser = PdfParser.from_config(
+            {
+                "engine": "unstructured",
+                "langs": ["en"],
+            }
+        )
+        """
         try:
             config = BaseParserConfig(**config_dict)
         except ValidationError as e:
@@ -123,6 +132,7 @@ class BaseParser(ABC):
         logger.info("Surya engine loaded successfully.")
 
     def _load_marker_engine(self):
+        """Load Marker engine"""
         logger.info("Loading Marker engine...")
         """Extract text, OCR if necessary (heuristics, surya, tesseract)
         Detect page layout and find reading order (surya)
@@ -142,6 +152,7 @@ class BaseParser(ABC):
         logger.info("Marker engine loaded successfully.")
 
     def _load_unstructured_engine(self):
+        """Load unstructured engine"""
         logger.info("Loading unstructured engine...")
         try:
             from unstructured.partition.auto import partition
@@ -169,6 +180,7 @@ class BaseParser(ABC):
         data: List[Any],  # List[unstructured.documents.elements.Element]
         add_title_marker: bool = False,
         include_image_link_in_text: bool = True,
+        ignore_page_number: bool = True,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -179,6 +191,8 @@ class BaseParser(ABC):
         :type data: List[unstructured.documents.elements.Element]
         :param include_image_link_in_text: Include image link in text, e.g. ![](image_path), defaults to True
         :type include_image_link_in_text: bool, optional
+        :param add_title_marker: Add title marker, defaults to False
+        :type add_title_marker: bool, optional
         :param work_dir: Working directory, defaults to "./"
         :type work_dir: str, optional
         :param relative_path: Use relative path to work_dir for image path, defaults to True
@@ -205,6 +219,8 @@ class BaseParser(ABC):
         # meerge text and image links
         text_chunks = []
         for element in data:
+            if ignore_page_number and element.category == "PageNumber":
+                continue
             if element.category == "Image":
                 # include image link in text
                 if include_image_link_in_text:
@@ -236,7 +252,12 @@ class BaseParser(ABC):
             if "image_path" in element.metadata.__dict__
         ]
 
-        metadata = [element.metadata.to_dict() for element in data]
+        unstructured_metadata = [element.metadata.to_dict() for element in data]
+
+        metadata = {
+            "engine": "unstructured",
+            "unstructured_metadata": unstructured_metadata,
+        }
 
         return E2MParsedData(
             text=text, attached_images=attached_images, metadata=metadata
@@ -294,6 +315,11 @@ class BaseParser(ABC):
                     text = text.replace(image_name, link_name)
                     attached_images.append(str(image_path.resolve()))
 
+        metadata = {
+            "engine": "marker",
+            "marker_metadata": metadata,
+        }
+
         return E2MParsedData(
             text=text, attached_images=attached_images, metadata=metadata
         )
@@ -306,6 +332,20 @@ class BaseParser(ABC):
         image_dir: str = "./figures",
         relative_path: bool = True,
     ):
+        """Convert jina data to E2MParsedData
+
+        :param text: Full text
+        :type text: str
+        :param include_image_link_in_text: Include image link in text, e.g. ![](image_path), defaults to True
+        :type include_image_link_in_text: bool, optional
+        :param work_dir: Working directory, defaults to "./"
+        :type work_dir: str, optional
+        :param relative_path: Use relative path to work_dir for image path, defaults to True
+        :type relative_path: bool, optional
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+
         raw_text = text
         image_link_pattern = re.compile(r"!\[.*?\]\((.*?)\)")
         image_links = image_link_pattern.findall(text)
@@ -356,5 +396,7 @@ class BaseParser(ABC):
                 )
 
         return E2MParsedData(
-            text=text, attached_images=attached_images, metadata={"raw_text": raw_text}
+            text=text,
+            attached_images=attached_images,
+            metadata={"engine": "jina", "jina_metadata": raw_text},
         )

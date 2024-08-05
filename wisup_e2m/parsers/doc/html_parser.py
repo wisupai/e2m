@@ -1,4 +1,4 @@
-# /e2m/parsers/pdf_parser.py
+# /e2m/parsers/html_parser.py
 import logging
 import httpx
 from typing import List, Optional, IO
@@ -6,6 +6,7 @@ from typing import List, Optional, IO
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
+from wisup_e2m.utils.web_util import get_web_content
 
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class HtmlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "jina"]
+    SUPPERTED_FILE_TYPES = ["html", "htm", "url"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         super().__init__(config)
@@ -23,6 +25,20 @@ class HtmlParser(BaseParser):
 
         self._ensure_engine_exists()
         self._load_engine()
+
+    def _load_unstructured_engine(self):
+        """
+        Load the unstructured engine
+        """
+        logger.info("Loading unstructured engine...")
+        try:
+            from unstructured.partition.html import partition_html
+        except ImportError:
+            raise ImportError(
+                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif-image pillow`"
+            ) from None
+
+        self.unstructured_parse_func = partition_html
 
     def _parse_by_unstructured(
         self,
@@ -47,8 +63,7 @@ class HtmlParser(BaseParser):
             try:
                 logger.info(f"Getting url content: {url}")
                 # get url content
-                url_content = httpx.get(url)
-                text = url_content.text
+                text = get_web_content(url, self.client)
                 logger.info(f"Got url content from: {url}")
             except Exception as e:
                 logger.error(f"Error getting url content: {e}")
