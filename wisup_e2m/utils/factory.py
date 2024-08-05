@@ -1,6 +1,5 @@
 import importlib
 
-from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser
 
 

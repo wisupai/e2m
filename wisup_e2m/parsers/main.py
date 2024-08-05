@@ -1,6 +1,6 @@
 import logging
-from pydantic import BaseModel, field_validator, ValidationError
-from typing import Any, Dict, List, Optional, Union
+from pydantic import ValidationError
+from typing import Any, Dict, Optional, Union
 
 from wisup_e2m.utils.factory import ParserFactory
 from wisup_e2m.configs.base import E2MParserConfig
