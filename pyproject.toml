@@ -39,6 +39,7 @@ ruff = "^0.4.8"
 isort = "^5.13.2"
 pytest = "^8.3.2"
 lint = "^1.2.1"
+black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core"]

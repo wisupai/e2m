@@ -1,6 +1,5 @@
 # /e2m/parsers/html_parser.py
 import logging
-import httpx
 from typing import List, Optional, IO
 
 

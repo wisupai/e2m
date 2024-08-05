@@ -1,0 +1,14 @@
+[flake8]
+ignore = E203, E501, E741, W503, F841, W605
+max-line-length = 100
+exclude = 
+    .git,
+    __pycache__,
+    build,
+    dist,
+    .venv
+    migrations
+    web
+    temp
+    transformers_cache
+    local_tests

@@ -77,7 +77,10 @@ class PptxParser(BaseParser):
         if include_image_link_in_text:
             logger.info("Extracting images with pptx...")
             pptx_images = get_pptx_images(
-                file_name=file_name, file=file, target_image_dir=image_dir, ignore_transparent_images=ignore_transparent_images
+                file_name=file_name,
+                file=file,
+                target_image_dir=image_dir,
+                ignore_transparent_images=ignore_transparent_images,
             )  # {'slide_number': 0, 'image_file': 'extracted_images/0_0.png', 'image_name': '0_0.png'}
 
             logger.info(
