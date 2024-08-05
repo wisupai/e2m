@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class E2MParser:
+    """
+    Parse everything to text and images
+    """
     def __init__(self, config: E2MParserConfig):
         logger.info("Initializing E2MParser...")
         self.config = config
