@@ -90,3 +90,10 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 
 For any questions or inquiries, please open an issue on [GitHub](https://github.com/wisupai/e2m) or contact us at [team@wisup.ai](mailto:team@wisup.ai).
+
+
+## 🌟Contributing
+
+<a href="https://github.com/wisupai/e2m/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=wisupai/e2m" />
+</a>
