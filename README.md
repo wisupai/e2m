@@ -1,4 +1,6 @@
-# E2M
+<p align="center">
+  <img src="docs/images/wisup_e2m_banner.jpg" width="800px" alt="wisup_e2m Logo">
+</p>
 
 <p align="center">
     <a href="https://github.com/wisupai/e2m">
@@ -11,6 +13,8 @@
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
     </a>
 </p>
+
+# E2M: Everything to Markdown
 
 **Everything to Markdown**
 
@@ -58,29 +62,28 @@ print(data.to_dict())
 
 ```yaml
 parsers:
-  doc_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  docx_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  epub_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  html_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  pdf_parser:
-    engine: "marker"
-    langs: ["en", "zh"]
-  pptx_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  voice_parser:
-    engine: "openai-whisper"
-    langs: ["en", "zh"]
-    openai_whisper_model: "large"
-
+    doc_parser:
+        engine: "unstructured"
+        langs: ["en", "zh"]
+    docx_parser:
+        engine: "unstructured"
+        langs: ["en", "zh"]
+    epub_parser:
+        engine: "unstructured"
+        langs: ["en", "zh"]
+    html_parser:
+        engine: "unstructured"
+        langs: ["en", "zh"]
+    pdf_parser:
+        engine: "marker"
+        langs: ["en", "zh"]
+    pptx_parser:
+        engine: "unstructured"
+        langs: ["en", "zh"]
+    voice_parser:
+        engine: "openai-whisper"
+        langs: ["en", "zh"]
+        openai_whisper_model: "large"
 ```
 
 ## License
@@ -90,7 +93,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 
 For any questions or inquiries, please open an issue on [GitHub](https://github.com/wisupai/e2m) or contact us at [team@wisup.ai](mailto:team@wisup.ai).
-
 
 ## 🌟Contributing
 
