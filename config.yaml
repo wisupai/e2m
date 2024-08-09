@@ -11,6 +11,9 @@ parsers:
   html_parser:
     engine: "unstructured"
     langs: ["en", "zh"]
+  url_parser:
+    engine: "url"
+    langs: ["en", "zh"]
   pdf_parser:
     engine: "marker"
     langs: ["en", "zh"]
