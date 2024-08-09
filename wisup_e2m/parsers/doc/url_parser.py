@@ -1,4 +1,4 @@
-# /e2m/parsers/html_parser.py
+# /e2m/parsers/doc/url_parser.py
 import logging
 from typing import List, Optional, IO
 
@@ -11,16 +11,15 @@ from wisup_e2m.utils.web_util import get_web_content
 logger = logging.getLogger(__name__)
 
 
-class HtmlParser(BaseParser):
-    SUPPORTED_ENGINES = ["unstructured"]
-    SUPPERTED_FILE_TYPES = ["html", "htm"]
-
+class UrlParser(BaseParser):
+    SUPPORTED_ENGINES = ["unstructured", "jina"]
+    SUPPERTED_FILE_TYPES = ["url"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         super().__init__(config)
 
         if not self.config.engine:
-            self.config.engine = "unstructured"  # unstructured / jina
+            self.config.engine = "jina"  # unstructured / jina
             logger.info("No engine specified. Defaulting to unstructured engine.")
 
         self._ensure_engine_exists()
@@ -33,6 +32,7 @@ class HtmlParser(BaseParser):
         logger.info("Loading unstructured engine...")
         try:
             from unstructured.partition.html import partition_html
+
         except ImportError:
             raise ImportError(
                 "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif-image pillow`"
@@ -89,6 +89,24 @@ class HtmlParser(BaseParser):
             relative_path=relative_path,
         )
 
+    def _parse_by_jina(
+        self,
+        url: str = None,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+    ):
+        parsed_text = self.jina_parse_func(url)
+
+        return self._prepare_jina_data_to_e2m_parsed_data(
+            parsed_text,
+            include_image_link_in_text=include_image_link_in_text,
+            work_dir=work_dir,
+            image_dir=image_dir,
+            relative_path=relative_path,
+        )
+
     def get_parsed_data(
         self,
         url: Optional[str] = None,
@@ -118,6 +136,14 @@ class HtmlParser(BaseParser):
                 text=text,
                 encoding=encoding,
                 skip_headers_and_footers=skip_headers_and_footers,
+                include_image_link_in_text=include_image_link_in_text,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
+        elif self.config.engine == "jina":
+            return self._parse_by_jina(
+                url=url,
                 include_image_link_in_text=include_image_link_in_text,
                 work_dir=work_dir,
                 image_dir=image_dir,
