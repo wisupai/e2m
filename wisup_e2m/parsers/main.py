@@ -13,25 +13,26 @@ class E2MParser:
     """
     Parse everything to text and images
     """
+
     def __init__(self, config: E2MParserConfig):
         logger.info("Initializing E2MParser...")
         self.config = config
         self.file_type_to_parser_map: Dict[str, BaseParser] = {}
 
         for parser_name, parser_config in self.config.parsers.items():
-            logger.info(f"Initializing parser: {parser_name}")
+            print(f"Initializing parser: {parser_name}")
             this_parser = ParserFactory.create(parser_name, parser_config)
             setattr(self, parser_name, this_parser)
             # set up the mapping of file types to parsers
             for file_type in this_parser.SUPPERTED_FILE_TYPES:
                 self.file_type_to_parser_map[file_type] = this_parser
 
-        logger.info(
+        print(
             f"E2MParser initialized successfully, including parsers: {list(self.config.parsers.keys())}, able to parse file types: {list(self.file_type_to_parser_map.keys())}"
         )
 
     @classmethod
-    def from_config(cls, config_dict: Union[Dict[str, Any] | str]):
+    def from_config(cls, config_dict: Union[Dict[str, Any] | str] = "./config.yaml"):
         if isinstance(config_dict, str):
             if not (config_dict.endswith(".yaml") or config_dict.endswith(".yml")):
                 raise ValueError("Only yaml files are supported.")
