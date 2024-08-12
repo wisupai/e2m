@@ -13,7 +13,7 @@ class ParserFactory:
     provider_to_class = {
         "pdf_parser": "wisup_e2m.parsers.doc.pdf_parser.PdfParser",
         "html_parser": "wisup_e2m.parsers.doc.html_parser.HtmlParser",
-        "url_parser": "wisup_e2m.configs.doc.url_parser.UrlParser",
+        "url_parser": "wisup_e2m.parsers.doc.url_parser.UrlParser",
         "pptx_parser": "wisup_e2m.parsers.doc.pptx_parser.PptxParser",
         "epub_parser": "wisup_e2m.parsers.doc.epub_parser.EpubParser",
         "docx_parser": "wisup_e2m.parsers.doc.docx_parser.DocxParser",
@@ -24,7 +24,7 @@ class ParserFactory:
     provider_to_config = {
         "pdf_parser": "wisup_e2m.configs.parsers.pdf_parser_config.PdfParserConfig",
         "html_parser": "wisup_e2m.configs.parsers.html_parser_config.HtmlParserConfig",
-        "url_parser": "wisup_e2m.configs.parsers.html_parser_config.UrlParserConfig",
+        "url_parser": "wisup_e2m.configs.parsers.url_parser_config.UrlParserConfig",
         "pptx_parser": "wisup_e2m.configs.parsers.pptx_parser_config.PptxParserConfig",
         "epub_parser": "wisup_e2m.configs.parsers.epub_parser_config.EpubParserConfig",
         "docx_parser": "wisup_e2m.configs.parsers.docx_parser_config.DocxParserConfig",

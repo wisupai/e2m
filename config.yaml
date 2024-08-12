@@ -1,27 +1,32 @@
 parsers:
-  doc_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  docx_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  epub_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  html_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
+  # doc_parser:
+  #   engine: "unstructured"
+  #   langs: ["en", "zh"]
+  # docx_parser:
+  #   engine: "unstructured"
+  #   langs: ["en", "zh"]
+  # epub_parser:
+  #   engine: "unstructured"
+  #   langs: ["en", "zh"]
+  # html_parser:
+  #   engine: "unstructured"
+  #   langs: ["en", "zh"]
   url_parser:
-    engine: "url"
+    engine: "jina"
     langs: ["en", "zh"]
-  pdf_parser:
-    engine: "marker"
-    langs: ["en", "zh"]
-  pptx_parser:
-    engine: "unstructured"
-    langs: ["en", "zh"]
-  voice_parser:
-    engine: "openai-whisper"
-    langs: ["en", "zh"]
-    openai_whisper_model: "large"
+  # pdf_parser:
+  #   engine: "marker"
+  #   langs: ["en", "zh"]
+  # pptx_parser:
+  #   engine: "unstructured"
+  #   langs: ["en", "zh"]
+  # voice_parser:
+  #   engine: "openai-whisper"
+  #   langs: ["en", "zh"]
+  #   openai_whisper_model: "large"
+
+converter:
+  engine: "litellm"
+  model: "deepseek/deepseek-chat"
+  api_key: "your_api_key"
 
