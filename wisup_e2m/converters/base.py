@@ -1,30 +1,15 @@
 from wisup_e2m.configs.converters.base import BaseConverterConfig
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import List, Optional, Dict, Any
-import base64
-from mimetypes import guess_type
+
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-# Function to encode a local image into data URL
-def local_image_to_data_url(image_path):
-    # Guess the MIME type of the image based on the file extension
-    mime_type, _ = guess_type(image_path)
-    if mime_type is None:
-        mime_type = "application/octet-stream"  # Default MIME type if none is found
-
-    # Read and encode the image file
-    with open(image_path, "rb") as image_file:
-        base64_encoded_data = base64.b64encode(image_file.read()).decode("utf-8")
-
-    # Construct the data URL
-    return f"data:{mime_type};base64,{base64_encoded_data}"
-
-
 class BaseConverter(ABC):
+    SUPPORTED_ENGINES = []
 
     def __init__(self, config: Optional[BaseConverterConfig] = None):
         if config is None:
@@ -32,11 +17,14 @@ class BaseConverter(ABC):
         else:
             self.config = config
 
+        self._ensure_engine_exists()
         self._load_engine()
 
-    @abstractmethod
-    def convert_to_md(self, data):
-        pass
+    def convert_to_md(self, text: str, verbose: bool = True, **kwargs) -> str:
+        if self.config.engine == "litellm":
+            return self._convert_to_md_by_litellm(text=text, verbose=verbose)
+        else:
+            raise ValueError(f"Unsupported engine: {self.config.engine}")
 
     @classmethod
     def from_config(cls, config_dict: Dict[str, Any]):
@@ -46,6 +34,17 @@ class BaseConverter(ABC):
             logging.error(f"Error loading config: {e}")
             raise
         return cls(config)
+
+    def _ensure_engine_exists(self):
+        """
+        Ensure the specified engine exists locally. If not, pull it from Ollama.
+        """
+        if self.config.engine not in self.SUPPORTED_ENGINES:
+            logger.error(
+                f"Engine {self.config.engine} not supported. Supported engines are {self.SUPPORTED_ENGINES}"
+            )
+            raise
+        logger.info(f"Engine: {self.config.engine} is valid.")
 
     def _load_engine(self):
 
@@ -79,80 +78,4 @@ class BaseConverter(ABC):
         verbose: bool = True,
     ) -> str:
 
-        if text and images:
-            raise ValueError("Only one of text or images should be provided")
-
-        messages = []
-        if text:
-            messages = [
-                {
-                    "role": "user",
-                    "content": f"请把下面内容转换为markdown格式:{text}",
-                }
-            ]
-
-        if images:
-            messages = [
-                {
-                    "role": "user",
-                    "content": [{"type": "text", "text": "请把图片转换为markdown格式"}],
-                }
-            ]
-
-            # When uploading images, there is a limit of 10 images per chat request.
-            for image in images:
-                messages[0]["content"].append(
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": (
-                                local_image_to_data_url(image)
-                                if not image.startswith("http")
-                                else image
-                            ),
-                        },
-                    }
-                )
-
-        response = self.litellm.chat.completions.create(
-            messages=messages,
-            model=self.config.model,
-            temperature=self.config.temperature,
-            top_p=self.config.top_p,
-            n=self.config.n,
-            max_tokens=self.config.max_tokens,
-            presence_penalty=self.config.presence_penalty,
-            frequency_penalty=self.config.frequency_penalty,
-            stream=True,
-        )
-
-        full_text = []
-
-        for chunk in response:
-            content = chunk.choices[0].delta.content
-            if verbose:
-                print(content, end="")
-            if content:
-                full_text.append(content)
-
-        return "".join(full_text)
-
-    async def _convert_to_md_by_litellm_async(self, text: str) -> str:
-        response = await self.litellm.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"请把下面内容转换为markdown格式:{text}",
-                }
-            ],
-            model=self.config.model,
-            temperature=self.config.temperature,
-            top_p=self.config.top_p,
-            n=self.config.n,
-            max_tokens=self.config.max_tokens,
-            presence_penalty=self.config.presence_penalty,
-            frequency_penalty=self.config.frequency_penalty,
-            acompletion=True,  # async
-        )
-
-        return response.choices[0].message.content
+        pass

@@ -72,3 +72,6 @@ class BaseConverterConfig(BaseModel):
         None,
         description="Default headers for the request",
     )
+
+    def to_dict(self):
+        return self.model_dump()

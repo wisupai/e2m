@@ -43,3 +43,27 @@ class ParserFactory:
             return parser_instance(base_config)
         else:
             raise ValueError(f"Unsupported Parser provider: {provider_name}")
+
+
+class ConverterFactory:
+    provider_to_class = {
+        "text_converter": "wisup_e2m.converters.text_converter.TextConverter",
+        "image_converter": "wisup_e2m.converters.image_converter.ImageConverter",
+    }
+
+    provider_to_config = {
+        "text_converter": "wisup_e2m.configs.converters.text_converter_config.TextConverterConfig",
+        "image_converter": "wisup_e2m.configs.converters.image_converter_config.ImageConverterConfig",
+    }
+
+    @classmethod
+    def create(cls, provider_name, config):
+        class_type = cls.provider_to_class.get(provider_name)
+        config_type = cls.provider_to_config.get(provider_name)
+        if class_type:
+            converter_instance = load_class(class_type)
+            config_instance = load_class(config_type)
+            base_config = config_instance(**config)
+            return converter_instance(base_config)
+        else:
+            raise ValueError(f"Unsupported Converter provider: {provider_name}")
