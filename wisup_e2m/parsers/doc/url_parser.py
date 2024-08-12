@@ -20,7 +20,9 @@ class UrlParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "jina"  # unstructured / jina
-            logger.info("No engine specified. Defaulting to unstructured engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import Optional
 
 
 class BaseConverterConfig(BaseModel):
@@ -58,7 +58,6 @@ class BaseConverterConfig(BaseModel):
         None,
         description="API key for the API",
     )
-
 
     # litellm class
     timeout: Optional[float] = Field(

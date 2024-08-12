@@ -1,10 +1,27 @@
 from wisup_e2m.configs.converters.base import BaseConverterConfig
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
+import base64
+from mimetypes import guess_type
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# Function to encode a local image into data URL
+def local_image_to_data_url(image_path):
+    # Guess the MIME type of the image based on the file extension
+    mime_type, _ = guess_type(image_path)
+    if mime_type is None:
+        mime_type = "application/octet-stream"  # Default MIME type if none is found
+
+    # Read and encode the image file
+    with open(image_path, "rb") as image_file:
+        base64_encoded_data = base64.b64encode(image_file.read()).decode("utf-8")
+
+    # Construct the data URL
+    return f"data:{mime_type};base64,{base64_encoded_data}"
 
 
 class BaseConverter(ABC):
@@ -55,15 +72,54 @@ class BaseConverter(ABC):
         )
         logger.info("litellm engine loaded successfully")
 
-    def _convert_to_md_by_litellm(self, text: str, verbose: bool = True) -> str:
+    def _convert_to_md_by_litellm(
+        self,
+        text: Optional[str] = None,
+        images: Optional[List[str]] = None,
+        verbose: bool = True,
+    ) -> str:
+
+        if text and images:
+            raise ValueError("Only one of text or images should be provided")
+
+        if text:
+            messages = (
+                [
+                    {
+                        "role": "user",
+                        "content": f"请把下面内容转换为markdown格式:{text}",
+                    }
+                ],
+            )
+
+        elif images:
+
+            messages = (
+                [
+                    {
+                        "role": "user",
+                        "content": "请把下面图片转换为markdown格式",
+                    }
+                ],
+            )
+
+            # When uploading images, there is a limit of 10 images per chat request.
+            for image in images:
+                messages.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": (
+                                local_image_to_data_url(image)
+                                if not image.startswith("http")
+                                else image
+                            ),
+                        },
+                    }
+                )
 
         response = self.litellm.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"请把下面内容转换为markdown格式:{text}",
-                }
-            ],
+            messages=messages,
             model=self.config.model,
             temperature=self.config.temperature,
             top_p=self.config.top_p,

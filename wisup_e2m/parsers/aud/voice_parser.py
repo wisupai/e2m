@@ -10,20 +10,26 @@ logger = logging.getLogger(__name__)
 
 
 class VoiceParser(BaseParser):
-    SUPPORTED_ENGINES = ["openai-whisper", "SpeechRecognition"]
+    SUPPORTED_ENGINES = [
+        "openai_whisper_api",
+        "openai_whisper_local",
+        "SpeechRecognition",
+    ]
     SUPPERTED_FILE_TYPES = ["mp3", "m4a"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None):
         super().__init__(config)
 
         if not self.config.engine:
-            self.config.engine = "openai-whisper"
-            logger.info("No engine specified. Defaulting to unstructured engine.")
+            self.config.engine = "openai_whisper_local"
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
 
-    def _parse_by_openai_whisper(
+    def _parse_by_openai_whisper_local(
         self,
         file: str,
     ):
@@ -31,7 +37,41 @@ class VoiceParser(BaseParser):
 
         return E2MParsedData(
             text=result["text"],
-            metadata={"engine": "openai-whisper", "openai-whisper_metadata": result},
+            metadata={
+                "engine": "openai-whisper",
+                "openai_whisper_local_metadata": result,
+            },
+        )
+
+    def _parse_by_openai_whisper_api(
+        self,
+        file: str,
+    ):
+
+        audio_file = open(file, "rb")
+
+        # check config
+        if not self.config.api_key:
+            raise ValueError("api_key is required for openai-whisper-api engine")
+        if not self.config.api_base:
+            raise ValueError("api_base is required for openai-whisper-api engine")
+        if not self.config.model:
+            raise ValueError("model is required for openai-whisper-api engine")
+
+        response = self.openai_whisper_api_func(
+            model=self.config.model,
+            file=audio_file,
+            api_base=self.config.api_base,
+            api_key=self.config.api_key,
+            custom_llm_provider="openai",
+        )
+
+        return E2MParsedData(
+            text=response.text,
+            metadata={
+                "engine": "openai-whisper",
+                "openai_whisper_api_metadata": response.to_dict(),
+            },
         )
 
     def _parse_by_speech_recognition(
@@ -57,8 +97,10 @@ class VoiceParser(BaseParser):
         :rtype: E2MParsedData
         """
 
-        if self.config.engine == "openai-whisper":
-            return self._parse_by_openai_whisper(file_name)
+        if self.config.engine == "openai_whisper_api":
+            return self._parse_by_openai_whisper_api(file_name)
+        elif self.config.engine == "openai_whisper_local":
+            return self._parse_by_openai_whisper_local(file_name)
         elif self.config.engine == "SpeechRecognition":
             return self._parse_by_speech_recognition(file_name)
         else:

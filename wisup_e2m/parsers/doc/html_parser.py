@@ -15,13 +15,14 @@ class HtmlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
     SUPPERTED_FILE_TYPES = ["html", "htm"]
 
-
     def __init__(self, config: Optional[BaseParserConfig] = None):
         super().__init__(config)
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
-            logger.info("No engine specified. Defaulting to unstructured engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()

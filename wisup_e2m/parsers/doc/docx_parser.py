@@ -20,7 +20,9 @@ class DocxParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
-            logger.info("No engine specified. Defaulting to unstructured engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -92,7 +94,7 @@ class DocxParser(BaseParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
-        **kwargs,        
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data and return the parsed data

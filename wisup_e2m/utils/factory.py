@@ -32,7 +32,6 @@ class ParserFactory:
         "voice_parser": "wisup_e2m.configs.parsers.voice_parser_config.VoiceParserConfig",
     }
 
-
     @classmethod
     def create(cls, provider_name, config) -> BaseParser | None:
         class_type = cls.provider_to_class.get(provider_name)

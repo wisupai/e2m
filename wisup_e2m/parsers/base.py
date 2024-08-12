@@ -116,8 +116,10 @@ class BaseParser(ABC):
             self._load_unstructured_engine()
         elif self.config.engine == "jina":
             self._load_jina_engine()
-        elif self.config.engine == "openai-whisper":
-            self._load_openai_whisper_engine()
+        elif self.config.engine == "openai_whisper_local":
+            self._load_openai_whisper_local_engine()
+        elif self.config.engine == "openai_whisper_api":
+            self._load_openai_whisper_api_engine()
 
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
@@ -184,7 +186,7 @@ class BaseParser(ABC):
         self.jina_parse_func = _parse_url_by_jina
         logger.info("Jina engine loaded successfully.")
 
-    def _load_openai_whisper_engine(self):
+    def _load_openai_whisper_local_engine(self):
         # check ffmpeg
         try:
             import subprocess
@@ -204,8 +206,18 @@ class BaseParser(ABC):
             ) from None
 
         logger.info("Loading OpenAI Whisper engine...")
-        self.openai_whisper = whisper.load_model(self.config.openai_whisper_model)
+        self.openai_whisper = whisper.load_model(self.config.model)
         logger.info("OpenAI Whisper engine loaded successfully.")
+
+    def _load_openai_whisper_api_engine(self):
+        try:
+            from litellm import transcription
+        except ImportError:
+            raise ImportError(
+                "litellm is not installed. Please install it using `pip install litellm`"
+            )
+
+        self.openai_whisper_api_func = transcription
 
     def _prepare_unstructured_data_to_e2m_parsed_data(
         self,
