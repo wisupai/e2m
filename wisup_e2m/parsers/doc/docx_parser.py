@@ -72,7 +72,7 @@ class DocxParser(BaseParser):
             file=file,
             target_image_dir=image_dir,
             ignore_transparent_images=ignore_transparent_images,
-        )
+        )  # {1: [{'image_number': 1, 'image_file': './figures/1_0.jpeg', 'image_name': '1_0.jpeg'}], 2: [{'image_number': 2, 'image_file': './figures/2_1.jpeg', 'image_name': '2_1.jpeg'}], 3: [{'image_number': 3, 'image_file': './figures/3_2.jpeg', 'image_name': '3_2.jpeg'}], 4: [{'image_number': 4, 'image_file': './figures/4_3.jpeg', 'image_name': '4_3.jpeg'}], 5: [{'image_number': 5, 'image_file': './figures/5_4.jpeg', 'image_name': '5_4.jpeg'}]} # noqa
         logger.info(f"Extracted {len(docx_images)} images from the docx file")
         # todo: insert images into the docx text
 

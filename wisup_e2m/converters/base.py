@@ -82,30 +82,26 @@ class BaseConverter(ABC):
         if text and images:
             raise ValueError("Only one of text or images should be provided")
 
+        messages = []
         if text:
-            messages = (
-                [
-                    {
-                        "role": "user",
-                        "content": f"请把下面内容转换为markdown格式:{text}",
-                    }
-                ],
-            )
+            messages = [
+                {
+                    "role": "user",
+                    "content": f"请把下面内容转换为markdown格式:{text}",
+                }
+            ]
 
-        elif images:
-
-            messages = (
-                [
-                    {
-                        "role": "user",
-                        "content": "请把下面图片转换为markdown格式",
-                    }
-                ],
-            )
+        if images:
+            messages = [
+                {
+                    "role": "user",
+                    "content": [{"type": "text", "text": "请把图片转换为markdown格式"}],
+                }
+            ]
 
             # When uploading images, there is a limit of 10 images per chat request.
             for image in images:
-                messages.append(
+                messages[0]["content"].append(
                     {
                         "type": "image_url",
                         "image_url": {
@@ -133,9 +129,11 @@ class BaseConverter(ABC):
         full_text = []
 
         for chunk in response:
+            content = chunk.choices[0].delta.content
             if verbose:
-                print(chunk.choices[0].delta.content, end="")
-            full_text.append(chunk.choices[0].delta.content)
+                print(content, end="")
+            if content:
+                full_text.append(content)
 
         return "".join(full_text)
 

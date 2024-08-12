@@ -246,8 +246,8 @@ class BaseParser(ABC):
 
         """
 
-        work_dir = Path(work_dir)
-        image_dir = Path(image_dir)
+        work_dir = Path(work_dir).resolve()
+        image_dir = Path(image_dir).resolve()
 
         image_dir.mkdir(parents=True, exist_ok=True)
 

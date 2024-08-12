@@ -35,4 +35,5 @@ converter:
   engine: "litellm"
   model: "deepseek/deepseek-chat"
   api_key: "your_api_key"
+  # base_url: ""
 
