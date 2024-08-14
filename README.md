@@ -95,9 +95,16 @@ parsers:
     model: "large" # available models: https://github.com/openai/whisper#available-models-and-languages
 
 converter:
-  engine: "litellm"
-  model: "deepseek/deepseek-chat"
-  api_key: "your_api_key"
+  text_converter:
+    engine: "litellm"
+    model: "deepseek/deepseek-chat"
+    api_key: "your_api_key"
+    # base_url: ""
+  image_converter:
+    engine: "litellm"
+    model: "gpt-4o-mini"
+    api_key: "your_api_key"
+    # base_url: ""
 
 ```
 
