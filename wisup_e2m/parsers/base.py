@@ -2,6 +2,7 @@
 import logging
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Dict
+from PIL import ImageFile
 from pydantic import BaseModel, Field, ValidationError
 from PIL import Image
 import shutil
@@ -108,10 +109,10 @@ class BaseParser(ABC):
         """
         Load the specified engine.
         """
-        if self.config.engine == "surya_layout":
-            self._load_surya_layout_engine()
-        elif self.config.engine == "marker":
+        if self.config.engine == "marker":
             self._load_marker_engine()
+        elif self.config.engine == "surya_layout":
+            self._load_surya_layout_engine()
         elif self.config.engine == "unstructured":
             self._load_unstructured_engine()
         elif self.config.engine == "jina":
@@ -124,22 +125,19 @@ class BaseParser(ABC):
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
         try:
-            from surya.model.detection.model import load_model, load_processor
-            from surya.settings import settings
+            from surya.model.detection.model import load_model, load_processor # noqa
+            from surya.settings import settings # noqa
         except ImportError:
             raise ImportError(
                 "Surya not installed. Please install Surya by `pip install surya-ocr`"
             ) from None
 
+        from wisup_e2m.utils.pdf_util import surya_detect_layout
+
         logger.info("Loading Surya layout model and processor..")
-        self.surya_layout_model = load_model(
-            checkpoint=settings.LAYOUT_MODEL_CHECKPOINT
-        )
-        self.surya_layout_processor = load_processor(
-            checkpoint=settings.LAYOUT_MODEL_CHECKPOINT
-        )
-        self.surya_text_line_model = load_model()
-        self.surya_text_line_processor = load_processor()
+            
+        self.surya_layout_func = surya_detect_layout
+
         logger.info("Surya engine loaded successfully.")
 
     def _load_marker_engine(self):
@@ -312,6 +310,127 @@ class BaseParser(ABC):
 
         return E2MParsedData(
             text=text, attached_images=attached_images, metadata=metadata
+        )
+
+    def _prepare_surya_layout_data_to_e2m_parsed_data(
+        self,
+        images: List[ImageFile.ImageFile],
+        layout_predictions: Dict[str, Any],
+        start_page: int,
+        end_page: int = None,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+    ):
+        import cv2
+        import numpy as np
+
+        # make dir
+        work_dir = Path(work_dir).resolve()
+        image_dir = Path(image_dir).resolve()
+        image_dir.mkdir(parents=True, exist_ok=True)
+
+        layout_images = []
+        attached_images = []
+
+        logger.debug(f"len of layout_predictions: {len(layout_predictions)}")
+        logger.debug(f"len of images: {len(images)}")
+
+        for i, (layout, image) in enumerate(zip(layout_predictions, images)):
+            j = 0
+            logger.info(f"Processing page {i+start_page}: {layout['page']}")
+            i = start_page + i
+
+            # Convert the image from RGB to BGR format
+            image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+            for bbox in layout["bboxes"]:
+                if bbox["label"] == "Figure" and bbox["confidence"] > 0.5:
+                    fig_name = image_dir / f"{i}_{j}.png"
+                    fig_label_name = str(fig_name)
+                    if relative_path:
+                        fig_label_name = str(fig_name.relative_to(work_dir))
+
+                    # 忽略小框
+                    if np.abs(bbox["polygon"][0][0] - bbox["polygon"][1][0]) < 300:
+                        continue
+
+                    cv2.rectangle(
+                        image,
+                        (bbox["polygon"][0]),
+                        (bbox["polygon"][2]),
+                        (255, 50, 12),
+                        2,
+                    )
+                    # 标注label
+                    cv2.putText(
+                        image,
+                        fig_label_name,
+                        (bbox["polygon"][0][0], bbox["polygon"][0][1] - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (255, 50, 12),
+                        2,
+                    )
+
+                    # 保存截图
+                    roi = image[
+                        bbox["polygon"][0][1] : bbox["polygon"][2][1],
+                        bbox["polygon"][0][0] : bbox["polygon"][2][0],
+                    ]
+                    cv2.imwrite(fig_name, roi)
+                    logger.info(f"Saved figure to {fig_name}")
+                    attached_images.append(str(fig_name))
+                    j += 1
+
+                elif bbox["label"] == "Table" and bbox["confidence"] > 0.5:
+                    tab_name = image_dir / f"{i}_{j}.png"
+                    tab_label_name = str(tab_name)
+                    if relative_path:
+                        tab_label_name = str(tab_name.relative_to(work_dir))
+                    cv2.rectangle(
+                        image,
+                        (bbox["polygon"][0]),
+                        (bbox["polygon"][2]),
+                        (0, 255, 0),
+                        2,
+                    )
+                    # 标注label
+                    cv2.putText(
+                        image,
+                        tab_label_name,
+                        (bbox["polygon"][0][0], bbox["polygon"][0][1] - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (0, 255, 0),
+                        2,
+                    )
+
+                    # 保存截图
+                    roi = image[
+                        bbox["polygon"][0][1] : bbox["polygon"][2][1],
+                        bbox["polygon"][0][0] : bbox["polygon"][2][0],
+                    ]
+                    cv2.imwrite(tab_name, roi)
+                    logger.info(f"Saved table to {tab_name}")
+                    attached_images.append(str(tab_name))
+                    j += 1
+
+                else:
+                    continue
+
+            # 保存图片
+            cv2.imwrite(str(image_dir / f"{i}.png"), image)
+            layout_images.append(str(image_dir / f"{i}.png"))
+
+        return E2MParsedData(
+            text="",
+            images=layout_images,
+            attached_images=attached_images,
+            metadata={
+                "engine": "surya_layout",
+                "surya_layout_metadata": layout_predictions,
+            },
         )
 
     def _prepare_marker_data_to_e2m_parsed_data(

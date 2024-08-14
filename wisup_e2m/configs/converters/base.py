@@ -13,6 +13,16 @@ class BaseConverterConfig(BaseModel):
         description="Engine to use for conversion (litellm)",
     )
 
+    caching: Optional[bool] = Field(
+        True,
+        description="Whether to cache the results",
+    )
+
+    cache_type: Optional[str] = Field(
+        "disk-cache",
+        description="Type of cache to use, including redis-cache, s3-cache, redis-semantic-cache, in-memory-cache, disk-cache",
+    )
+
     # liellm completion config
     model: str = Field(
         "deepseek/deepseek-chat",
@@ -57,6 +67,10 @@ class BaseConverterConfig(BaseModel):
     api_key: Optional[str] = Field(
         None,
         description="API key for the API",
+    )
+    custom_llm_provider: Optional[str] = Field(
+        None,
+        description="Custom LLM provider"
     )
 
     # litellm class
