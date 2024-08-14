@@ -47,6 +47,7 @@ class DocxParser(BaseParser):
         file: Optional[IO[bytes]] = None,
         start_page: Optional[int] = None,
         end_page: Optional[int] = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -67,14 +68,17 @@ class DocxParser(BaseParser):
             )
         )
 
-        docx_images = get_docx_images(
-            file_name=file_name,
-            file=file,
-            target_image_dir=image_dir,
-            ignore_transparent_images=ignore_transparent_images,
-        )  # {1: [{'image_number': 1, 'image_file': './figures/1_0.jpeg', 'image_name': '1_0.jpeg'}], 2: [{'image_number': 2, 'image_file': './figures/2_1.jpeg', 'image_name': '2_1.jpeg'}], 3: [{'image_number': 3, 'image_file': './figures/3_2.jpeg', 'image_name': '3_2.jpeg'}], 4: [{'image_number': 4, 'image_file': './figures/4_3.jpeg', 'image_name': '4_3.jpeg'}], 5: [{'image_number': 5, 'image_file': './figures/5_4.jpeg', 'image_name': '5_4.jpeg'}]} # noqa
-        logger.info(f"Extracted {len(docx_images)} images from the docx file")
-        # todo: insert images into the docx text
+        if extract_images:
+            docx_images = get_docx_images(
+                file_name=file_name,
+                file=file,
+                target_image_dir=image_dir,
+                ignore_transparent_images=ignore_transparent_images,
+            )  # {1: [{'image_number': 1, 'image_file': './figures/1_0.jpeg', 'image_name': '1_0.jpeg'}], 2: [{'image_number': 2, 'image_file': './figures/2_1.jpeg', 'image_name': '2_1.jpeg'}], 3: [{'image_number': 3, 'image_file': './figures/3_2.jpeg', 'image_name': '3_2.jpeg'}], 4: [{'image_number': 4, 'image_file': './figures/4_3.jpeg', 'image_name': '4_3.jpeg'}], 5: [{'image_number': 5, 'image_file': './figures/5_4.jpeg', 'image_name': '5_4.jpeg'}]} # noqa
+            logger.info(f"Extracted {len(docx_images)} images from the docx file")
+            # todo: insert images into the docx text
+        else:
+            docx_images = {}
 
         return self._prepare_unstructured_data_to_e2m_parsed_data(
             unstructured_elements,
@@ -89,6 +93,7 @@ class DocxParser(BaseParser):
         self,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -107,6 +112,7 @@ class DocxParser(BaseParser):
             return self._parse_by_unstructured(
                 file_name=file_name,
                 file=file,
+                extract_images=extract_images,
                 include_image_link_in_text=include_image_link_in_text,
                 ignore_transparent_images=ignore_transparent_images,
                 work_dir=work_dir,

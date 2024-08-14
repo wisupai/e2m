@@ -15,6 +15,7 @@ class DocParser(DocxParser):
     def get_parsed_data(
         self,
         file_name: str,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -36,6 +37,7 @@ class DocParser(DocxParser):
 
         return super().get_parsed_data(
             file_name=file_name,
+            extract_images=extract_images,
             include_image_link_in_text=include_image_link_in_text,
             ignore_transparent_images=ignore_transparent_images,
             work_dir=work_dir,

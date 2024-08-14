@@ -45,6 +45,7 @@ class EpubParser(BaseParser):
         self,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -64,14 +65,17 @@ class EpubParser(BaseParser):
             )
         )
 
-        epub_images = get_epub_images(
-            file_name=file_name,
-            file=file,
-            target_image_dir=image_dir,
-            ignore_transparent_images=ignore_transparent_images,
-        )
-        logger.info(f"Extracted {len(epub_images)} images from the epub file")
-        # todo: insert images into the  epub text
+        if extract_images:
+            epub_images = get_epub_images(
+                file_name=file_name,
+                file=file,
+                target_image_dir=image_dir,
+                ignore_transparent_images=ignore_transparent_images,
+            )
+            logger.info(f"Extracted {len(epub_images)} images from the epub file")
+            # todo: insert images into the  epub text
+        else:
+            epub_images = {}
 
         return self._prepare_unstructured_data_to_e2m_parsed_data(
             unstructured_elements,
@@ -86,6 +90,7 @@ class EpubParser(BaseParser):
         self,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -104,6 +109,7 @@ class EpubParser(BaseParser):
             return self._parse_by_unstructured(
                 file_name=file_name,
                 file=file,
+                extract_images=extract_images,
                 include_image_link_in_text=include_image_link_in_text,
                 ignore_transparent_images=ignore_transparent_images,
                 work_dir=work_dir,

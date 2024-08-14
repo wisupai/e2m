@@ -50,6 +50,7 @@ class PptxParser(BaseParser):
         include_page_breaks: bool = True,
         include_slide_notes: Optional[bool] = None,
         infer_table_structure: bool = True,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -76,7 +77,7 @@ class PptxParser(BaseParser):
 
         # 由于 unstructured 的 partition_pptx 没有自带的图片提取功能，所以这里需要自己提取图片
         # 提取图片
-        if include_image_link_in_text:
+        if extract_images:
             logger.info("Extracting images with pptx...")
             pptx_images = get_pptx_images(
                 file_name=file_name,
@@ -128,6 +129,7 @@ class PptxParser(BaseParser):
         include_page_breaks: bool = True,
         include_slide_notes: Optional[bool] = None,
         infer_table_structure: bool = True,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
         work_dir: str = "./",
@@ -151,6 +153,7 @@ class PptxParser(BaseParser):
                 include_page_breaks=include_page_breaks,
                 include_slide_notes=include_slide_notes,
                 infer_table_structure=infer_table_structure,
+                extract_images=extract_images,
                 include_image_link_in_text=include_image_link_in_text,
                 ignore_transparent_images=ignore_transparent_images,
                 work_dir=work_dir,
