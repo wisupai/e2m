@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
+from wisup_e2m.utils.pdf_util import convert_pdf_to_images
 
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ class PdfParser(BaseParser):
         file: str,
         start_page: int = None,
         end_page: int = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         work_dir: str = "./",
         image_dir: str = "./figures",
@@ -54,16 +56,27 @@ class PdfParser(BaseParser):
         """
         import unstructured
 
-        unstructured_elements: List[unstructured.documents.elements.Element] = (
-            self.unstructured_parse_func(
-                filename=file,
-                strategy="hi_res",
-                languages=self.config.langs,
-                extract_images_in_pdf=True,
-                extract_image_block_types=["Image"],
-                starting_page_number=start_page if start_page else 1,
+        if not extract_images:
+            unstructured_elements: List[unstructured.documents.elements.Element] = (
+                self.unstructured_parse_func(
+                    filename=file,
+                    strategy="auto",
+                    languages=self.config.langs,
+                    extract_images_in_pdf=False,
+                    starting_page_number=start_page if start_page else 1,
+                )
             )
-        )
+        else:
+            unstructured_elements: List[unstructured.documents.elements.Element] = (
+                self.unstructured_parse_func(
+                    filename=file,
+                    strategy="hi_res",
+                    languages=self.config.langs,
+                    extract_images_in_pdf=True,
+                    extract_image_block_types=["Image"],
+                    starting_page_number=start_page if start_page else 1,
+                )
+            )
 
         return self._prepare_unstructured_data_to_e2m_parsed_data(
             unstructured_elements,
@@ -74,11 +87,73 @@ class PdfParser(BaseParser):
             relative_path=relative_path,
         )
 
-    def _parse_by_surya_layout(self, file, batch_multiplier: int = 1):
+    def _parse_by_surya_layout(
+        self,
+        file,
+        start_page: int = None,
+        end_page: int = None,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        proc_count: int = 1,
+        batch_size: int = None,
+    ):
         """
         Parse the data using the surya layout engine
         """
-        return "Parsed by Surya Layout"
+        import uuid
+        from PIL import Image
+        from pathlib import Path
+
+        # 根目录
+        base_tmp_dir = Path("./.tmp")
+        # 创建临时目录
+        tmp_dir = base_tmp_dir / str(uuid.uuid4())
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+
+        all_images = []
+        images = []
+        try:
+            all_images = convert_pdf_to_images(
+                file, start_page, end_page, proc_count, save_dir=str(tmp_dir)
+            )
+
+            images = [Image.open(image_file) for image_file in all_images]
+
+            logger.info(f"Total {len(all_images)} images")
+            layout_predictions = self.surya_layout_func(
+                str(tmp_dir), batch_size=batch_size
+            )
+
+            # reorder layout predictions,依据name字段，要和  all_images 的文件stem对应
+            new_layout_predictions = []
+            for image_file in all_images:
+                image_name = Path(image_file).stem
+                for pred in layout_predictions:
+                    if pred["name"] == image_name:
+                        new_layout_predictions.append(pred)
+                        break
+
+            logger.debug(f"layout_predictions: {new_layout_predictions}")
+
+        except Exception as e:
+            logger.error(f"Error in parsing {file}: {e}")
+            return None
+        finally:
+            # rm tmp dir
+            for image_file in all_images:
+                Path(image_file).unlink()
+            tmp_dir.rmdir()
+
+        logger.info("Start _prepare_surya_layout_data_to_e2m_parsed_data")
+        return self._prepare_surya_layout_data_to_e2m_parsed_data(
+            images=images,
+            layout_predictions=new_layout_predictions,
+            start_page=start_page,
+            work_dir=work_dir,
+            image_dir=image_dir,
+            relative_path=relative_path,
+        )
 
     def _parse_by_marker(
         self,
@@ -147,6 +222,7 @@ class PdfParser(BaseParser):
         file_name: str,
         start_page: int = None,
         end_page: int = None,
+        extract_images: bool = True,
         include_image_link_in_text: bool = True,
         work_dir: str = "./",
         image_dir: str = "./figures",
@@ -175,7 +251,14 @@ class PdfParser(BaseParser):
             self._validate_input_flie(file_name)
 
         if self.config.engine == "surya_layout":
-            return self._parse_by_surya_layout(file_name)
+            return self._parse_by_surya_layout(
+                file_name,
+                start_page,
+                end_page,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
         elif self.config.engine == "marker":
             return self._parse_by_marker(
                 file_name,
@@ -191,6 +274,7 @@ class PdfParser(BaseParser):
                 file_name,
                 start_page,
                 end_page,
+                extract_images=extract_images,
                 include_image_link_in_text=include_image_link_in_text,
                 work_dir=work_dir,
                 image_dir=image_dir,
