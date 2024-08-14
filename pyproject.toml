@@ -28,6 +28,7 @@ pypandoc = "^1.13"
 python-docx = "^1.1.2"
 speechrecognition = "^3.10.4"
 setuptools-rust = "^1.10.1"
+diskcache = "^5.6.3"
 
 
 [tool.poetry.group.test.dependencies]
