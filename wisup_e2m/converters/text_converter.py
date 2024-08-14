@@ -5,19 +5,18 @@ class TextConverter(BaseConverter):
     SUPPORTED_ENGINES = ["litellm"]
 
     def _convert_to_md_by_litellm(
-        self,
-        text: str,
-        verbose: bool = True,
-        strategy: str = "default",
+        self, text: str, verbose: bool = True, strategy: str = "default", **kwargs
     ) -> str:
         from wisup_e2m.converters.strategies.litellm_strategy import LitellmStrategy
 
+        litellm_strategy = LitellmStrategy()
+
         if strategy == "default":
-            return LitellmStrategy.default_text_convert(
+            return litellm_strategy.default_text_convert(
                 text, verbose=verbose, **self.config.to_dict()
             )
         elif strategy == "with_toc":
-            return LitellmStrategy.with_toc_text_convert(
+            return litellm_strategy.with_toc_text_convert(
                 text, verbose=verbose, **self.config.to_dict()
             )
         else:

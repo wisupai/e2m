@@ -1,10 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import Any
+from abc import ABC
 
 
 class BaseStrategy(ABC):
     TYPE = None
-
-    @abstractmethod
-    def run(self, **kwargs) -> Any:
-        pass
