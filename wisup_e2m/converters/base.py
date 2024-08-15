@@ -24,7 +24,7 @@ class BaseConverter(ABC):
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
-        attached_images: Optional[List[str]] = None,
+        attached_images_map: Optional[List[str]] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -32,7 +32,7 @@ class BaseConverter(ABC):
             return self._convert_to_md_by_litellm(
                 text=text,
                 images=images,
-                attached_images=attached_images,
+                attached_images_map=attached_images_map,
                 verbose=verbose,
                 **kwargs,
             )
@@ -114,6 +114,7 @@ class BaseConverter(ABC):
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
+        attached_images_map: Optional[Dict[str, List[str]]] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
