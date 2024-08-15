@@ -30,7 +30,7 @@ parser_default_config = {
         "langs": ["en", "zh"],
     },
     "pdf_parser": {
-        "engine": "surya_layout",
+        "engine": "marker",
         "langs": ["en", "zh"],
     },
     "pptx_parser": {

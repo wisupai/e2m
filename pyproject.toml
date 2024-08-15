@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wisup_e2m"
-version = "0.1.23"
+version = "0.1.31"
 description = "Everything to Markdown."
 authors = ["Wisup Team <team@wisup.a>"]
 license = "MIT"
