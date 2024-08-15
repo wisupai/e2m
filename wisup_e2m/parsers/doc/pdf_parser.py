@@ -100,6 +100,7 @@ class PdfParser(BaseParser):
         image_merge_threshold: float = 0.1,
         proc_count: int = 1,
         batch_size: int = None,
+        dpi=180,
         **kwargs,
     ):
         """
@@ -120,7 +121,7 @@ class PdfParser(BaseParser):
         images = []
         try:
             all_images = convert_pdf_to_images(
-                file, start_page, end_page, proc_count, save_dir=str(tmp_dir)
+                file, start_page, end_page, proc_count, save_dir=str(tmp_dir), dpi=dpi
             )
 
             images = [Image.open(image_file) for image_file in all_images]
@@ -272,7 +273,9 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
-                **kwargs,
+                proc_count=kwargs.get("proc_count", 1),
+                batch_size=kwargs.get("batch_size", None),
+                dpi=kwargs.get("dpi", 180),
             )
         elif self.config.engine == "marker":
             return self._parse_by_marker(
@@ -283,7 +286,7 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
-                **kwargs,
+                batch_multiplier=kwargs.get("batch_multiplier", 1),
             )
         else:
             return self._parse_by_unstructured(
@@ -295,5 +298,4 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
-                **kwargs,
             )

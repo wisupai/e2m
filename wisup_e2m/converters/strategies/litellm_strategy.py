@@ -9,6 +9,7 @@ from wisup_e2m.converters.strategies.prompts import (
     CONTINUE_NOTION,
     NEWLINE_NOTION,
     TEXT_FORMAT_INFERENCE_ROLE,
+    FORMAT_INFERENCE_INSTRUCTION,
     DEFAULT_TEXT_ROLE,
     DEFAULT_IMAGE_ROLE,
 )
@@ -192,7 +193,7 @@ class LitellmStrategy(BaseStrategy):
                 },
                 {
                     "role": "user",
-                    "content": f"文本类型和结构可以参考:\n{inferenced_text_format}",
+                    "content": FORMAT_INFERENCE_INSTRUCTION.format(inferenced_text_format=inferenced_text_format),
                 },
             ]
             if idx != 0 and len(converted_text) > 0:
@@ -231,7 +232,7 @@ class LitellmStrategy(BaseStrategy):
     def default_image_convert(
         self,
         images: List[str],
-        attached_images: Dict[str, List[str]],
+        attached_images_map: Dict[str, List[str]],
         image_batch_size: int = 5,
         verbose: bool = True,
         **kwargs,
@@ -251,7 +252,7 @@ class LitellmStrategy(BaseStrategy):
                         {"type": "text", "text": DEFAULT_IMAGE_ROLE},
                         {
                             "type": "text",
-                            "text": f"文本类型和结构可以参考:\n{inferenced_text_format}",
+                            "text": FORMAT_INFERENCE_INSTRUCTION.format(inferenced_text_format=inferenced_text_format),
                         },
                     ],
                 },
@@ -274,8 +275,9 @@ class LitellmStrategy(BaseStrategy):
 
                 # 获取 attached_images
                 tmp_attached_images = []
-                if image in attached_images:
-                    tmp_attached_images = attached_images[image]
+                image_name = image.split("/")[-1]
+                if image_name in attached_images_map:
+                    tmp_attached_images = attached_images_map[image]
 
                 # 添加content说明，你可以使用的图片
                 if tmp_attached_images:

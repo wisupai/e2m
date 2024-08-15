@@ -29,8 +29,11 @@ class E2MParsedData(BaseModel):
     attached_images: Optional[List[str]] = Field(
         [], description="Attached image paths, like 1_0.png, 1_1.png, etc."
     )
+    attached_images_map: Optional[Dict[str, str]] = Field(
+        {}, description="Attached image paths map, like {1.png: /path/to/1_0.png, 2.png: /path/to/2_1.png}, only available for layout detection."
+    )
     metadata: Optional[List[Any] | Dict[str, Any]] = Field(
-        {}, description="Metadata of the parsed data"
+        {}, description="Metadata of the parsed data, including engine, etc."
     )
 
     def to_dict(self):
@@ -353,6 +356,7 @@ class BaseParser(ABC):
 
         layout_images = []
         attached_images = []
+        attached_images_map = {}
 
         logger.debug(f"len of layout_predictions: {len(layout_predictions)}")
         logger.debug(f"len of images: {len(images)}")
@@ -523,16 +527,23 @@ class BaseParser(ABC):
                 j += 1
 
             # 保存图片
-            cv2.imwrite(str(image_dir / f"{i}.png"), image)
-            layout_images.append(str(image_dir / f"{i}.png"))
+            full_image_path = image_dir / f"{i}.png"
+            full_image_path_name = str(full_image_path)
+            cv2.imwrite(full_image_path_name, image)
+            layout_images.append(full_image_path_name)
             attached_images.extend(
                 [img["image_path"] for img in page_attached_image_infos]
             )
+            # image name -> attached image paths
+            attached_images_map[full_image_path.name] = [
+                img["image_path"] for img in page_attached_image_infos
+            ]
 
         return E2MParsedData(
             text="",
             images=layout_images,
             attached_images=attached_images,
+            attached_images_map=attached_images_map,
             metadata={
                 "engine": "surya_layout",
                 "surya_layout_metadata": layout_predictions,
