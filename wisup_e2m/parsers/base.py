@@ -30,7 +30,8 @@ class E2MParsedData(BaseModel):
         [], description="Attached image paths, like 1_0.png, 1_1.png, etc."
     )
     attached_images_map: Optional[Dict[str, str]] = Field(
-        {}, description="Attached image paths map, like {1.png: /path/to/1_0.png, 2.png: /path/to/2_1.png}, only available for layout detection."
+        {},
+        description="Attached image paths map, like {1.png: /path/to/1_0.png, 2.png: /path/to/2_1.png}, only available for layout detection.",
     )
     metadata: Optional[List[Any] | Dict[str, Any]] = Field(
         {}, description="Metadata of the parsed data, including engine, etc."

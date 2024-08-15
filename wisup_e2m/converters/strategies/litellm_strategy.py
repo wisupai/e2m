@@ -193,7 +193,9 @@ class LitellmStrategy(BaseStrategy):
                 },
                 {
                     "role": "user",
-                    "content": FORMAT_INFERENCE_INSTRUCTION.format(inferenced_text_format=inferenced_text_format),
+                    "content": FORMAT_INFERENCE_INSTRUCTION.format(
+                        inferenced_text_format=inferenced_text_format
+                    ),
                 },
             ]
             if idx != 0 and len(converted_text) > 0:
@@ -252,7 +254,9 @@ class LitellmStrategy(BaseStrategy):
                         {"type": "text", "text": DEFAULT_IMAGE_ROLE},
                         {
                             "type": "text",
-                            "text": FORMAT_INFERENCE_INSTRUCTION.format(inferenced_text_format=inferenced_text_format),
+                            "text": FORMAT_INFERENCE_INSTRUCTION.format(
+                                inferenced_text_format=inferenced_text_format
+                            ),
                         },
                     ],
                 },
