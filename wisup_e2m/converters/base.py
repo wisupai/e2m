@@ -97,7 +97,7 @@ class BaseConverter(ABC):
                 litellm.cache = Cache(type="disk")
             else:
                 raise ValueError(f"Unsupported cache type: {self.config.cache_type}")
-            
+
             self.litellm_client = None
 
         logger.info("Loading litellm engine")
