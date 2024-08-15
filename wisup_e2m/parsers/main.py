@@ -8,14 +8,52 @@ from wisup_e2m.parsers.base import E2MParsedData, BaseParser
 
 logger = logging.getLogger(__name__)
 
+parser_default_config = {
+    "doc_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
+    "docx_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
+    "epub_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
+    "html_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
+    "url_parser": {
+        "engine": "jina",
+        "langs": ["en", "zh"],
+    },
+    "pdf_parser": {
+        "engine": "surya_layout",
+        "langs": ["en", "zh"],
+    },
+    "pptx_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
+    "voice_parser": {
+        "engine": "openai_whisper_local",
+        "model": "large",  # # available models: https://github.com/openai/whisper#available-models-and-languages
+    },
+}
+
 
 class E2MParser:
     """
     Parse everything to text and images
     """
 
-    def __init__(self, config: E2MParserConfig):
+    def __init__(self, config: E2MParserConfig = None):
         logger.info("Initializing E2MParser...")
+        if not config:
+            config = E2MParserConfig(parsers=parser_default_config)
+            logger.info("Using default configuration.")
         self.config = config
         self.file_type_to_parser_map: Dict[str, BaseParser] = {}
 

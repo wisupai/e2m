@@ -20,3 +20,6 @@ from wisup_e2m.parsers.main import E2MParser  # noqa
 # converter
 from wisup_e2m.converters.text_converter import TextConverter  # noqa
 from wisup_e2m.converters.image_converter import ImageConverter  # noqa
+
+# main
+from wisup_e2m.converters.main import E2MConverter  # noqa

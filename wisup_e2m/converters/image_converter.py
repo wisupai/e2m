@@ -8,7 +8,7 @@ class ImageConverter(BaseConverter):
     def _convert_to_md_by_litellm(
         self,
         images: List[str],
-        attached_images_map: Dict[str, List[str]],
+        attached_images_map: Dict[str, List[str]] = {},
         verbose: bool = True,
         strategy: str = "default",
         image_batch_size: int = 5,

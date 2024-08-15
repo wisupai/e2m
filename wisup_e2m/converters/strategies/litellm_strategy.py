@@ -1,6 +1,7 @@
 from litellm import LiteLLM, completion, acompletion
 from litellm import get_model_info
 from typing import List, Optional, Dict
+from pathlib import Path
 
 from wisup_e2m.converters.strategies.base import BaseStrategy
 from wisup_e2m.utils.image_util import local_image_to_data_url
@@ -278,10 +279,8 @@ class LitellmStrategy(BaseStrategy):
                 )
 
                 # 获取 attached_images
-                tmp_attached_images = []
-                image_name = image.split("/")[-1]
-                if image_name in attached_images_map:
-                    tmp_attached_images = attached_images_map[image]
+                image_name = Path(image).name
+                tmp_attached_images = attached_images_map.get(image_name, [])
 
                 # 添加content说明，你可以使用的图片
                 if tmp_attached_images:

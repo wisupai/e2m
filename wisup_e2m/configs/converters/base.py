@@ -68,10 +68,7 @@ class BaseConverterConfig(BaseModel):
         None,
         description="API key for the API",
     )
-    custom_llm_provider: Optional[str] = Field(
-        None,
-        description="Custom LLM provider"
-    )
+    custom_llm_provider: Optional[str] = Field(None, description="Custom LLM provider")
 
     # litellm class
     timeout: Optional[float] = Field(

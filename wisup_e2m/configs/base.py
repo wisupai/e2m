@@ -8,3 +8,11 @@ class E2MParserConfig(BaseModel):
         {},
         description="Configuration for parsers",
     )
+
+
+class E2MConverterConfig(BaseModel):
+
+    converters: Dict[str, Any] = Field(
+        {},
+        description="Configuration for converters",
+    )
