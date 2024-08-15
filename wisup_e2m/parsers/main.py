@@ -61,6 +61,7 @@ class E2MParser:
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        **kwargs,
     ) -> Optional[E2MParsedData]:
         """
         Parse the data using the appropriate parser
@@ -89,6 +90,7 @@ class E2MParser:
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
+                **kwargs,
             )
             return data
         except Exception as e:

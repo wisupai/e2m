@@ -39,7 +39,7 @@ def surya_detect_layout(
             logger.error(f"Error during layout detection: {stderr.decode()}")
             raise RuntimeError(f"Layout detection failed: {stderr.decode()}")
         else:
-            logger.info(f"Layout detection completed successfully.")
+            logger.info("Layout detection completed successfully.")
 
     # 确保输出日志中包含调试信息
     logger.debug(f"stdout: {stdout.decode()}")

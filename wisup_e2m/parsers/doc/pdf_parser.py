@@ -50,6 +50,7 @@ class PdfParser(BaseParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data using the unstructured engine
@@ -95,8 +96,11 @@ class PdfParser(BaseParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        confidence_threshold: float = 0.5,
+        image_merge_threshold: float = 0.1,
         proc_count: int = 1,
         batch_size: int = None,
+        **kwargs,
     ):
         """
         Parse the data using the surya layout engine
@@ -104,6 +108,7 @@ class PdfParser(BaseParser):
         import uuid
         from PIL import Image
         from pathlib import Path
+        from wisup_e2m.utils.image_util import BLUE_BGR
 
         # 根目录
         base_tmp_dir = Path("./.tmp")
@@ -153,6 +158,14 @@ class PdfParser(BaseParser):
             work_dir=work_dir,
             image_dir=image_dir,
             relative_path=relative_path,
+            confidence_threshold=confidence_threshold,
+            image_merge_threshold=image_merge_threshold,
+            label_types={"Figure": BLUE_BGR},
+            ignore_label_types=[
+                "Page-header",
+                "Page-footer",
+                "Footnote",
+            ],
         )
 
     def _parse_by_marker(
@@ -165,6 +178,7 @@ class PdfParser(BaseParser):
         image_dir: str = "./figures",
         relative_path: bool = True,
         batch_multiplier: int = 1,
+        **kwargs,
     ) -> E2MParsedData:
         """
         Parse the data using the marker engine
@@ -258,6 +272,7 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
+                **kwargs,
             )
         elif self.config.engine == "marker":
             return self._parse_by_marker(
@@ -268,6 +283,7 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
+                **kwargs,
             )
         else:
             return self._parse_by_unstructured(
@@ -279,4 +295,5 @@ class PdfParser(BaseParser):
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
+                **kwargs,
             )

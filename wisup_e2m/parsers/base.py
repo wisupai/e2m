@@ -1,7 +1,7 @@
 # e2m/parsers/base.py
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Dict
+from typing import Any, List, Optional, Dict, Tuple
 from PIL import ImageFile
 from pydantic import BaseModel, Field, ValidationError
 from PIL import Image
@@ -13,6 +13,12 @@ import re
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.utils.web_util import download_image, get_web_content
+from wisup_e2m.utils.image_util import (
+    BLUE_BGR,
+    RED_BGR,
+    GREEN_BGR,
+    YELLOW_BGR,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +131,8 @@ class BaseParser(ABC):
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
         try:
-            from surya.model.detection.model import load_model, load_processor # noqa
-            from surya.settings import settings # noqa
+            from surya.model.detection.model import load_model, load_processor  # noqa
+            from surya.settings import settings  # noqa
         except ImportError:
             raise ImportError(
                 "Surya not installed. Please install Surya by `pip install surya-ocr`"
@@ -135,7 +141,7 @@ class BaseParser(ABC):
         from wisup_e2m.utils.pdf_util import surya_detect_layout
 
         logger.info("Loading Surya layout model and processor..")
-            
+
         self.surya_layout_func = surya_detect_layout
 
         logger.info("Surya engine loaded successfully.")
@@ -321,9 +327,24 @@ class BaseParser(ABC):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        confidence_threshold: float = 0.5,
+        image_merge_threshold: float = 0.1,
+        label_types: Dict[str, Tuple[int, int, int]] = {
+            "Figure": BLUE_BGR,
+            "Table": GREEN_BGR,
+        },
+        ignore_label_types: List[str] = [
+            "Page-header",
+            "Page-footer",
+            "Footnote",
+        ],
     ):
         import cv2
         import numpy as np
+        from wisup_e2m.utils.image_util import check_overlap_percentage, merge_images
+
+        if not start_page:
+            start_page = 0
 
         # make dir
         work_dir = Path(work_dir).resolve()
@@ -337,91 +358,176 @@ class BaseParser(ABC):
         logger.debug(f"len of images: {len(images)}")
 
         for i, (layout, image) in enumerate(zip(layout_predictions, images)):
-            j = 0
-            logger.info(f"Processing page {i+start_page}: {layout['page']}")
+
             i = start_page + i
+            page_width = image.width
+            page_height = image.height
+
+            logger.info(
+                f"Processing page {i}: width = {page_width}, height = {page_height}"
+            )
 
             # Convert the image from RGB to BGR format
             image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            page_attached_image_infos = []
 
+            # 判断是否所有像素都是相同的颜色，如果是则认为是空白页
+            if np.all(image == image[0, 0]):
+                logger.info(f"Page {i} is blank")
+                continue
+
+            # x1,y1 ------
+            # |          |
+            # |          |
+            # |          |
+            # --------x2,y2
+
+            # 先筛选出符合条件的截图
             for bbox in layout["bboxes"]:
-                if bbox["label"] == "Figure" and bbox["confidence"] > 0.5:
-                    fig_name = image_dir / f"{i}_{j}.png"
-                    fig_label_name = str(fig_name)
-                    if relative_path:
-                        fig_label_name = str(fig_name.relative_to(work_dir))
 
-                    # 忽略小框
-                    if np.abs(bbox["polygon"][0][0] - bbox["polygon"][1][0]) < 300:
-                        continue
+                """
+                "bbox": [
+                    127, # x1
+                    235, # y1
+                    1135, # x2
+                    1785 # y2
+                ]
+                """
 
-                    cv2.rectangle(
-                        image,
-                        (bbox["polygon"][0]),
-                        (bbox["polygon"][2]),
-                        (255, 50, 12),
-                        2,
-                    )
-                    # 标注label
-                    cv2.putText(
-                        image,
-                        fig_label_name,
-                        (bbox["polygon"][0][0], bbox["polygon"][0][1] - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.9,
-                        (255, 50, 12),
-                        2,
-                    )
+                label_type, confidence, points = (
+                    bbox["label"],
+                    bbox["confidence"],
+                    bbox["bbox"],
+                )
+                x1, y1, x2, y2 = points
+                width = x2 - x1
+                height = y2 - y1
 
-                    # 保存截图
-                    roi = image[
-                        bbox["polygon"][0][1] : bbox["polygon"][2][1],
-                        bbox["polygon"][0][0] : bbox["polygon"][2][0],
-                    ]
-                    cv2.imwrite(fig_name, roi)
-                    logger.info(f"Saved figure to {fig_name}")
-                    attached_images.append(str(fig_name))
-                    j += 1
-
-                elif bbox["label"] == "Table" and bbox["confidence"] > 0.5:
-                    tab_name = image_dir / f"{i}_{j}.png"
-                    tab_label_name = str(tab_name)
-                    if relative_path:
-                        tab_label_name = str(tab_name.relative_to(work_dir))
-                    cv2.rectangle(
-                        image,
-                        (bbox["polygon"][0]),
-                        (bbox["polygon"][2]),
-                        (0, 255, 0),
-                        2,
-                    )
-                    # 标注label
-                    cv2.putText(
-                        image,
-                        tab_label_name,
-                        (bbox["polygon"][0][0], bbox["polygon"][0][1] - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.9,
-                        (0, 255, 0),
-                        2,
-                    )
-
-                    # 保存截图
-                    roi = image[
-                        bbox["polygon"][0][1] : bbox["polygon"][2][1],
-                        bbox["polygon"][0][0] : bbox["polygon"][2][0],
-                    ]
-                    cv2.imwrite(tab_name, roi)
-                    logger.info(f"Saved table to {tab_name}")
-                    attached_images.append(str(tab_name))
-                    j += 1
-
-                else:
+                # 填充页眉
+                if label_type == "Page-header" and label_type in ignore_label_types:
+                    # 如果y2是在页面上方1/4的位置，就认为是页眉
+                    if y2 < page_height / 4:
+                        cv2.rectangle(
+                            image,
+                            (0, 0),
+                            (page_width, y2),
+                            GREEN_BGR,
+                            cv2.FILLED,
+                        )
                     continue
+
+                # 填充页脚
+                if label_type == "Page-footer" and label_type in ignore_label_types:
+                    # 如果y1是在页面下方3/4的位置，就认为是页脚
+                    if y1 > page_height * 3 / 4:
+                        cv2.rectangle(
+                            image,
+                            (0, y1),
+                            (page_width, page_height),
+                            YELLOW_BGR,
+                            cv2.FILLED,
+                        )
+                    continue
+
+                # 填充脚注
+                if label_type == ["Footnote"] and label_type in ignore_label_types:
+                    cv2.rectangle(
+                        image,
+                        (x1, y1),
+                        (x2, y2),
+                        RED_BGR,
+                        cv2.FILLED,
+                    )
+                    continue
+
+                # 忽略 长宽比大于5的框
+                if height / width > 5 or width / height > 5:
+                    continue
+
+                # 忽略 面积小于总面积 3/100 的框
+                if (height * width) < (page_width * page_height * 3 / 100):
+                    continue
+
+                if (label_type not in label_types) or (
+                    confidence < confidence_threshold
+                ):
+                    continue
+
+                # 遍历 page_attached_image_infos，如果有重叠度大于 image_merge_threshold 的，合并
+                for img_info in page_attached_image_infos:
+                    overlap_percentage = check_overlap_percentage(
+                        img_info["points"], points
+                    )
+                    logger.info(f"overlap_percentage: {overlap_percentage}")
+                    if overlap_percentage > image_merge_threshold:
+                        logger.info(
+                            f"Merging images: {img_info['points']} and {points}"
+                        )
+                        img_info["points"] = merge_images(img_info["points"], points)
+                        break
+
+                page_attached_image_infos.append(
+                    {
+                        "label": label_type,
+                        "points": points,
+                        "height": height,
+                        "width": width,
+                        "color_bgr": label_types[label_type],
+                    }
+                )
+
+            # 开始处理截图
+            j = 0
+            for page_attached_image_info in page_attached_image_infos:
+                logger.info(f"Cutting Image: {page_attached_image_info}")
+
+                label_type = page_attached_image_info["label"]
+                x1, y1, x2, y2 = page_attached_image_info["points"]
+                color_bgr = page_attached_image_info["color_bgr"]
+                height = page_attached_image_info["height"]
+                width = page_attached_image_info["width"]
+
+                fig_name = image_dir / f"{i}_{j}.png"
+                fig_label_name = str(fig_name)
+                if relative_path:
+                    fig_label_name = str(fig_name.relative_to(work_dir))
+
+                # 保存截图
+
+                roi = image[y1:y2, x1:x2]
+
+                cv2.imwrite(fig_name, roi)
+                logger.info(f"Saved figure to {fig_name}")
+
+                cv2.rectangle(
+                    image,
+                    (x1, y1),
+                    (x2, y2),
+                    color_bgr,
+                    2,
+                )
+
+                # 标注label
+                cv2.putText(
+                    image,
+                    fig_label_name,
+                    (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.9,
+                    color_bgr,
+                    2,
+                )
+
+                page_attached_image_info["image_path"] = str(fig_name)
+
+                j += 1
 
             # 保存图片
             cv2.imwrite(str(image_dir / f"{i}.png"), image)
             layout_images.append(str(image_dir / f"{i}.png"))
+            attached_images.extend(
+                [img["image_path"] for img in page_attached_image_infos]
+            )
 
         return E2MParsedData(
             text="",
