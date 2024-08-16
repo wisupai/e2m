@@ -1,6 +1,14 @@
 from wisup_e2m.converters.base import BaseConverter
 from typing import List, Dict
 
+_image_converter_params = [
+    "images",
+    "attached_images_map",
+    "verbose",
+    "strategy",
+    "image_batch_size",
+]
+
 
 class ImageConverter(BaseConverter):
     SUPPORTED_ENGINES = ["litellm"]
@@ -62,6 +70,7 @@ class ImageConverter(BaseConverter):
         **kwargs,
     ) -> str:
         for k, v in locals().items():
-            kwargs[k] = v
+            if k in _image_converter_params:
+                kwargs[k] = v
 
         return self.convert(**kwargs)

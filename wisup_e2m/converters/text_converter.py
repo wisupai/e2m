@@ -2,6 +2,12 @@ from typing import Any
 from wisup_e2m.converters.base import BaseConverter
 
 
+_text_converter_params = [
+    "text",
+    "verbose",
+    "strategy",
+]
+
 class TextConverter(BaseConverter):
     SUPPORTED_ENGINES = ["litellm"]
 
@@ -31,7 +37,8 @@ class TextConverter(BaseConverter):
         **kwargs,
     ) -> str:
         for k, v in locals().items():
-            kwargs[k] = v
+            if k in _text_converter_params:
+                kwargs[k] = v
 
         if self.config.engine == "litellm":
             return self._convert_to_md_by_litellm(**kwargs)
