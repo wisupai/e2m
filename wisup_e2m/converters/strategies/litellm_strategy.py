@@ -238,8 +238,8 @@ class LitellmStrategy(BaseStrategy):
         self,
         images: List[str],
         attached_images_map: Dict[str, List[str]],
-        image_batch_size: int = 5,
         verbose: bool = True,
+        image_batch_size: int = 5,
         **kwargs,
     ) -> str:
 
@@ -321,7 +321,8 @@ class LitellmStrategy(BaseStrategy):
         # 先识别出目录
 
         # 根据目录来修复文本
-        pass
+
+        raise NotImplementedError("Not implemented yet.")
 
     def with_toc_image_convert(
         self, images: List[str], verbose: bool = True, **kwargs
@@ -329,7 +330,8 @@ class LitellmStrategy(BaseStrategy):
         # 先识别出目录
 
         # 根据目录来修复文本
-        pass
+
+        raise NotImplementedError("Not implemented yet.")
 
 
 def _break_text_into_chunks(

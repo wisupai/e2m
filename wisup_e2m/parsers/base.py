@@ -287,6 +287,7 @@ class BaseParser(ABC):
                 shutil.move(str(image_path), str(new_image_path))
                 element.metadata.image_path = str(new_image_path.resolve())
 
+        attached_images = []
         # meerge text and image links
         text_chunks = []
         for element in data:
@@ -301,6 +302,7 @@ class BaseParser(ABC):
                     else:
                         image_name = str(image_path.resolve())
                     text_chunks.append(f"![]({image_name})")
+                    attached_images.append(image_name)
             elif element.text:
                 if not add_title_marker:
                     text_chunks.append(element.text)
@@ -316,12 +318,6 @@ class BaseParser(ABC):
                         text_chunks.append(element.text)
 
         text = "\n".join(text_chunks)
-
-        attached_images = [
-            element.metadata.image_path
-            for element in data
-            if "image_path" in element.metadata.__dict__
-        ]
 
         unstructured_metadata = [element.metadata.to_dict() for element in data]
         for metadata_dict, element in zip(unstructured_metadata, data):
@@ -542,7 +538,7 @@ class BaseParser(ABC):
                     2,
                 )
 
-                page_attached_image_info["image_path"] = str(fig_name)
+                page_attached_image_info["image_path"] = fig_label_name
 
                 j += 1
 
@@ -620,7 +616,8 @@ class BaseParser(ABC):
 
                     # replace image path in text
                     text = text.replace(image_name, link_name)
-                    attached_images.append(str(image_path.resolve()))
+                    # attached_images.append(str(image_path.resolve()))
+                    attached_images.append(link_name)
 
         metadata = {
             "engine": "marker",
@@ -691,12 +688,13 @@ class BaseParser(ABC):
                     except Exception as e:
                         logger.error(f"Failing to download image: {image_link}, {e}")
                         continue
-                    attached_images.append(str(image_path.resolve()))
 
                     if relative_path:
                         md_image_path = str(Path(image_path).relative_to(work_dir))
                     else:
                         md_image_path = str(image_path)
+                    # attached_images.append(str(image_path.resolve()))
+                    attached_images.append(md_image_path)
                     text = text.replace(image_link, f"![{image_name}]({md_image_path})")
                 logger.info(
                     f"Finihsed downloading {len(attached_images)} images to {image_dir}"
