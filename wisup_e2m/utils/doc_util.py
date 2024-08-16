@@ -7,7 +7,7 @@ from wisup_e2m.utils.libreoffice import convert_by_libreoffice
 logger = logging.getLogger(__name__)
 
 
-def convert_doc_to_docx(doc_path: str, docx_path: str, rm_original: bool = True):
+def convert_doc_to_docx(doc_path: str, docx_path: str, rm_original: bool = False):
     """Convert a .doc file to a .docx file.
 
     Args:

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 
-def convert_ppt_to_pptx(ppt_path: str, pptx_path: str, rm_original: bool = True):
+def convert_ppt_to_pptx(ppt_path: str, pptx_path: str, rm_original: bool = False):
     """Convert a .ppt file to a .pptx file.
 
     Args:
