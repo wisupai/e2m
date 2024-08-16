@@ -103,6 +103,7 @@ class BaseConverter(ABC):
 
         # load cache
         if self.config.caching:
+            logging.info("Litellm caching enabled, initializing cache")
             from litellm.caching import Cache
 
             if self.config.cache_type == "redis-cache":
@@ -139,6 +140,8 @@ class BaseConverter(ABC):
 
                 cache.get_cache_key = custom_get_cache_key
 
+            litellm.caching = True
+            litellm.caching_with_models = True
             litellm.cache = cache
 
             self.litellm_client = None

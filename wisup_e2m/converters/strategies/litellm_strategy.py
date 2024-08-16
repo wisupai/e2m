@@ -66,6 +66,7 @@ class LitellmStrategy(BaseStrategy):
 
     def _query(self, messages, verbose=True, **kwargs):
         if not self.litellm_client:
+            logging.info("Using the default LiteLLM client.")
             response = completion(
                 messages=messages,
                 model=kwargs.get("model"),
@@ -90,6 +91,7 @@ class LitellmStrategy(BaseStrategy):
                 max_tokens=kwargs.get("max_tokens"),
                 presence_penalty=kwargs.get("presence_penalty"),
                 frequency_penalty=kwargs.get("frequency_penalty"),
+                cache=kwargs.get("cache"),
                 stream=True,
             )
 
@@ -172,7 +174,7 @@ class LitellmStrategy(BaseStrategy):
                     get_model_info(model)["max_input_tokens"]
                 )
             ],
-            verbose=False,
+            verbose=verbose,
             **kwargs,
         )
 
@@ -242,7 +244,7 @@ class LitellmStrategy(BaseStrategy):
     ) -> str:
 
         inferenced_text_format = self.text_format_inference(
-            images=images[:10], verbose=False, **kwargs
+            images=images[:10], verbose=verbose, **kwargs
         )
 
         converted_text = []
