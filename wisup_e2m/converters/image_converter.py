@@ -34,3 +34,34 @@ class ImageConverter(BaseConverter):
             )
         else:
             raise ValueError(f"Unsupported strategy: {strategy}")
+
+    def convert(
+        self,
+        images: List[str],
+        attached_images_map: Dict[str, List[str]] = {},
+        verbose: bool = True,
+        strategy: str = "default",
+        image_batch_size: int = 5,
+        **kwargs,
+    ) -> str:
+        for k, v in kwargs.items():
+            setattr(kwargs, k, v)
+
+        if self.config.engine == "litellm":
+            return self._convert_to_md_by_litellm(**kwargs)
+        else:
+            raise ValueError(f"Unsupported engine: {self.config.engine}")
+
+    def __call__(
+        self,
+        images: List[str],
+        attached_images_map: Dict[str, List[str]] = {},
+        verbose: bool = True,
+        strategy: str = "default",
+        image_batch_size: int = 5,
+        **kwargs,
+    ) -> str:
+        for k, v in kwargs.items():
+            setattr(kwargs, k, v)
+
+        return self.convert(**kwargs)

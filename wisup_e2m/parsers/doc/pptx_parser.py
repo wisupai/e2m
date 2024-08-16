@@ -15,8 +15,8 @@ class PptxParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
     SUPPERTED_FILE_TYPES = ["pptx"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None):
-        super().__init__(config)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
+        super().__init__(config, **kwargs)
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
@@ -162,3 +162,50 @@ class PptxParser(BaseParser):
             )
         else:
             raise NotImplementedError(f"Engine {self.config.engine} not supported")
+
+    def parse(
+        self,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        start_page: int = None,
+        end_page: int = None,
+        include_page_breaks: bool = True,
+        include_slide_notes: Optional[bool] = None,
+        infer_table_structure: bool = True,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)
+
+    def __call__(
+        self,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        start_page: int = None,
+        end_page: int = None,
+        include_page_breaks: bool = True,
+        include_slide_notes: Optional[bool] = None,
+        infer_table_structure: bool = True,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)

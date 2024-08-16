@@ -11,11 +11,16 @@ logger = logging.getLogger(__name__)
 class BaseConverter(ABC):
     SUPPORTED_ENGINES = []
 
-    def __init__(self, config: Optional[BaseConverterConfig] = None):
+    def __init__(self, config: Optional[BaseConverterConfig] = None, **config_kwargs):
         if config is None:
             self.config = BaseConverterConfig()
         else:
             self.config = config
+
+        for k, v in config_kwargs.items():
+            if not hasattr(self.config, k):
+                raise ValueError(f"Config does not have attribute {k}")
+            setattr(self.config, k, v)
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -28,14 +33,11 @@ class BaseConverter(ABC):
         verbose: bool = True,
         **kwargs,
     ) -> str:
+        for k, v in kwargs.items():
+            setattr(kwargs, k, v)
+
         if self.config.engine == "litellm":
-            return self._convert_to_md_by_litellm(
-                text=text,
-                images=images,
-                attached_images_map=attached_images_map,
-                verbose=verbose,
-                **kwargs,
-            )
+            return self._convert_to_md_by_litellm(**kwargs)
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
 

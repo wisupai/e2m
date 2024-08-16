@@ -49,7 +49,7 @@ class BaseParser(ABC):
     SUPPORTED_ENGINES = []
     SUPPERTED_FILE_TYPES = []
 
-    def __init__(self, config: Optional[BaseParserConfig] = None):
+    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
         """Initialize a base parser class
 
         :param config: Parser configuration option class, defaults to None
@@ -70,6 +70,10 @@ class BaseParser(ABC):
             max_redirects=self.config.client_max_redirects,
             proxy=self.config.client_proxy,
         )
+
+        for k, v in kwargs.items():
+            if hasattr(self.config, k):
+                setattr(self.config, k, v)
 
     @classmethod
     def from_config(cls, config_dict: Dict[str, Any]):
@@ -97,6 +101,17 @@ class BaseParser(ABC):
         :type data: Any
         """
         pass
+
+    def parse(self, *args, **kwargs):
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        return self.get_parsed_data(*args, **kwargs)
+    
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.parse(*args, **kwargs)
 
     def _ensure_engine_exists(self):
         """

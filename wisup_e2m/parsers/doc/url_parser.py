@@ -15,8 +15,8 @@ class UrlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "jina"]
     SUPPERTED_FILE_TYPES = ["url"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None):
-        super().__init__(config)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
+        super().__init__(config, **kwargs)
 
         if not self.config.engine:
             self.config.engine = "jina"  # unstructured / jina
@@ -153,3 +153,46 @@ class UrlParser(BaseParser):
             )
         else:
             raise NotImplementedError(f"Engine {self.config.engine} not supported")
+        
+
+    
+    def parse(
+        self,
+        url: Optional[str] = None,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        text: Optional[str] = None,
+        encoding: str = "utf-8",
+        skip_headers_and_footers: bool = True,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)
+
+    def __call__(
+        self,
+        url: Optional[str] = None,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        text: Optional[str] = None,
+        encoding: str = "utf-8",
+        skip_headers_and_footers: bool = True,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)

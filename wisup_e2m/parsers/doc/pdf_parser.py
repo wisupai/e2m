@@ -1,6 +1,6 @@
 # /e2m/parsers/pdf_parser.py
 import logging
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
@@ -14,8 +14,8 @@ class PdfParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker"]
     SUPPERTED_FILE_TYPES = ["pdf"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None):
-        super().__init__(config)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
+        super().__init__(config, **kwargs)
 
         if not self.config.engine:
             self.config.engine = "unstructured"
@@ -299,3 +299,40 @@ class PdfParser(BaseParser):
                 image_dir=image_dir,
                 relative_path=relative_path,
             )
+
+    def parse(
+        self,
+        file_name: str,
+        start_page: int = None,
+        end_page: int = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)
+
+    def __call__(
+        self,
+        file_name: str,
+        start_page: int = None,
+        end_page: int = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)

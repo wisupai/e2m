@@ -1,6 +1,8 @@
 # /e2m/parsers/doc_parser.py
 import logging
 
+from typing import Optional, IO
+
 from wisup_e2m.parsers.base import E2MParsedData
 from wisup_e2m.parsers.doc.docx_parser import DocxParser
 from wisup_e2m.utils.doc_util import convert_doc_to_docx
@@ -35,12 +37,44 @@ class DocParser(DocxParser):
             convert_doc_to_docx(file_name, docx_file)
             file_name = docx_file
 
-        return super().get_parsed_data(
-            file_name=file_name,
-            extract_images=extract_images,
-            include_image_link_in_text=include_image_link_in_text,
-            ignore_transparent_images=ignore_transparent_images,
-            work_dir=work_dir,
-            image_dir=image_dir,
-            relative_path=relative_path,
-        )
+        for k, v in locals().items():
+            kwargs[k] = v
+
+        return super().get_parsed_data(**kwargs)
+
+    def parse(
+        self,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)
+
+    def __call__(
+        self,
+        file_name: Optional[str] = None,
+        file: Optional[IO[bytes]] = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        for k, v in locals().items():
+            kwargs[k] = v
+        self.get_parsed_data(**kwargs)
