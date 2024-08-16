@@ -7,11 +7,36 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class BaseConverter(ABC):
     SUPPORTED_ENGINES = []
 
     def __init__(self, config: Optional[BaseConverterConfig] = None, **config_kwargs):
+        """
+        Initialize the converter with the given config
+
+        :param config: BaseConverterConfig
+
+        :param engine: str, the engine to use for conversion, default is litellm
+
+        :param caching: bool, whether to cache the results, default is True
+        :param cache_type: str, type of cache to use, including redis-cache, s3-cache, redis-semantic-cache, in-memory-cache, disk-cache, default is disk-cache
+        :param cache_key_params: list, list of parameters to use as cache key, default is ["model", "messages", "temperature", "top_p", "n", "max_tokens", "presence_penalty", "frequency_penalty"]
+        :param model: str, model to use for conversion, default is deepseek/deepseek-chat
+        :param temperature: float, the temperature parameter for controlling the randomness of the output (default is 1.0), default is None
+        :param top_p: float, the top-p parameter for nucleus sampling (default is 1.0), default is None
+        :param n: int, the number of completions to generate (default is 1), default is None
+        :param max_tokens: int, the maximum number of tokens in the generated completion (default is infinity), default is None
+        :param presence_penalty: float, it is used to penalize new tokens based on their existence in the text so far, default is None
+        :param frequency_penalty: float, it is used to penalize new tokens based on their frequency in the text so far, default is None
+        :param base_url: str, base URL for the API, default is None
+        :param api_version: str, API version, default is None
+        :param api_key: str, API key for the API, default is None
+        :param custom_llm_provider: str, custom LLM provider, default is None
+
+        :param timeout: float, timeout for the request, default is 600
+        :param max_retries: int, maximum number of retries, default is 3
+        :param default_headers: dict, default headers for the request, default is None
+        """
         if config is None:
             self.config = BaseConverterConfig()
         else:
@@ -76,6 +101,7 @@ class BaseConverter(ABC):
                 "litellm is not installed. Please install it using `pip install litellm`"
             )
 
+        # load cache
         if self.config.caching:
             from litellm.caching import Cache
 
@@ -96,11 +122,28 @@ class BaseConverter(ABC):
                     raise ImportError(
                         "diskcache is not installed. Please install it using `pip install diskcache`"
                     )
-                litellm.cache = Cache(type="disk")
+                cache = Cache(type="disk")
+
             else:
                 raise ValueError(f"Unsupported cache type: {self.config.cache_type}")
 
+            # set custom cache key function
+            if self.config.cache_key_params:
+
+                def custom_get_cache_key(*args, **kwargs):
+                    # return key to use for your cache:
+                    for item in self.config.cache_key_params:
+                        key = kwargs.get(item, "")
+                    logger.debug(f"key for cache: {key}")
+                    return key
+
+                cache.get_cache_key = custom_get_cache_key
+
+            litellm.cache = cache
+
             self.litellm_client = None
+
+            return
 
         logger.info("Loading litellm engine")
         self.litellm_client = litellm.LiteLLM(

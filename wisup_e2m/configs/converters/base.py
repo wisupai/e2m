@@ -23,14 +23,15 @@ class BaseConverterConfig(BaseModel):
         description="Type of cache to use, including redis-cache, s3-cache, redis-semantic-cache, in-memory-cache, disk-cache",
     )
 
+    cache_key_params: Optional[list] = Field(
+        ["model", "messages", "temperature", "top_p", "n", "max_tokens", "presence_penalty", "frequency_penalty"],
+        description="List of parameters to use as cache key",
+    )
+
     # liellm completion config
     model: str = Field(
         "deepseek/deepseek-chat",
         description="Model to use for conversion",
-    )
-    timeout: Optional[float] = Field(
-        None,
-        description="Timeout for the request",
     )
     temperature: Optional[float] = Field(
         None,

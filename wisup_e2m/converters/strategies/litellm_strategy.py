@@ -172,7 +172,7 @@ class LitellmStrategy(BaseStrategy):
                     get_model_info(model)["max_input_tokens"]
                 )
             ],
-            verbose=verbose,
+            verbose=False,
             **kwargs,
         )
 
@@ -242,7 +242,7 @@ class LitellmStrategy(BaseStrategy):
     ) -> str:
 
         inferenced_text_format = self.text_format_inference(
-            images=images[:10], verbose=verbose, **kwargs
+            images=images[:10], verbose=False, **kwargs
         )
 
         converted_text = []
@@ -338,6 +338,7 @@ def _break_text_into_chunks(
     max_tokens: Optional[int] = None,
 ) -> List[str]:
     model_info = get_model_info(model, custom_llm_provider)
+    logger.info(f"Model info: {model_info}")
     max_output_tokens = model_info["max_output_tokens"]
     if not max_tokens or max_tokens > max_output_tokens:
         logger.debug(
