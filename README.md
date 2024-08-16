@@ -6,7 +6,7 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.2">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.3">
         <img src="https://img.shields.io/badge/version-0.1.2-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
