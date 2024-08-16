@@ -115,7 +115,7 @@ class EpubParser(BaseParser):
 
         """
         if file_name:
-            self._validate_input_flie(file_name)
+            EpubParser._validate_input_flie(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(

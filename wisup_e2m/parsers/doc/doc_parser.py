@@ -2,6 +2,8 @@
 import logging
 
 from typing import Optional, IO
+from pathlib import Path
+from uuid import uuid4
 
 from wisup_e2m.parsers.base import E2MParsedData
 from wisup_e2m.parsers.doc.docx_parser import DocxParser
@@ -40,18 +42,30 @@ class DocParser(DocxParser):
         Parse the data and return the parsed data
 
         """
-        if not file_name:
-            raise ValueError("file_name is required")
 
-        if file_name.endswith(".doc"):
-            docx_file = file_name.replace(".doc", ".docx")
-            convert_doc_to_docx(file_name, docx_file)
-            file_name = docx_file
+        DocParser._validate_input_flie(file_name)
 
-        for k, v in locals().items():
-            kwargs[k] = v
+        try:
+            tmp_dir = Path(f"./.tmp/{uuid4()}")
+            tmp_dir.mkdir(parents=True, exist_ok=True)
+            tmp_file_name = tmp_dir / f"{uuid4()}.docx"
+            convert_doc_to_docx(file_name, str(tmp_file_name))
+            file_name = str(tmp_file_name)
 
-        return super().get_parsed_data(**kwargs)
+            for k, v in locals().items():
+                if k in _doc_parser_params:
+                    kwargs[k] = v
+
+            data = super().get_parsed_data(**kwargs)
+
+            return data
+
+        except Exception as e:
+            logger.error(f"Error converting {file_name} to docx: {e}")
+            raise
+        finally:
+            if tmp_file_name.exists():
+                tmp_file_name.unlink()
 
     def parse(
         self,

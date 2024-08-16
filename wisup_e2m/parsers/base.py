@@ -123,10 +123,15 @@ class BaseParser(ABC):
             raise
         logger.info(f"Engine: {self.config.engine} is valid.")
 
-    def _validate_input_flie(self, file: str):
-        if not any(file.endswith(ext) for ext in self.SUPPERTED_FILE_TYPES):
+    @classmethod
+    def _validate_input_flie(cls, file: str):
+        if not file:
+            raise ValueError("File is empty!")
+        if not Path(file).exists():
+            raise FileNotFoundError(f"File not found: {file}")
+        if not any(file.endswith(ext) for ext in cls.SUPPERTED_FILE_TYPES):
             raise ValueError(
-                f"File type not supported. Supported file types: {self.SUPPERTED_FILE_TYPES}"
+                f"File type not supported. Supported file types: {cls.SUPPERTED_FILE_TYPES}"
             )
 
     def _load_engine(self):

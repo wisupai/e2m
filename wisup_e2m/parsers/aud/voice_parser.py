@@ -100,6 +100,9 @@ class VoiceParser(BaseParser):
         :rtype: E2MParsedData
         """
 
+        if file_name:
+            VoiceParser._validate_input_flie(file_name)
+
         if self.config.engine == "openai_whisper_api":
             return self._parse_by_openai_whisper_api(file_name)
         elif self.config.engine == "openai_whisper_local":

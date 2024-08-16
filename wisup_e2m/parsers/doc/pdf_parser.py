@@ -274,7 +274,7 @@ class PdfParser(BaseParser):
         :rtype: E2MParsedData
         """
         if file_name:
-            self._validate_input_flie(file_name)
+            PdfParser._validate_input_flie(file_name)
 
         if self.config.engine == "surya_layout":
             return self._parse_by_surya_layout(

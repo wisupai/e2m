@@ -2,6 +2,8 @@
 import logging
 
 from typing import Optional, IO
+from pathlib import Path
+from uuid import uuid4
 
 from wisup_e2m.parsers.base import E2MParsedData
 from wisup_e2m.parsers.doc.pptx_parser import PptxParser
@@ -12,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 _ppt_parser_params = [
     "file_name",
-    "file",
     "start_page",
     "end_page",
     "include_page_breaks",
@@ -26,13 +27,13 @@ _ppt_parser_params = [
     "relative_path",
 ]
 
+
 class PptParser(PptxParser):
     SUPPERTED_FILE_TYPES = ["ppt"]
 
     def get_parsed_data(
         self,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
+        file_name: str = None,
         start_page: int = None,
         end_page: int = None,
         include_page_breaks: bool = True,
@@ -50,23 +51,32 @@ class PptParser(PptxParser):
         Parse the data and return the parsed data
 
         """
-        if not file_name:
-            raise ValueError("file_name is required")
+        PptParser._validate_input_flie(file_name)
 
-        if file_name.endswith(".ppt"):
-            docx_file = file_name.replace(".ppt", ".pptx")
-            convert_ppt_to_pptx(file_name, docx_file)
-            file_name = docx_file
+        try:
+            tmp_dir = Path(f"./.tmp/{uuid4()}")
+            tmp_dir.mkdir(parents=True, exist_ok=True)
+            tmp_file_name = tmp_dir / f"{uuid4()}.pptx"
+            convert_ppt_to_pptx(file_name, str(tmp_file_name))
+            file_name = str(tmp_file_name)
 
-        for k, v in locals().items():
-            kwargs[k] = v
+            for k, v in locals().items():
+                if k in _ppt_parser_params:
+                    kwargs[k] = v
 
-        return super().get_parsed_data(**kwargs)
+            data = super().get_parsed_data(**kwargs)
+            return data
+
+        except Exception as e:
+            logger.error(f"Error converting {file_name} to docx: {e}")
+            raise
+        finally:
+            if tmp_file_name.exists():
+                tmp_file_name.unlink()
 
     def parse(
         self,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
+        file_name: str = None,
         start_page: int = None,
         end_page: int = None,
         include_page_breaks: bool = True,

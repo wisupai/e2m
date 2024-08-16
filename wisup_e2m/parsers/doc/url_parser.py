@@ -141,7 +141,7 @@ class UrlParser(BaseParser):
 
         """
         if file_name:
-            self._validate_input_flie(file_name)
+            UrlParser._validate_input_flie(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(
