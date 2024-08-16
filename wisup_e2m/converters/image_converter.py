@@ -53,7 +53,8 @@ class ImageConverter(BaseConverter):
         **kwargs,
     ) -> str:
         for k, v in locals().items():
-            kwargs[k] = v
+            if k in _image_converter_params:
+                kwargs[k] = v
 
         if self.config.engine == "litellm":
             return self._convert_to_md_by_litellm(**kwargs)
