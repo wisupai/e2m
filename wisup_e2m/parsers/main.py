@@ -33,6 +33,10 @@ parser_default_config = {
         "engine": "marker",
         "langs": ["en", "zh"],
     },
+    "ppt_parser": {
+        "engine": "unstructured",
+        "langs": ["en", "zh"],
+    },
     "pptx_parser": {
         "engine": "unstructured",
         "langs": ["en", "zh"],
