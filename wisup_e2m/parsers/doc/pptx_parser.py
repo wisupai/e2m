@@ -10,6 +10,39 @@ from wisup_e2m.utils.pptx_util import get_pptx_images
 
 logger = logging.getLogger(__name__)
 
+"""
+file_name: Optional[str] = None,
+file: Optional[IO[bytes]] = None,
+start_page: int = None,
+end_page: int = None,
+include_page_breaks: bool = True,
+include_slide_notes: Optional[bool] = None,
+infer_table_structure: bool = True,
+extract_images: bool = True,
+include_image_link_in_text: bool = True,
+ignore_transparent_images: bool = True,
+work_dir: str = "./",
+image_dir: str = "./figures",
+relative_path: bool = True,
+"""
+
+
+_pptx_parser_params = [
+    "file_name",
+    "file",
+    "start_page",
+    "end_page",
+    "include_page_breaks",
+    "include_slide_notes",
+    "infer_table_structure",
+    "extract_images",
+    "include_image_link_in_text",
+    "ignore_transparent_images",
+    "work_dir",
+    "image_dir",
+    "relative_path",
+]
+
 
 class PptxParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
@@ -186,26 +219,8 @@ class PptxParser(BaseParser):
         :rtype: E2MParsedData
         """
         for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+            if k in _pptx_parser_params:
+                kwargs[k] = v
 
-    def __call__(
-        self,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
-        start_page: int = None,
-        end_page: int = None,
-        include_page_breaks: bool = True,
-        include_slide_notes: Optional[bool] = None,
-        infer_table_structure: bool = True,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+        return self.get_parsed_data(**kwargs)
+

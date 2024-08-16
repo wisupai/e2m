@@ -10,6 +10,19 @@ from wisup_e2m.utils.web_util import get_web_content
 
 logger = logging.getLogger(__name__)
 
+_html_parser_params = [
+    "url",
+    "file_name",
+    "file",
+    "text",
+    "encoding",
+    "skip_headers_and_footers",
+    "include_image_link_in_text",
+    "work_dir",
+    "image_dir",
+    "relative_path",
+]
+
 
 class HtmlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
@@ -147,23 +160,6 @@ class HtmlParser(BaseParser):
         :rtype: E2MParsedData
         """
         for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
-
-    def __call__(
-        self,
-        url: Optional[str] = None,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
-        text: Optional[str] = None,
-        encoding: str = "utf-8",
-        skip_headers_and_footers: bool = True,
-        include_image_link_in_text: bool = True,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+            if k in _html_parser_params:
+                kwargs[k] = v
+        return self.get_parsed_data(**kwargs)

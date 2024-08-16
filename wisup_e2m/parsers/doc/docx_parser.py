@@ -11,6 +11,18 @@ from wisup_e2m.utils.docx_util import get_docx_images
 logger = logging.getLogger(__name__)
 
 
+_docx_parser_params = [
+    "file_name",
+    "file",
+    "extract_images",
+    "include_image_link_in_text",
+    "ignore_transparent_images",
+    "work_dir",
+    "image_dir",
+    "relative_path",
+]
+
+
 class DocxParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
     SUPPERTED_FILE_TYPES = ["docx"]
@@ -121,7 +133,7 @@ class DocxParser(BaseParser):
             )
         else:
             raise NotImplementedError(f"Engine {self.config.engine} not supported")
-        
+
     def parse(
         self,
         file_name: Optional[str] = None,
@@ -140,21 +152,7 @@ class DocxParser(BaseParser):
         :rtype: E2MParsedData
         """
         for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+            if k in _docx_parser_params:
+                kwargs[k] = v
 
-    def __call__(
-        self,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+        return self.get_parsed_data(**kwargs)

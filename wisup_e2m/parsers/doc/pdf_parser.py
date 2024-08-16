@@ -9,6 +9,17 @@ from wisup_e2m.utils.pdf_util import convert_pdf_to_images
 
 logger = logging.getLogger(__name__)
 
+_pdf_parser_params = [
+    "file_name",
+    "start_page",
+    "end_page",
+    "extract_images",
+    "include_image_link_in_text",
+    "work_dir",
+    "image_dir",
+    "relative_path",
+]
+
 
 class PdfParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker"]
@@ -318,21 +329,6 @@ class PdfParser(BaseParser):
         :rtype: E2MParsedData
         """
         for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
-
-    def __call__(
-        self,
-        file_name: str,
-        start_page: int = None,
-        end_page: int = None,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+            if k in _pdf_parser_params:
+                kwargs[k] = v
+        return self.get_parsed_data(**kwargs)

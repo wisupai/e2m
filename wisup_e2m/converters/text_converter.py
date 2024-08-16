@@ -30,22 +30,10 @@ class TextConverter(BaseConverter):
         strategy: str = "default",
         **kwargs,
     ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
+        for k, v in locals().items():
+            kwargs[k] = v
 
         if self.config.engine == "litellm":
             return self._convert_to_md_by_litellm(**kwargs)
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
-
-    def __call__(
-        self,
-        text: str,
-        verbose: bool = True,
-        strategy: str = "default",
-        **kwargs,
-    ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
-
-        return self.convert(**kwargs)

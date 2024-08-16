@@ -11,6 +11,18 @@ from wisup_e2m.utils.epub_util import get_epub_images
 logger = logging.getLogger(__name__)
 
 
+_epub_parser_params = [
+    "file_name",
+    "file",
+    "extract_images",
+    "include_image_link_in_text",
+    "ignore_transparent_images",
+    "work_dir",
+    "image_dir",
+    "relative_path",
+]
+
+
 class EpubParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
     SUPPERTED_FILE_TYPES = ["epub"]
@@ -137,21 +149,6 @@ class EpubParser(BaseParser):
         :rtype: E2MParsedData
         """
         for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
-
-    def __call__(
-        self,
-        file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        for k, v in locals().items():
-            kwargs[k] = v
-        self.get_parsed_data(**kwargs)
+            if k in _epub_parser_params:
+                kwargs[k] = v
+        return self.get_parsed_data(**kwargs)

@@ -9,6 +9,9 @@ from wisup_e2m.parsers.base import BaseParser, E2MParsedData
 logger = logging.getLogger(__name__)
 
 
+_voice_parser_params = ["file_name"]
+
+
 class VoiceParser(BaseParser):
     SUPPORTED_ENGINES = [
         "openai_whisper_api",
@@ -112,15 +115,7 @@ class VoiceParser(BaseParser):
         **kwargs,
     ):
         for k, v in locals().items():
-            setattr(kwargs, k, v)
+            if k in _voice_parser_params:
+                kwargs[k] = v
 
         return self.get_parsed_data(**kwargs)
-
-    def __call__(
-        self,
-        file_name: str,
-        **kwargs,
-    ):
-        for k, v in locals().items():
-            setattr(kwargs, k, v)
-        return self.parse(**kwargs)

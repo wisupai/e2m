@@ -44,8 +44,8 @@ class ImageConverter(BaseConverter):
         image_batch_size: int = 5,
         **kwargs,
     ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
+        for k, v in locals().items():
+            kwargs[k] = v
 
         if self.config.engine == "litellm":
             return self._convert_to_md_by_litellm(**kwargs)
@@ -61,7 +61,7 @@ class ImageConverter(BaseConverter):
         image_batch_size: int = 5,
         **kwargs,
     ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
+        for k, v in locals().items():
+            kwargs[k] = v
 
         return self.convert(**kwargs)

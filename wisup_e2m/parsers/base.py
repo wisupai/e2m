@@ -72,8 +72,7 @@ class BaseParser(ABC):
         )
 
         for k, v in config_kwargs.items():
-            if hasattr(self.config, k):
-                setattr(self.config, k, v)
+            setattr(self.config, k, v)
 
     @classmethod
     def from_config(cls, config_dict: Dict[str, Any]):

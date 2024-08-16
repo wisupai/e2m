@@ -106,21 +106,6 @@ class E2MConverter:
         image_batch_size: int = 5,
         **kwargs,
     ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
-        return self.convert_to_md(**kwargs)
-
-    def __call__(
-        self,
-        text: Optional[str] = None,
-        images: Optional[List[str]] = None,
-        attached_images_map: Dict[str, List[str]] = {},
-        verbose: bool = True,
-        strategy: str = "default",
-        image_batch_size: int = 5,
-        **kwargs,
-    ) -> str:
-        for k, v in kwargs.items():
-            setattr(kwargs, k, v)
-
+        for k, v in locals().items():
+            kwargs[k] = v
         return self.convert_to_md(**kwargs)
