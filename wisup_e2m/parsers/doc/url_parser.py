@@ -15,8 +15,8 @@ class UrlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "jina"]
     SUPPERTED_FILE_TYPES = ["url"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
-        super().__init__(config, **kwargs)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
             self.config.engine = "jina"  # unstructured / jina

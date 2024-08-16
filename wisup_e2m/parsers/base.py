@@ -49,7 +49,7 @@ class BaseParser(ABC):
     SUPPORTED_ENGINES = []
     SUPPERTED_FILE_TYPES = []
 
-    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
+    def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """Initialize a base parser class
 
         :param config: Parser configuration option class, defaults to None
@@ -71,7 +71,7 @@ class BaseParser(ABC):
             proxy=self.config.client_proxy,
         )
 
-        for k, v in kwargs.items():
+        for k, v in config_kwargs.items():
             if hasattr(self.config, k):
                 setattr(self.config, k, v)
 

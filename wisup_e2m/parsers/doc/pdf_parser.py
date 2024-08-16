@@ -14,8 +14,8 @@ class PdfParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker"]
     SUPPERTED_FILE_TYPES = ["pdf"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
-        super().__init__(config, **kwargs)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
             self.config.engine = "unstructured"

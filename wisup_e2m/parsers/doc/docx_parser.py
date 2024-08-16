@@ -15,8 +15,8 @@ class DocxParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
     SUPPERTED_FILE_TYPES = ["docx"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None, **kwargs):
-        super().__init__(config, **kwargs)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina

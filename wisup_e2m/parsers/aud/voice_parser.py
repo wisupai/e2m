@@ -17,8 +17,8 @@ class VoiceParser(BaseParser):
     ]
     SUPPERTED_FILE_TYPES = ["mp3", "m4a"]
 
-    def __init__(self, config: Optional[BaseParserConfig] = None):
-        super().__init__(config)
+    def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
             self.config.engine = "openai_whisper_local"
@@ -105,3 +105,22 @@ class VoiceParser(BaseParser):
             return self._parse_by_speech_recognition(file_name)
         else:
             raise ValueError(f"Engine {self.config.engine} not supported")
+
+    def parse(
+        self,
+        file_name: str,
+        **kwargs,
+    ):
+        for k, v in locals().items():
+            setattr(kwargs, k, v)
+
+        return self.get_parsed_data(**kwargs)
+
+    def __call__(
+        self,
+        file_name: str,
+        **kwargs,
+    ):
+        for k, v in locals().items():
+            setattr(kwargs, k, v)
+        return self.parse(**kwargs)
