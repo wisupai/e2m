@@ -27,31 +27,31 @@ class LitellmStrategy(BaseStrategy):
     def __init__(self, litellm_client: Optional[LiteLLM] = None):
         self.litellm_client = litellm_client
 
-    async def _query_async(self, messages, **kwargs):
+    async def _query_async(self, messages, **completion_kwargs):
         if not self.litellm_client:
             response = await acompletion(
                 messages=messages,
-                model=kwargs.get("model"),
-                temperature=kwargs.get("temperature"),
-                top_p=kwargs.get("top_p"),
-                n=kwargs.get("n"),
-                max_tokens=kwargs.get("max_tokens"),
-                presence_penalty=kwargs.get("presence_penalty"),
-                frequency_penalty=kwargs.get("frequency_penalty"),
-                api_key=kwargs.get("api_key"),
-                base_url=kwargs.get("base_url"),
-                caching=kwargs.get("caching"),
+                model=completion_kwargs.get("model"),
+                temperature=completion_kwargs.get("temperature"),
+                top_p=completion_kwargs.get("top_p"),
+                n=completion_kwargs.get("n"),
+                max_tokens=completion_kwargs.get("max_tokens"),
+                presence_penalty=completion_kwargs.get("presence_penalty"),
+                frequency_penalty=completion_kwargs.get("frequency_penalty"),
+                api_key=completion_kwargs.get("api_key"),
+                base_url=completion_kwargs.get("base_url"),
+                caching=completion_kwargs.get("caching"),
             )
         else:
             response = await self.litellm_client.chat.completions.create(
                 messages=messages,
-                model=kwargs.get("model"),
-                temperature=kwargs.get("temperature"),
-                top_p=kwargs.get("top_p"),
-                n=kwargs.get("n"),
-                max_tokens=kwargs.get("max_tokens"),
-                presence_penalty=kwargs.get("presence_penalty"),
-                frequency_penalty=kwargs.get("frequency_penalty"),
+                model=completion_kwargs.get("model"),
+                temperature=completion_kwargs.get("temperature"),
+                top_p=completion_kwargs.get("top_p"),
+                n=completion_kwargs.get("n"),
+                max_tokens=completion_kwargs.get("max_tokens"),
+                presence_penalty=completion_kwargs.get("presence_penalty"),
+                frequency_penalty=completion_kwargs.get("frequency_penalty"),
                 acompletion=True,
             )
 
@@ -64,34 +64,34 @@ class LitellmStrategy(BaseStrategy):
 
         return response.choices[0].message.content
 
-    def _query(self, messages, verbose=True, **kwargs):
+    def _query(self, messages, verbose=True, **completion_kwargs):
         if not self.litellm_client:
             logging.info("Using the default LiteLLM client.")
             response = completion(
                 messages=messages,
-                model=kwargs.get("model"),
-                temperature=kwargs.get("temperature"),
-                top_p=kwargs.get("top_p"),
-                n=kwargs.get("n"),
-                max_tokens=kwargs.get("max_tokens"),
-                presence_penalty=kwargs.get("presence_penalty"),
-                frequency_penalty=kwargs.get("frequency_penalty"),
-                caching=kwargs.get("caching"),
-                api_key=kwargs.get("api_key"),
-                base_url=kwargs.get("base_url"),
+                model=completion_kwargs.get("model"),
+                temperature=completion_kwargs.get("temperature"),
+                top_p=completion_kwargs.get("top_p"),
+                n=completion_kwargs.get("n"),
+                max_tokens=completion_kwargs.get("max_tokens"),
+                presence_penalty=completion_kwargs.get("presence_penalty"),
+                frequency_penalty=completion_kwargs.get("frequency_penalty"),
+                caching=completion_kwargs.get("caching"),
+                api_key=completion_kwargs.get("api_key"),
+                base_url=completion_kwargs.get("base_url"),
                 stream=True,
             )
         else:
             response = self.litellm_client.chat.completions.create(
                 messages=messages,
-                model=kwargs.get("model"),
-                temperature=kwargs.get("temperature"),
-                top_p=kwargs.get("top_p"),
-                n=kwargs.get("n"),
-                max_tokens=kwargs.get("max_tokens"),
-                presence_penalty=kwargs.get("presence_penalty"),
-                frequency_penalty=kwargs.get("frequency_penalty"),
-                cache=kwargs.get("cache"),
+                model=completion_kwargs.get("model"),
+                temperature=completion_kwargs.get("temperature"),
+                top_p=completion_kwargs.get("top_p"),
+                n=completion_kwargs.get("n"),
+                max_tokens=completion_kwargs.get("max_tokens"),
+                presence_penalty=completion_kwargs.get("presence_penalty"),
+                frequency_penalty=completion_kwargs.get("frequency_penalty"),
+                cache=completion_kwargs.get("cache"),
                 stream=True,
             )
 
@@ -243,6 +243,7 @@ class LitellmStrategy(BaseStrategy):
         **kwargs,
     ) -> str:
 
+        # 取前10张图片进行格式推断
         inferenced_text_format = self.text_format_inference(
             images=images[:10], verbose=verbose, **kwargs
         )
