@@ -5,7 +5,7 @@ import os
 import sys
 
 from surya.detection import batch_text_detection
-from surya.input.load import load_from_folder, load_from_file
+from surya.input.load import load_from_file, load_from_folder
 from surya.layout import batch_layout_detection
 from surya.model.detection.model import load_model, load_processor
 from surya.settings import settings
@@ -26,18 +26,14 @@ def main():
         help="Maximum number of images to process in the same time.",
         default=100,
     )
-    parser.add_argument(
-        "--max", type=int, help="Maximum number of pages to process.", default=None
-    )
+    parser.add_argument("--max", type=int, help="Maximum number of pages to process.", default=None)
     parser.add_argument(
         "--batch_size",
         type=int,
         help="Batch size to use for processing images.",
         default=6,
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="Run in debug mode.", default=False
-    )
+    parser.add_argument("--debug", action="store_true", help="Run in debug mode.", default=False)
     args = parser.parse_args()
 
     # Suppress all output except print
@@ -58,9 +54,7 @@ def main():
         else:
             images, names = load_from_file(args.input_path, args.max)  # noqa
 
-        line_predictions = batch_text_detection(
-            images, det_model, det_processor, args.batch_size
-        )
+        line_predictions = batch_text_detection(images, det_model, det_processor, args.batch_size)
 
         layout_predictions = batch_layout_detection(
             images, model, processor, line_predictions, args.batch_size

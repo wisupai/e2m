@@ -1,14 +1,12 @@
 # /e2m/parsers/doc_parser.py
 import logging
-
-from typing import Optional, IO
 from pathlib import Path
+from typing import IO, Optional
 from uuid import uuid4
 
 from wisup_e2m.parsers.base import E2MParsedData
 from wisup_e2m.parsers.doc.docx_parser import DocxParser
 from wisup_e2m.utils.doc_util import convert_doc_to_docx
-
 
 logger = logging.getLogger(__name__)
 

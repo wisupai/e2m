@@ -1,11 +1,10 @@
 # /e2m/parsers/pdf_parser.py
 import logging
-from typing import List, Optional, Any, Dict
+from typing import List, Optional
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
 from wisup_e2m.utils.pdf_util import convert_pdf_to_images
-
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +29,7 @@ class PdfParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -46,7 +43,10 @@ class PdfParser(BaseParser):
             from unstructured.partition.pdf import partition_pdf
         except ImportError:
             raise ImportError(
-                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif-image pillow`"
+                "Unstructured engine not installed. Please install Unstructured by \
+                    `pip install unstructured unstructured_pytesseract \
+                        unstructured_inference pdfminer.six \
+                            matplotlib pillow-heif-image pillow`"
             ) from None
 
         self.unstructured_parse_func = partition_pdf
@@ -118,8 +118,10 @@ class PdfParser(BaseParser):
         Parse the data using the surya layout engine
         """
         import uuid
-        from PIL import Image
         from pathlib import Path
+
+        from PIL import Image
+
         from wisup_e2m.utils.image_util import BLUE_BGR
 
         # 根目录
@@ -138,9 +140,7 @@ class PdfParser(BaseParser):
             images = [Image.open(image_file) for image_file in all_images]
 
             logger.info(f"Total {len(all_images)} images")
-            layout_predictions = self.surya_layout_func(
-                str(tmp_dir), batch_size=batch_size
-            )
+            layout_predictions = self.surya_layout_func(str(tmp_dir), batch_size=batch_size)
 
             # reorder layout predictions,依据name字段，要和  all_images 的文件stem对应
             new_layout_predictions = []

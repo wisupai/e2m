@@ -1,5 +1,6 @@
+from typing import Dict, List
+
 from wisup_e2m.converters.base import BaseConverter
-from typing import List, Dict
 
 _image_converter_params = [
     "images",
@@ -60,4 +61,3 @@ class ImageConverter(BaseConverter):
             return self._convert_to_md_by_litellm(**kwargs)
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
-

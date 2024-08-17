@@ -1,7 +1,8 @@
-from pptx import Presentation
-import os
-from typing import IO, Dict, Any
 import io
+import os
+from typing import IO, Any, Dict
+
+from pptx import Presentation
 
 from wisup_e2m.utils.image_util import has_transparent_background
 
@@ -42,4 +43,5 @@ def get_pptx_images(
                 )
                 image_count += 1
 
-    return image_dict  # {page_number: [{'slide_number': 0, 'image_file': 'extracted_images/0_0.png', 'image_name': '0_0.png'}]}
+    # {page_number: [{'slide_number': 0, 'image_file': 'extracted_images/0_0.png', 'image_name': '0_0.png'}]}
+    return image_dict

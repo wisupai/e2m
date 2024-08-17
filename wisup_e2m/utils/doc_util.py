@@ -1,6 +1,4 @@
-import os
 import logging
-import subprocess
 
 from wisup_e2m.utils.libreoffice import convert_by_libreoffice
 

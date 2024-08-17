@@ -1,7 +1,9 @@
-import os
-from typing import IO, Dict, Any, Union
 import io
+import os
+from typing import IO, Any, Dict, Union
+
 from ebooklib import epub
+
 from wisup_e2m.utils.image_util import has_transparent_background
 
 
@@ -26,9 +28,7 @@ def get_epub_images(
         if item.media_type.startswith("image/"):
             image_bytes = item.content
 
-            if ignore_transparent_images and has_transparent_background(
-                io.BytesIO(image_bytes)
-            ):
+            if ignore_transparent_images and has_transparent_background(io.BytesIO(image_bytes)):
                 continue
 
             image_name = f"{idx}_{item.file_name.split('/')[-1]}"

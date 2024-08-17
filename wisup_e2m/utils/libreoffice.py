@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -28,9 +28,7 @@ def suggest_libo_installation():
     elif sys.platform == "darwin":
         return "brew install --cask libreoffice"
     elif sys.platform == "win32":
-        return (
-            "Please download and install LibreOffice from https://www.libreoffice.org/"
-        )
+        return "Please download and install LibreOffice from https://www.libreoffice.org/"
     else:
         return "Unknown system. Please install LibreOffice manually."
 
@@ -70,9 +68,7 @@ def convert_by_libreoffice(
 
     output_dir = os.path.dirname(output_path)
 
-    logger.info(
-        f"Converting [{input_path}] to [{output_path}] with format [{output_format}]"
-    )
+    logger.info(f"Converting [{input_path}] to [{output_path}] with format [{output_format}]")
 
     # Construct the command to convert the file using LibreOffice
     command = [
@@ -86,9 +82,7 @@ def convert_by_libreoffice(
     ]
 
     # Execute the command
-    subprocess.run(
-        command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-    )
+    subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Rename the converted file to the desired output filename if necessary
     converted_file = os.path.join(

@@ -1,11 +1,12 @@
 import logging
-from pydantic import ValidationError
-from typing import Any, Dict, Optional, Union, List
+from typing import Any, Dict, List, Optional, Union
 
-from wisup_e2m.utils.factory import ConverterFactory  # noqa
+from pydantic import ValidationError
+
 from wisup_e2m.configs.base import E2MConverterConfig
-from wisup_e2m.converters.text_converter import TextConverter
 from wisup_e2m.converters.image_converter import ImageConverter
+from wisup_e2m.converters.text_converter import TextConverter
+from wisup_e2m.utils.factory import ConverterFactory  # noqa
 
 logger = logging.getLogger(__name__)
 

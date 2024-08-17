@@ -1,6 +1,7 @@
-import os
-from typing import IO, Dict, Any, Union
 import io
+import os
+from typing import IO, Any, Dict, Union
+
 from docx import Document
 
 from wisup_e2m.utils.image_util import has_transparent_background
@@ -29,9 +30,7 @@ def get_docx_images(
         if "image" in rel.target_ref:
             image_bytes = rel.target_part.blob
 
-            if ignore_transparent_images and has_transparent_background(
-                io.BytesIO(image_bytes)
-            ):
+            if ignore_transparent_images and has_transparent_background(io.BytesIO(image_bytes)):
                 continue
 
             image_ext = rel.target_part.content_type.split("/")[-1]

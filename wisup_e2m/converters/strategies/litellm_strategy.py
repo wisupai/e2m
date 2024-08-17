@@ -1,22 +1,20 @@
-from litellm import LiteLLM, completion, acompletion
-from litellm import get_model_info
-from typing import List, Optional, Dict
+import logging
 from pathlib import Path
+from typing import Dict, List, Optional
+
+from litellm import LiteLLM, acompletion, completion, get_model_info
 
 from wisup_e2m.converters.strategies.base import BaseStrategy
-from wisup_e2m.utils.image_util import local_image_to_data_url
-from wisup_e2m.utils.llm_utils import LlmUtils
 from wisup_e2m.converters.strategies.prompts import (
     CONTINUE_NOTION,
+    DEFAULT_IMAGE_ROLE,
+    DEFAULT_TEXT_ROLE,
+    FORMAT_INFERENCE_INSTRUCTION,
     NEWLINE_NOTION,
     TEXT_FORMAT_INFERENCE_ROLE,
-    FORMAT_INFERENCE_INSTRUCTION,
-    DEFAULT_TEXT_ROLE,
-    DEFAULT_IMAGE_ROLE,
 )
-
-
-import logging
+from wisup_e2m.utils.image_util import local_image_to_data_url
+from wisup_e2m.utils.llm_utils import LlmUtils
 
 logger = logging.getLogger(__name__)
 
@@ -169,11 +167,7 @@ class LitellmStrategy(BaseStrategy):
         max_tokens = kwargs.get("max_tokens", None)
 
         inferenced_text_format = self.text_format_inference(
-            text=text[
-                : LlmUtils.estimate_token_to_char(
-                    get_model_info(model)["max_input_tokens"]
-                )
-            ],
+            text=text[: LlmUtils.estimate_token_to_char(get_model_info(model)["max_input_tokens"])],
             verbose=verbose,
             **kwargs,
         )
@@ -218,9 +212,7 @@ class LitellmStrategy(BaseStrategy):
             logger.info(f"Sending messages to the model: \n{messages}")
 
             converted_text.append(
-                LlmUtils.clean_to_markdown(
-                    self._query(messages, verbose=verbose, **kwargs)
-                )
+                LlmUtils.clean_to_markdown(self._query(messages, verbose=verbose, **kwargs))
             )
 
         # 去除所有的`<CONTINUE>`和`<END>`,  <CONTINUE> -> "", <END> -> "\n"
@@ -303,9 +295,7 @@ class LitellmStrategy(BaseStrategy):
                 )
 
             converted_text.append(
-                LlmUtils.clean_to_markdown(
-                    self._query(messages, verbose=verbose, **kwargs)
-                )
+                LlmUtils.clean_to_markdown(self._query(messages, verbose=verbose, **kwargs))
             )
 
         return "".join(
@@ -325,9 +315,7 @@ class LitellmStrategy(BaseStrategy):
 
         raise NotImplementedError("Not implemented yet.")
 
-    def with_toc_image_convert(
-        self, images: List[str], verbose: bool = True, **kwargs
-    ) -> str:
+    def with_toc_image_convert(self, images: List[str], verbose: bool = True, **kwargs) -> str:
         # 先识别出目录
 
         # 根据目录来修复文本

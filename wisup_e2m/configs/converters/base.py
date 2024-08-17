@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class BaseConverterConfig(BaseModel):
@@ -20,11 +21,21 @@ class BaseConverterConfig(BaseModel):
 
     cache_type: Optional[str] = Field(
         "disk-cache",
-        description="Type of cache to use, including redis-cache, s3-cache, redis-semantic-cache, in-memory-cache, disk-cache",
+        description="Type of cache to use, including redis-cache, \
+            s3-cache, redis-semantic-cache, in-memory-cache, disk-cache",
     )
 
     cache_key_params: Optional[list] = Field(
-        ["model", "messages", "temperature", "top_p", "n", "max_tokens", "presence_penalty", "frequency_penalty"],
+        [
+            "model",
+            "messages",
+            "temperature",
+            "top_p",
+            "n",
+            "max_tokens",
+            "presence_penalty",
+            "frequency_penalty",
+        ],
         description="List of parameters to use as cache key",
     )
 
@@ -35,7 +46,8 @@ class BaseConverterConfig(BaseModel):
     )
     temperature: Optional[float] = Field(
         None,
-        description="The temperature parameter for controlling the randomness of the output (default is 1.0)",
+        description="The temperature parameter for controlling \
+            the randomness of the output (default is 1.0)",
     )
     top_p: Optional[float] = Field(
         None,
@@ -47,15 +59,18 @@ class BaseConverterConfig(BaseModel):
     )
     max_tokens: Optional[int] = Field(
         None,
-        description="The maximum number of tokens in the generated completion (default is infinity)",
+        description="The maximum number of tokens in the \
+            generated completion (default is infinity)",
     )
     presence_penalty: Optional[float] = Field(
         None,
-        description="It is used to penalize new tokens based on their existence in the text so far.",
+        description="It is used to penalize new tokens based on \
+            their existence in the text so far.",
     )
     frequency_penalty: Optional[float] = Field(
         None,
-        description="It is used to penalize new tokens based on their frequency in the text so far.",
+        description="It is used to penalize new tokens based on \
+            their frequency in the text so far.",
     )
     base_url: Optional[str] = Field(
         None,

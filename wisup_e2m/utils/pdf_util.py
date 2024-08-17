@@ -1,7 +1,7 @@
-import subprocess
 import json
-from pathlib import Path
 import logging
+import subprocess
+from pathlib import Path
 from typing import Dict
 
 logger = logging.getLogger(__name__)
@@ -30,9 +30,7 @@ def surya_detect_layout(
     if max_pages:
         cmd.extend(["--max", str(max_pages)])
 
-    with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as process:
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:

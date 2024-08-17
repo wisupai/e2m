@@ -1,10 +1,11 @@
 import logging
-from pydantic import ValidationError
 from typing import Any, Dict, Optional, Union
 
-from wisup_e2m.utils.factory import ParserFactory
+from pydantic import ValidationError
+
 from wisup_e2m.configs.base import E2MParserConfig
-from wisup_e2m.parsers.base import E2MParsedData, BaseParser
+from wisup_e2m.parsers.base import BaseParser, E2MParsedData
+from wisup_e2m.utils.factory import ParserFactory
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,8 @@
-from PIL import Image
-from typing import Union, IO, Tuple
 import base64
 from mimetypes import guess_type
+from typing import IO, Tuple, Union
+
+from PIL import Image
 
 # RGB
 WHITE_RGB = (255, 255, 255)
@@ -137,9 +138,7 @@ def has_transparent_background(image_input: Union[str, IO[bytes]]) -> bool:
     :return: 如果图片具有透明背景，返回 True；否则返回 False
     """
     with Image.open(image_input) as img:
-        if img.mode in ("RGBA", "LA") or (
-            img.mode == "P" and "transparency" in img.info
-        ):
+        if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
             # 检查alpha通道
             alpha = img.split()[-1]
             if alpha.getextrema()[0] < 255:

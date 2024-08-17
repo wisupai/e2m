@@ -1,8 +1,9 @@
 # pdf_to_image_script.py
-from pathlib import Path
-from pdf2image import convert_from_path
-import json
 import argparse
+import json
+from pathlib import Path
+
+from pdf2image import convert_from_path
 
 
 def convert_pdf_to_images(pdf_path, output_dir, start_page, end_page, dpi=200):

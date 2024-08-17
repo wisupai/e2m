@@ -1,12 +1,8 @@
-import os
 import logging
-import subprocess
-import sys
 
 from wisup_e2m.utils.libreoffice import convert_by_libreoffice
 
 logger = logging.getLogger(__name__)
-
 
 
 def convert_ppt_to_pptx(ppt_path: str, pptx_path: str, rm_original: bool = False):

@@ -1,11 +1,11 @@
-from wisup_e2m.configs.converters.base import BaseConverterConfig
-from abc import ABC
-from typing import List, Optional, Dict, Any
-
-
 import logging
+from abc import ABC
+from typing import Any, Dict, List, Optional
+
+from wisup_e2m.configs.converters.base import BaseConverterConfig
 
 logger = logging.getLogger(__name__)
+
 
 class BaseConverter(ABC):
     SUPPORTED_ENGINES = []

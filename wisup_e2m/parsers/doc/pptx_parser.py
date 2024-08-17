@@ -1,12 +1,10 @@
 # /e2m/parsers/pptx_parser.py
 import logging
-from typing import List, Optional, IO
-
+from typing import IO, List, Optional
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
 from wisup_e2m.utils.pptx_util import get_pptx_images
-
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +35,7 @@ class PptxParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -103,12 +99,9 @@ class PptxParser(BaseParser):
                 ignore_transparent_images=ignore_transparent_images,
             )  # {'slide_number': 0, 'image_file': 'extracted_images/0_0.png', 'image_name': '0_0.png'}
 
-            logger.info(
-                f"Succesfully extracted {len(pptx_images)} images to {image_dir}"
-            )
+            logger.info(f"Succesfully extracted {len(pptx_images)} images to {image_dir}")
 
-            from unstructured.documents.elements import Image
-            from unstructured.documents.elements import ElementMetadata
+            from unstructured.documents.elements import ElementMetadata, Image
 
             # 添加为Image Element,添加在对应的页面后面
             for element in unstructured_elements:

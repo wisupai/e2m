@@ -1,19 +1,17 @@
-from pydantic import Field, field_validator, ValidationInfo
-from wisup_e2m.configs.parsers.base import BaseParserConfig
 from typing import Optional
+
+from pydantic import Field, ValidationInfo, field_validator
+
+from wisup_e2m.configs.parsers.base import BaseParserConfig
 
 
 class VoiceParserConfig(BaseParserConfig):
     # openai whisper settings
     model: Optional[str] = Field(None, description="OpenAI Whisper model to use")
 
-    api_key: Optional[str] = Field(
-        None, description="OpenAI API key to use for Whisper"
-    )
+    api_key: Optional[str] = Field(None, description="OpenAI API key to use for Whisper")
 
-    api_base: Optional[str] = Field(
-        None, description="OpenAI API base to use for Whisper"
-    )
+    api_base: Optional[str] = Field(None, description="OpenAI API base to use for Whisper")
 
     @field_validator("model")
     def validate_model(cls, v, values: ValidationInfo):

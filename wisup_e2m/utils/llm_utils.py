@@ -7,9 +7,7 @@ logger = logging.getLogger(__name__)
 class LlmUtils:
 
     @staticmethod
-    def break_text_into_chunks(
-        text: str, max_tokens: int, overlap: int = 300
-    ) -> list[str]:
+    def break_text_into_chunks(text: str, max_tokens: int, overlap: int = 300) -> list[str]:
         """
         Break a given text into chunks based on a maximum number of tokens per chunk.
 

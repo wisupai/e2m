@@ -1,8 +1,8 @@
 import logging
-import httpx
-from typing import Optional
 from functools import wraps
+from typing import Optional
 
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +51,7 @@ def get_web_content(url: str, client: Optional[httpx.Client] = None) -> str:
 
 
 @api_error_handler_async
-async def get_web_content_async(
-    url: str, client: Optional[httpx.AsyncClient] = None
-) -> str:
+async def get_web_content_async(url: str, client: Optional[httpx.AsyncClient] = None) -> str:
     if client is None:
         client = httpx.AsyncClient()
 

@@ -1,14 +1,12 @@
 # /e2m/parsers/doc_parser.py
 import logging
-
-from typing import Optional, IO
 from pathlib import Path
+from typing import Optional
 from uuid import uuid4
 
 from wisup_e2m.parsers.base import E2MParsedData
 from wisup_e2m.parsers.doc.pptx_parser import PptxParser
 from wisup_e2m.utils.ppt_util import convert_ppt_to_pptx
-
 
 logger = logging.getLogger(__name__)
 

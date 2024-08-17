@@ -1,12 +1,11 @@
-from typing import Any
 from wisup_e2m.converters.base import BaseConverter
-
 
 _text_converter_params = [
     "text",
     "verbose",
     "strategy",
 ]
+
 
 class TextConverter(BaseConverter):
     SUPPORTED_ENGINES = ["litellm"]
