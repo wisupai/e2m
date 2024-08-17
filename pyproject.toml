@@ -16,7 +16,6 @@ surya-ocr = "^0.4.15"
 torch = "2.3.1"
 marker-pdf = "^0.2.16"
 unstructured = "^0.15.0"
-pdfminer-six = "^20240706"
 pillow-heif = "^0.18.0"
 matplotlib = "3.9.0"
 unstructured-inference = "^0.7.36"
@@ -29,6 +28,7 @@ python-docx = "^1.1.2"
 speechrecognition = "^3.10.4"
 setuptools-rust = "^1.10.1"
 diskcache = "^5.6.3"
+platformdirs = "^4.2.2"
 
 
 [tool.poetry.group.test.dependencies]
@@ -38,9 +38,26 @@ pytest = "^8.3.2"
 ruff = "^0.4.8"
 isort = "^5.13.2"
 pytest = "^8.3.2"
-lint = "^1.2.1"
 black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+lint.ignore = ["C901"]
+lint.select = ["E", "F", "W", "C"]
+exclude = [
+    "venv",
+    ".venv",
+    "env",
+    ".env",
+    "migrations",
+    "__pycache__",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = true
