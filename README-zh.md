@@ -284,6 +284,12 @@ converter:
 
 ## 📧 联系我们
 
+扫描以下二维码加入我们的微信群(备注来自e2m项目):
+
+<p align="center">
+  <img src="docs/images/wechat_QR.jpg" width="200px" alt="wisup_e2m Logo">
+</p>
+
 如有任何问题或疑问，请在 [GitHub](https://github.com/wisupai/e2m) 上创建 issue 或通过 [team@wisup.ai](mailto:team@wisup.ai) 联系我们。
 
 ## 🌟 贡献
