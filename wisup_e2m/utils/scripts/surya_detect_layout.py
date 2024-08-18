@@ -10,6 +10,31 @@ from surya.layout import batch_layout_detection
 from surya.model.detection.model import load_model, load_processor
 from surya.settings import settings
 
+'''
+- Resource wordnet not found.
+  - Download [corpora/wordnet.zip](https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip) manually and unzip it to the directory specified in the error message. Otherwise, you can download it using the following commands:
+    - Windows: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~\AppData\Roaming\nltk_data\corpora\wordnet.zip` and `unzip ~\AppData\Roaming\nltk_data\corpora\wordnet.zip -d ~\AppData\Roaming\nltk_data\corpora\`
+    - Unix: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~/nltk_data/corpora/wordnet.zip` and `unzip ~/nltk_data/corpora/wordnet.zip -d ~/nltk_data/corpora/`
+
+'''
+
+def check_nltk_corpora_wordnet():
+    if os.name == 'nt':
+        nltk_data_path = os.path.join(os.environ['APPDATA'], 'nltk_data')
+    else:
+        nltk_data_path = os.path.join(os.environ['HOME'], '.nltk_data')
+    wordnet_path = os.path.join(nltk_data_path, 'corpora', 'wordnet')
+    if not os.path.exists(wordnet_path):
+        import httpx
+        with httpx.stream('GET', 'https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip') as r:
+            with open(os.path.join(nltk_data_path, 'corpora', 'wordnet.zip'), 'wb') as f:
+                for chunk in r.iter_bytes():
+                    f.write(chunk)
+        import zipfile
+        with zipfile.ZipFile(os.path.join(nltk_data_path, 'corpora', 'wordnet.zip'), 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(nltk_data_path, 'corpora'))
+    return True
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -78,4 +103,5 @@ def main():
 
 
 if __name__ == "__main__":
+    check_nltk_corpora_wordnet()
     main()
