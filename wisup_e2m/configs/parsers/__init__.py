@@ -17,5 +17,5 @@ __all__ = [
     "PptxParserConfig",
     "UrlParserConfig",
     "HtmlParserConfig",
-    "VoiceParserConfig"
+    "VoiceParserConfig",
 ]
