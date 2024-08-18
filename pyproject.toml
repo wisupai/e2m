@@ -33,11 +33,11 @@ platformdirs = "^4.2.2"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.8"
 isort = "^5.13.2"
-pytest = "^8.3.2"
 black = "^24.8.0"
 
 [build-system]
@@ -48,14 +48,7 @@ build-backend = "poetry.core.masonry.api"
 line-length = 100
 lint.ignore = ["C901"]
 lint.select = ["E", "F", "W", "C"]
-exclude = [
-    "venv",
-    ".venv",
-    "env",
-    ".env",
-    "migrations",
-    "__pycache__",
-]
+exclude = ["venv", ".venv", "env", ".env", "migrations", "__pycache__"]
 
 [tool.ruff.format]
 quote-style = "single"

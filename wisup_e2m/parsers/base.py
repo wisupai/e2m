@@ -191,7 +191,9 @@ class BaseParser(ABC):
             from unstructured.partition.auto import partition
         except ImportError:
             raise ImportError(
-                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif-image pillow`"
+                "Unstructured engine not installed. Please install Unstructured by \
+                    `pip install unstructured unstructured_pytesseract unstructured_inference\
+                          pdfminer.six matplotlib pillow-heif-image pillow`"
             ) from None
         self.unstructured_parse_func = partition
         logger.info("Unstructured engine loaded successfully.")

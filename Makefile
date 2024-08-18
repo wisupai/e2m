@@ -2,7 +2,8 @@
 
 # Variables
 ISORT_OPTIONS = --profile black
-PROJECT_NAME := e2m
+PROJECT_NAME := wisup_e2m
+BLACK_OPTIONS = --line-length 100
 
 # Default target
 all: format sort lint
@@ -15,6 +16,7 @@ install_all:
 
 # Format code with ruff
 format:
+	poetry run black . $(BLACK_OPTIONS)
 	poetry run ruff check . --fix $(RUFF_OPTIONS)
 
 # Sort imports with isort
