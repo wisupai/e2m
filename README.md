@@ -6,7 +6,7 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.3">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.4">
         <img src="https://img.shields.io/badge/version-0.1.2-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
@@ -107,6 +107,15 @@ converter:
     # base_url: ""
 
 ```
+
+## Q&A
+
+- Resource wordnet not found.
+  - Uninstall `nltk` completely: `pip uninstall nltk`
+  - Reinstall `nltk` with the following command: `pip install nltk`
+  - Download [corpora/wordnet.zip](https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip) manually and unzip it to the directory specified in the error message. Otherwise, you can download it using the following commands:
+    - Windows: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~\AppData\Roaming\nltk_data\corpora\wordnet.zip` and `unzip ~\AppData\Roaming\nltk_data\corpora\wordnet.zip -d ~\AppData\Roaming\nltk_data\corpora\`
+    - Unix: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~/nltk_data/corpora/wordnet.zip` and `unzip ~/nltk_data/corpora/wordnet.zip -d ~/nltk_data/corpora/`
 
 ## License
 
