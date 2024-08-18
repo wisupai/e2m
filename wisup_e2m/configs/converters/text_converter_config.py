@@ -1,4 +1,4 @@
-from wisup_e2m.converters.base import BaseConverter
+from wisup_e2m.configs.converters.base import BaseConverter
 
 
 class TextConverterConfig(BaseConverter):
