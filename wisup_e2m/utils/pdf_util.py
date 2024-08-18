@@ -3,6 +3,8 @@ import logging
 import subprocess
 import os
 from pathlib import Path
+import httpx
+import zipfile
 from typing import Dict
 
 
@@ -19,27 +21,59 @@ pwd = Path(__file__).parent
 
 
 def check_nltk_corpora_wordnet():
+    # 确定操作系统并设置NLTK数据路径
     if os.name == "nt":
         nltk_data_path = os.path.join(os.environ["APPDATA"], "nltk_data")
     else:
-        nltk_data_path = os.path.join(os.environ["HOME"], ".nltk_data")
-    wordnet_path = os.path.join(nltk_data_path, "corpora", "wordnet")
-    if not os.path.exists(wordnet_path):
-        import httpx
+        nltk_data_path = os.path.join(os.environ["HOME"], "nltk_data")
 
-        with httpx.stream(
-            "GET",
-            "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip",
-        ) as r:
-            with open(os.path.join(nltk_data_path, "corpora", "wordnet.zip"), "wb") as f:
-                for chunk in r.iter_bytes():
-                    f.write(chunk)
-        import zipfile
+    # 构建WordNet目录和zip文件的路径
+    corpara_dir_path = os.path.join(nltk_data_path, "corpora")
+    wordnet_dir_path = os.path.join(nltk_data_path, "corpora", "wordnet")
+    wordnet_zip_path = os.path.join(nltk_data_path, "corpora", "wordnet.zip")
 
-        with zipfile.ZipFile(
-            os.path.join(nltk_data_path, "corpora", "wordnet.zip"), "r"
-        ) as zip_ref:
-            zip_ref.extractall(os.path.join(nltk_data_path, "corpora"))
+    # 检查corpora目录是否存在，如果不存在则创建
+    if not os.path.exists(corpara_dir_path):
+        os.makedirs(corpara_dir_path)
+        print(f"Creating the directory {corpara_dir_path}")
+
+    # 检查wordnet.zip是否存在，如果不存在则下载
+    if not os.path.exists(wordnet_dir_path):
+        url = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip"
+        print(f"The WordNet corpus is not installed. Starting to download from {url}")
+
+        try:
+            # 使用httpx发送GET请求
+            with httpx.Client() as client:
+                response = client.get(url, follow_redirects=True)
+                response.raise_for_status()  # 确保请求成功
+
+                # 写入zip文件
+                with open(wordnet_zip_path, "wb") as f:
+                    for chunk in response.iter_bytes():
+                        f.write(chunk)
+        except httpx.RequestError as e:
+            print(f"An error occurred while downloading: {e}")
+            return False
+
+        # 解压wordnet.zip到指定目录
+        try:
+            with zipfile.ZipFile(wordnet_zip_path, "r") as zip_ref:
+                zip_ref.extractall(corpara_dir_path)
+                print(f"WordNet corpus downloaded and extracted to {corpara_dir_path}")
+
+        except zipfile.BadZipFile as e:
+            print(f"An error occurred while extracting: {e}")
+            return False
+        except Exception as e:
+            print(f"An unknown error occurred: {e}")
+            return False
+
+        # 下载并解压完成后，删除zip文件
+        os.remove(wordnet_zip_path)
+    else:
+        print("WordNet corpus is already installed.")
+
     return True
 
 
@@ -65,7 +99,9 @@ def surya_detect_layout(
     if max_pages:
         cmd.extend(["--max", str(max_pages)])
 
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as process:
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:
@@ -117,3 +153,8 @@ def convert_pdf_to_images(file, start_page, end_page, proc_count, save_dir, dpi=
     logger.info(f"PDF converted to images: {stdout.decode()}")
     # 解析返回的 JSON 结果
     return json.loads(stdout.decode())
+
+
+if __name__ == "__main__":
+    # check_nltk_corpora_wordnet
+    check_nltk_corpora_wordnet()
