@@ -14,13 +14,13 @@
     </a>
 </p>
 
-# E2M: Everything to Markdown
+# 🚀 E2M: Everything to Markdown
 
 **Everything to Markdown**
 
 E2M is a versatile tool that converts a wide range of file types into Markdown format.
 
-## Supported File Types
+## 📂 Supported File Types
 
 -   doc
 -   docx
@@ -33,7 +33,7 @@ E2M is a versatile tool that converts a wide range of file types into Markdown f
 -   mp3
 -   m4a
 
-## Installation
+## 📦 Installation
 
 To install E2M, use pip:
 
@@ -41,11 +41,11 @@ To install E2M, use pip:
 pip install wisup_e2m
 ```
 
-## Parser Quick Start
+## ⚡️ Parser Quick Start
 
 Here's simple examples demonstrating how to use E2M Parsers:
 
-### Pdf Parser
+### 📄 Pdf Parser
 
 ```python
 from wisup_e2m import PdfParser
@@ -56,7 +56,7 @@ pdf_data = parser.parse(pdf_path)
 print(pdf_data.text)
 ```
 
-### Doc Parser
+### 📝 Doc Parser
 
 ```python
 from wisup_e2m import DocParser
@@ -67,7 +67,7 @@ doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
 
-### Docx Parser
+### 📜 Docx Parser
 
 ```python
 from wisup_e2m import DocxParser
@@ -78,7 +78,7 @@ docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
 
-### Epub Parser
+### 📚 Epub Parser
 
 ```python
 from wisup_e2m import EpubParser
@@ -89,7 +89,7 @@ epub_data = parser.parse(epub_path)
 print(epub_data.text)
 ```
 
-### Html Parser
+### 🌐 Html Parser
 
 ```python
 from wisup_e2m import HtmlParser
@@ -100,7 +100,7 @@ html_data = parser.parse(html_path)
 print(html_data.text)
 ```
 
-### Url Parser
+### 🔗 Url Parser
 
 ```python
 from wisup_e2m import UrlParser
@@ -111,7 +111,7 @@ url_data = parser.parse(url)
 print(url_data.text)
 ```
 
-### Ppt Parser
+### 🖼️ Ppt Parser
 
 ```python
 from wisup_e2m import PptParser
@@ -122,7 +122,7 @@ ppt_data = parser.parse(ppt_path)
 print(ppt_data.text)
 ```
 
-### Pptx Parser
+### 🖼️ Pptx Parser
 
 ```python
 from wisup_e2m import PptxParser
@@ -133,7 +133,7 @@ pptx_data = parser.parse(pptx_path)
 print(pptx_data.text)
 ```
 
-### Voice Parser
+### 🎤 Voice Parser
 
 ```python
 from wisup_e2m import VoiceParser
@@ -148,11 +148,11 @@ voice_data = parser.parse(voice_path)
 print(voice_data.text)
 ```
 
-## Converter Quick Start
+## 🔄 Converter Quick Start
 
 Here's simple examples demonstrating how to use E2M Converters:
 
-### Text Converter
+### 📝 Text Converter
 
 ```python
 from wisup_e2m import TextConverter
@@ -168,7 +168,7 @@ text_data = converter.convert(text)
 print(text_data)
 ```
 
-### Image Converter
+### 🖼️ Image Converter
 
 ```python
 from wisup_e2m import ImageConverter
@@ -184,9 +184,9 @@ image_data = converter.convert(image_path)
 print(image_data)
 ```
 
-## Next Level
+## 🆙 Next Level
 
-### E2MParser
+### 🛠️ E2MParser
 
 `E2MParser` is an integrated parser that supports multiple file types. It can be used to parse a wide range of file types into Markdown format.
 
@@ -203,7 +203,7 @@ data = ep.parse(file_name="/path/to/file.pdf")
 print(data.to_dict())
 ```
 
-### E2MConverter
+### 🛠️ E2MConverter
 
 `E2MConverter` is an integrated converter that supports text and image conversion. It can be used to convert text and images into Markdown format.
 
@@ -270,7 +270,7 @@ converter:
         # base_url: ""
 ```
 
-## Q&A
+## ❓ Q&A
 
 -   Resource wordnet not found.
     -   Uninstall `nltk` completely: `pip uninstall nltk`
@@ -279,15 +279,15 @@ converter:
         -   Windows: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~\AppData\Roaming\nltk_data\corpora\wordnet.zip` and `unzip ~\AppData\Roaming\nltk_data\corpora\wordnet.zip -d ~\AppData\Roaming\nltk_data\corpora\`
         -   Unix: `wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip -O ~/nltk_data/corpora/wordnet.zip` and `unzip ~/nltk_data/corpora/wordnet.zip -d ~/nltk_data/corpora/`
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
+## 📧 Contact
 
 For any questions or inquiries, please open an issue on [GitHub](https://github.com/wisupai/e2m) or contact us at [team@wisup.ai](mailto:team@wisup.ai).
 
-## 🌟Contributing
+## 🌟 Contributing
 
 <a href="https://github.com/wisupai/e2m/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=wisupai/e2m" />
