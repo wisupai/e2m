@@ -22,4 +22,3 @@ from wisup_e2m.parsers.doc.pdf_parser import PdfParser  # noqa
 from wisup_e2m.parsers.doc.ppt_parser import PptParser  # noqa
 from wisup_e2m.parsers.doc.pptx_parser import PptxParser  # noqa
 from wisup_e2m.parsers.doc.url_parser import UrlParser  # noqa
-

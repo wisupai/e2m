@@ -156,7 +156,9 @@ class BaseParser(ABC):
                 "Surya not installed. Please install Surya by `pip install surya-ocr`"
             ) from None
 
-        from wisup_e2m.utils.pdf_util import surya_detect_layout
+        from wisup_e2m.utils.pdf_util import surya_detect_layout, check_nltk_corpora_wordnet
+
+        check_nltk_corpora_wordnet()
 
         logger.info("Loading Surya layout model and processor..")
 
