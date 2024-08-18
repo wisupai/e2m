@@ -29,6 +29,7 @@ speechrecognition = "^3.10.4"
 setuptools-rust = "^1.10.1"
 diskcache = "^5.6.3"
 platformdirs = "^4.2.2"
+nltk = "^3.9"
 
 
 [tool.poetry.group.test.dependencies]
