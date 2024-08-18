@@ -179,8 +179,8 @@ class BaseParser(ABC):
             raise ImportError(
                 "Marker not installed. Please install Marker by `pip install marker-pdf`"
             ) from None
-        
-        from wisup_e2m.utils.pdf_util import  check_nltk_corpora_wordnet
+
+        from wisup_e2m.utils.pdf_util import check_nltk_corpora_wordnet
 
         check_nltk_corpora_wordnet()
 

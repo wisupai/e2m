@@ -35,10 +35,24 @@ E2M 是一个多功能工具，可将各种文件类型转换为 Markdown 格式
 
 ## 📦 安装
 
+创建环境:
+```bash
+conda create -n e2m python=3.10
+conda activate e2m
+```
+
 使用 pip 安装 E2M：
 
 ```bash
+# 选项 1: 通过pip安装
 pip install wisup_e2m
+# 选项 2: 通过git安装
+pip install git+https://github.com/wisupai/e2m.git
+# 选项 3: 手动安装
+git clone https://github.com/wisupai/e2m.git
+pip install poetry
+poetry build
+pip install dist/wisup_e2m-0.1.41-py3-none-any.whl
 ```
 
 ## ⚡️ 解析器: 快速开始

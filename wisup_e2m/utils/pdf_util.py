@@ -39,7 +39,9 @@ def check_nltk_corpora_wordnet():
 
     # 检查wordnet.zip是否存在，如果不存在则下载
     if not os.path.exists(wordnet_dir_path):
-        url = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip"
+        url = (
+            "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip"
+        )
         print(f"The WordNet corpus is not installed. Starting to download from {url}")
 
         try:
@@ -99,9 +101,7 @@ def surya_detect_layout(
     if max_pages:
         cmd.extend(["--max", str(max_pages)])
 
-    with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as process:
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:

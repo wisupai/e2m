@@ -35,10 +35,24 @@ E2M is a versatile tool that converts a wide range of file types into Markdown f
 
 ## 📦 Installation
 
-To install E2M, use pip:
+Create Environment:
+```bash
+conda create -n e2m python=3.10
+conda activate e2m
+```
+
+Install E2M using pip:
 
 ```bash
+# Option 1: Install via pip
 pip install wisup_e2m
+# Option 2: Install via git
+pip install git+https://github.com/wisupai/e2m.git
+# Option 3: Manual installation
+git clone https://github.com/wisupai/e2m.git
+pip install poetry
+poetry build
+pip install dist/wisup_e2m-0.1.41-py3-none-any.whl
 ```
 
 ## ⚡️ Parser Quick Start
