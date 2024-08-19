@@ -18,7 +18,9 @@
 
 **Everything to Markdown**
 
-E2M 是一个多功能工具，可将各种文件类型转换为 Markdown 格式。
+E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python库，通过解析器+转换器的架构，实现对doc, docx, epub, html, htm, url, pdf, ppt, pptx, mp3, m4a等多种文件格式的转换。
+
+✨E2M项目的终极目标是为了RAG和模型训练、微调，提供高质量的数据。
 
 ## 📂 支持的文件类型
 

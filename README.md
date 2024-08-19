@@ -18,7 +18,9 @@
 
 **Everything to Markdown**
 
-E2M is a versatile tool that converts a wide range of file types into Markdown format.
+E2M is a Python library that can parse and convert various file types into Markdown format. By utilizing a parser-converter architecture, it supports the conversion of multiple file formats, including doc, docx, epub, html, htm, url, pdf, ppt, pptx, mp3, and m4a.
+
+✨The ultimate goal of the E2M project is to provide high-quality data for Retrieval-Augmented Generation (RAG) and model training or fine-tuning.
 
 ## 📂 Supported File Types
 
