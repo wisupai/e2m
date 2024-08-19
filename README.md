@@ -288,6 +288,12 @@ converter:
 
 ## ❓ Q&A
 
+- Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
+  ```python
+    import nltk
+    nltk.download('all') # you can directly download all resources
+    ```
+
 -   Resource wordnet not found.
     -   Uninstall `nltk` completely: `pip uninstall nltk`
     -   Reinstall `nltk` with the following command: `pip install nltk`

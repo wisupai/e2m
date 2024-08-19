@@ -287,6 +287,12 @@ converter:
 
 ## ❓ 问答
 
+- Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
+  ```python
+    import nltk
+    nltk.download('all') # 最好直接下载所有资源,3.57G
+    ```
+
 -   未找到资源 wordnet。
     -   完全卸载 `nltk`：`pip uninstall nltk`
     -   使用以下命令重新安装 `nltk`：`pip install nltk`
