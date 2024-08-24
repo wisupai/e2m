@@ -89,6 +89,11 @@ Generally, for any type of file, the parser is run first to extract internal dat
       <td>epub</td>
     </tr>
     <tr>
+      <td>HtmlParser</td>
+      <td>unstructured</td>
+      <td>html, htm</td>
+    </tr>
+    <tr>
       <td>VoiceParser</td>
       <td>openai_whisper_api, openai_whisper_local, SpeechRecognition</td>
       <td>mp3, m4a</td>

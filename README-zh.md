@@ -89,6 +89,11 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
       <td>epub</td>
     </tr>
     <tr>
+      <td>HtmlParser</td>
+      <td>unstructured</td>
+      <td>html, htm</td>
+    </tr>
+    <tr>
       <td>VoiceParser</td>
       <td>openai_whisper_api, openai_whisper_local, SpeechRecognition</td>
       <td>mp3, m4a</td>
