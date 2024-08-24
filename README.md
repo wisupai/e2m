@@ -22,6 +22,13 @@ E2M is a Python library that can parse and convert various file types into Markd
 
 ✨The ultimate goal of the E2M project is to provide high-quality data for Retrieval-Augmented Generation (RAG) and model training or fine-tuning.
 
+**Core Architecture of the Project:**
+
+- **Parser**: Responsible for parsing various file types into text or image data.
+- **Converter**: Responsible for converting text or image data into Markdown format.
+
+Generally, for any type of file, the parser is run first to extract internal data such as text and images. Then, the converter is used to transform this data into Markdown format.
+
 ## 📂 Supported File Types
 
 -   doc
