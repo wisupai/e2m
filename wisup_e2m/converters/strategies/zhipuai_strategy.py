@@ -321,9 +321,8 @@ class ZhipuaiStrategy(BaseStrategy):
                 )
 
                 # 获取 attached_images
-                image_name = Path(image).name
                 if attached_images_map:
-                    tmp_attached_images = attached_images_map.get(image_name, [])
+                    tmp_attached_images = attached_images_map.get(Path(image).name, [])
 
                     # 添加content说明，你可以使用的图片
                     if tmp_attached_images:

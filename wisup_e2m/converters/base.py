@@ -11,6 +11,7 @@ _convert_params = [
     "text",
     "images",
     "attached_images_map",
+    "image_batch_size",
     "verbose",
 ]
 
@@ -63,6 +64,7 @@ class BaseConverter(ABC):
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
         attached_images_map: Optional[List[str]] = None,
+        image_batch_size: int = 5,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -192,6 +194,7 @@ class BaseConverter(ABC):
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
         attached_images_map: Optional[Dict[str, List[str]]] = None,
+        image_batch_size: int = 5,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -203,6 +206,7 @@ class BaseConverter(ABC):
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
         attached_images_map: Optional[Dict[str, List[str]]] = None,
+        image_batch_size: int = 5,
         verbose: bool = True,
         **kwargs,
     ) -> str:
