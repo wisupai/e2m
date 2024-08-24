@@ -156,7 +156,8 @@ class DocxParser(BaseParser):
 
             if include_image_link_in_text:
                 if "<w:drawing>" in xml:
-                    img_ids = re.findall(r'r:embed="(R[0-9a-zA-Z]+)"', xml)
+                    # <a:blip r:embed="rId8"> or <a:blip r:embed="R7aeea335d84042e6">
+                    img_ids = re.findall(r'r:embed="([^"]+)"', xml)
 
                     for img_id in img_ids:
                         for img in image_list:
@@ -171,6 +172,7 @@ class DocxParser(BaseParser):
                                         f"![{img.target.name}]({img.target})"
                                     )
                                     attached_images.append(str(img.target.resolve()))
+                                    logger.info(f"Inserted image {img.target} in text")
 
         return E2MParsedData(
             text="\n".join(text_list),
