@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
-
-from litellm import LiteLLM, acompletion, completion, get_model_info
+from dataclasses import dataclass
+from zhipuai import ZhipuAI
 
 from wisup_e2m.converters.strategies.base import BaseStrategy
 from wisup_e2m.converters.strategies.prompts import (
@@ -13,58 +13,107 @@ from wisup_e2m.converters.strategies.prompts import (
     NEWLINE_NOTION,
     TEXT_FORMAT_INFERENCE_ROLE,
 )
-from wisup_e2m.utils.image_util import local_image_to_data_url
+from wisup_e2m.utils.image_util import image_to_base64
 from wisup_e2m.utils.llm_utils import LlmUtils
 
 logger = logging.getLogger(__name__)
+
+
+zhipuai_model_infos = {
+    "GLM-4-0520": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4-Long": {  # beta
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4-AirX": {
+        "max_input_tokens": 8192,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4-Air": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4-Flash": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4-AllTools": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+    "GLM-4": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+    "CogVideoX": {
+        "max_input_tokens": 500,
+        "max_output_tokens": 1440 * 960,
+    },
+    "CogView-3": {
+        "max_input_tokens": 1000,
+        "max_output_tokens": 1024 * 1024,
+    },
+    "GLM-4V": {
+        "max_input_tokens": 2048,
+        "max_output_tokens": -1,
+    },
+    "Embedding-3": {
+        "max_input_tokens": 8192,
+        "max_output_tokens": 2048,
+    },
+    "Embedding-2": {
+        "max_input_tokens": 8192,
+        "max_output_tokens": 1024,
+    },
+    "CharGLM-3": {
+        "max_input_tokens": 4096,
+        "max_output_tokens": 2048,
+    },
+    "Emohaa": {
+        "max_input_tokens": 8192,
+        "max_output_tokens": 4096,
+    },
+    "CodeGeeX-4": {
+        "max_input_tokens": 128000,
+        "max_output_tokens": 4096,
+    },
+}
+
+
+def get_model_info(model_name: str) -> Dict:
+    if model_name.upper() not in zhipuai_model_infos:
+        raise ValueError(f"Model {model_name} is not supported.")
+    return zhipuai_model_infos[model_name]
+
 
 _completion_params = [
     "model",
     "temperature",
     "top_p",
-    "n",
     "max_tokens",
-    "presence_penalty",
-    "frequency_penalty",
-    "api_key",
-    "base_url",
-    "caching",
 ]
 
 
-class LitellmStrategy(BaseStrategy):
-    TYPE = "litellm"
+class ZhipuaiStrategy(BaseStrategy):
+    TYPE = "zhipuai"
 
-    def __init__(self, litellm_client: Optional[LiteLLM] = None):
-        self.litellm_client = litellm_client
+    def __init__(self, zhipuai_client: Optional[ZhipuAI] = None):
+        if not zhipuai_client:
+            raise ValueError("Zhipuai client must be provided.")
+        self.zhipuai_client = zhipuai_client
 
     async def _query_async(self, messages, **completion_kwargs):
-        if not self.litellm_client:
-            response = await acompletion(
-                messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                api_key=completion_kwargs.get("api_key"),
-                base_url=completion_kwargs.get("base_url"),
-                caching=completion_kwargs.get("caching"),
-            )
-        else:
-            response = await self.litellm_client.chat.completions.create(
-                messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                acompletion=True,
-            )
+        response = await self.zhipuai_client.chat.asyncCompletions.create(
+            messages=messages,
+            model=completion_kwargs.get("model"),
+            temperature=completion_kwargs.get("temperature"),
+            top_p=completion_kwargs.get("top_p"),
+            max_tokens=completion_kwargs.get("max_tokens"),
+            acompletion=True,
+        )
 
         messages.append(
             {
@@ -76,35 +125,14 @@ class LitellmStrategy(BaseStrategy):
         return response.choices[0].message.content
 
     def _query(self, messages, verbose=True, **completion_kwargs):
-        if not self.litellm_client:
-            logging.info("Using the default LiteLLM client.")
-            response = completion(
-                messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                caching=completion_kwargs.get("caching"),
-                api_key=completion_kwargs.get("api_key"),
-                base_url=completion_kwargs.get("base_url"),
-                stream=True,
-            )
-        else:
-            response = self.litellm_client.chat.completions.create(
-                messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                cache=completion_kwargs.get("cache"),
-                stream=True,
-            )
+        response = self.zhipuai_client.chat.completions.create(
+            messages=messages,
+            model=completion_kwargs.get("model"),
+            temperature=completion_kwargs.get("temperature"),
+            top_p=completion_kwargs.get("top_p"),
+            max_tokens=completion_kwargs.get("max_tokens"),
+            stream=True,
+        )
 
         full_text = []
 
@@ -165,7 +193,7 @@ class LitellmStrategy(BaseStrategy):
                         "type": "image_url",
                         "image_url": {
                             "url": (
-                                local_image_to_data_url(image)
+                                image_to_base64(image)
                                 if not image.startswith("http")
                                 else image
                             ),
@@ -284,7 +312,7 @@ class LitellmStrategy(BaseStrategy):
                         "type": "image_url",
                         "image_url": {
                             "url": (
-                                local_image_to_data_url(image)
+                                image_to_base64(image)
                                 if not image.startswith("http")
                                 else image
                             ),
@@ -351,10 +379,9 @@ def _break_text_into_chunks(
     text: str,
     model: str,
     overlap: int = 300,
-    custom_llm_provider: Optional[str] = None,
     max_tokens: Optional[int] = None,
 ) -> List[str]:
-    model_info = get_model_info(model, custom_llm_provider)
+    model_info = get_model_info(model)
     logger.info(f"Model info: {model_info}")
     max_output_tokens = model_info["max_output_tokens"]
     if not max_tokens or max_tokens > max_output_tokens:

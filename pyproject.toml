@@ -30,6 +30,7 @@ setuptools-rust = "^1.10.1"
 diskcache = "^5.6.3"
 platformdirs = "^4.2.2"
 nltk = "^3.9"
+zhipuai = "^2.1.4.20230814"
 
 
 [tool.poetry.group.test.dependencies]

@@ -130,6 +130,19 @@ def local_image_to_data_url(image_path):
     return f"data:{mime_type};base64,{base64_encoded_data}"
 
 
+def image_to_base64(image_input: str) -> str:
+    """
+    将图片文件转换为 base64 编码的字符串。
+
+
+    :param image_input: 图片的文件路径
+    :return: base64 编码的字符串
+    """
+    with open(image_input, "rb") as f:
+        base64_data = base64.b64encode(f.read())
+        return base64_data.decode("utf-8")
+
+
 def has_transparent_background(image_input: Union[str, IO[bytes]]) -> bool:
     """
     判断给定的图片是否具有透明背景。

@@ -7,6 +7,14 @@ from wisup_e2m.configs.converters.base import BaseConverterConfig
 logger = logging.getLogger(__name__)
 
 
+_convert_params = [
+    "text",
+    "images",
+    "attached_images_map",
+    "verbose",
+]
+
+
 class BaseConverter(ABC):
     SUPPORTED_ENGINES = []
 
@@ -59,10 +67,13 @@ class BaseConverter(ABC):
         **kwargs,
     ) -> str:
         for k, v in locals().items():
-            kwargs[k] = v
+            if k in _convert_params:
+                kwargs[k] = v
 
         if self.config.engine == "litellm":
             return self._convert_to_md_by_litellm(**kwargs)
+        elif self.config.engine == "zhipuai":
+            return self._convert_to_md_by_zhipuai(**kwargs)
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
 
@@ -90,6 +101,8 @@ class BaseConverter(ABC):
 
         if self.config.engine == "litellm":
             self._load_litellm_engine()
+        if self.config.engine == "zhipuai":
+            self._load_zhipuai_engine()
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
 
@@ -158,7 +171,34 @@ class BaseConverter(ABC):
         )
         logger.info("litellm engine loaded successfully")
 
+    def _load_zhipuai_engine(self):
+        try:
+            from zhipuai import ZhipuAI
+        except ImportError:
+            raise ImportError(
+                "zhipuai is not installed. Please install it using `pip install zhipuai`"
+            )
+
+        self.zhipuai_client = ZhipuAI(
+            api_key=self.config.api_key,
+            base_url=self.config.base_url,
+            timeout=self.config.timeout,
+            max_retries=self.config.max_retries,
+            disable_token_cache=not self.config.caching,
+        )
+
     def _convert_to_md_by_litellm(
+        self,
+        text: Optional[str] = None,
+        images: Optional[List[str]] = None,
+        attached_images_map: Optional[Dict[str, List[str]]] = None,
+        verbose: bool = True,
+        **kwargs,
+    ) -> str:
+
+        raise NotImplementedError("This method should be implemented in the subclass")
+
+    def _convert_to_md_by_zhipuai(
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
