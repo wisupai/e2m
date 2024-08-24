@@ -392,7 +392,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 You can scan the QR code below to join our WeChat group:
 
 <p align="center">
-  <img src="docs/images/wechat_QR.jpg" width="200px" alt="wisup_e2m Logo">
+  <img src="docs/images/wechat_QR.png" width="200px" alt="wisup_e2m Logo">
 </p>
 
 For any questions or inquiries, please open an issue on [GitHub](https://github.com/wisupai/e2m) or contact us at [team@wisup.ai](mailto:team@wisup.ai).
