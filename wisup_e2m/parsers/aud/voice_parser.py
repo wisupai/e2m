@@ -20,6 +20,15 @@ class VoiceParser(BaseParser):
     SUPPERTED_FILE_TYPES = ["mp3", "m4a"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        '''
+        :param config: BaseParserConfig
+
+        :param engine: str, the engine to use for conversion, default is  openai_whisper_local, options are ['openai_whisper_api', 'openai_whisper_local', 'SpeechRecognition']
+        :param langs: List[str], the languages to use for parsing, default is ['en', 'zh']
+        :param client_timeout: int, the client timeout, default is 30
+        :param client_max_redirects: int, the client max redirects, default is 5
+        :param client_proxy: Optional[str], the client proxy, default is None
+        '''
         super().__init__(config, **config_kwargs)
 
         if not self.config.engine:

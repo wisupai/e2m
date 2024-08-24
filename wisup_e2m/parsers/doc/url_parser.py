@@ -23,15 +23,28 @@ _url_parser_params = [
 
 
 class UrlParser(BaseParser):
-    SUPPORTED_ENGINES = ["unstructured", "jina"]
+    SUPPORTED_ENGINES = ["unstructured", "jina", "firecrawl"]
     SUPPERTED_FILE_TYPES = ["url"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
+        """
+        :param config: BaseParserConfig
+
+        :param engine: str, the engine to use for conversion, default is jina, options are ['unstructured', 'jina', 'firecrawl']
+        :param api_key: str, the api key for the firecrawl engine
+        :param langs: List[str], the languages to use for parsing, default is ['en', 'zh']
+        :param client_timeout: int, the client timeout, default is 30
+        :param client_max_redirects: int, the client max redirects, default is 5
+        :param client_proxy: Optional[str], the client proxy, default is None
+        """
+
         super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
-            self.config.engine = "jina"  # unstructured / jina
-            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
+            self.config.engine = "jina"  # unstructured / jina / firecrawl
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -120,6 +133,44 @@ class UrlParser(BaseParser):
             relative_path=relative_path,
         )
 
+    def _parse_by_firecrawl(
+        self,
+        url: str = None,
+        include_image_link_in_text: bool = True,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+    ):
+        """
+        demo:
+            from firecrawl import FirecrawlApp
+
+            app = FirecrawlApp(api_key="fc-7f2b602e3c374ac2b0157a9444548b7b")
+
+            crawl_result = app.crawl_url(
+                "https://alexyancey.com/lost-airpods"
+            )
+
+            # Get the markdown
+            for result in crawl_result:
+                print(result["markdown"])
+        """
+
+        text = []
+        parsed_text_list = self.firecrawl_app.crawl_url(url)
+        for parsed_text in parsed_text_list:
+            text.append(parsed_text["markdown"])
+
+        text = "\n".join(text)
+
+        return self._prepare_jina_data_to_e2m_parsed_data(
+            text,
+            include_image_link_in_text=include_image_link_in_text,
+            work_dir=work_dir,
+            image_dir=image_dir,
+            relative_path=relative_path,
+        )
+
     def get_parsed_data(
         self,
         url: Optional[str] = None,
@@ -156,6 +207,14 @@ class UrlParser(BaseParser):
             )
         elif self.config.engine == "jina":
             return self._parse_by_jina(
+                url=url,
+                include_image_link_in_text=include_image_link_in_text,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
+        elif self.config.engine == "firecrawl":
+            return self._parse_by_firecrawl(
                 url=url,
                 include_image_link_in_text=include_image_link_in_text,
                 work_dir=work_dir,
