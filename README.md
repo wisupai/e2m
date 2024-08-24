@@ -35,7 +35,78 @@ Generally, for any type of file, the parser is run first to extract internal dat
 
 ## 📂 All Converters and Parsers
 
-c
+<table>
+  <thead>
+    <tr>
+      <th colspan="3" style="text-align:center;">Parser</th>
+    </tr>
+    <tr>
+      <th>Parser Type</th>
+      <th>Engine</th>
+      <th>Supported File Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PdfParser</td>
+      <td>surya_layout, marker, unstructured</td>
+      <td>pdf</td>
+    </tr>
+    <tr>
+      <td>DocParser</td>
+      <td>xml</td>
+      <td>doc</td>
+    </tr>
+    <tr>
+      <td>DocxParser</td>
+      <td>xml</td>
+      <td>docx</td>
+    </tr>
+    <tr>
+      <td>PptParser</td>
+      <td>unstructured</td>
+      <td>ppt</td>
+    </tr>
+    <tr>
+      <td>PptxParser</td>
+      <td>unstructured</td>
+      <td>pptx</td>
+    </tr>
+    <tr>
+      <td>UrlParser</td>
+      <td>unstructured, jina, firecrawl</td>
+      <td>url</td>
+    </tr>
+    <tr>
+      <td>VoiceParser</td>
+      <td>openai_whisper_api, openai_whisper_local, SpeechRecognition</td>
+      <td>mp3, m4a</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="2" style="text-align:center;">Converter</th>
+    </tr>
+    <tr>
+      <th>Converter Type</th>
+      <th>Engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ImageConverter</td>
+      <td>litellm</td>
+    </tr>
+    <tr>
+      <td>TextConverter</td>
+      <td>litellm</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📦 Installation
 
