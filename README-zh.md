@@ -106,7 +106,7 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
   <tbody>
     <tr>
       <td>ImageConverter</td>
-      <td>litellm, zhipuai</td>
+      <td>litellm, zhipuai (图像识别表现不佳,不推荐)</td>
       <td>default</td>
     </tr>
     <tr>

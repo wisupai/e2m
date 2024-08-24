@@ -106,7 +106,7 @@ Generally, for any type of file, the parser is run first to extract internal dat
   <tbody>
     <tr>
       <td>ImageConverter</td>
-      <td>litellm, zhipuai</td>
+      <td>litellm, zhipuai (Not Well in Image Recognition, Not Recommended)</td>
       <td>default</td>
     </tr>
     <tr>
