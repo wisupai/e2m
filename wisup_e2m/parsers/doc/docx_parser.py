@@ -46,7 +46,7 @@ class DocxParser(BaseParser):
         file_name: str,
         extract_images: bool = True,
         include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
+        ignore_transparent_images: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -82,6 +82,7 @@ class DocxParser(BaseParser):
                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
                     zip_ref.extractall(tmp_dir)
 
+                word_dir = tmp_dir / "word"
                 rels_xml = tmp_dir / "word/_rels/document.xml.rels"
 
                 with open(rels_xml, "r", encoding="utf-8") as f:
@@ -105,8 +106,12 @@ class DocxParser(BaseParser):
                     # 处理 target，如果以 / 开头，则认为是相对路径，需要加上 tmp_dir
                     if target.startswith("/"):
                         target = target[1:]
-                    # tmp_dir / target 就是图片的路径
+                    # tmp_dir / target 或者 word_dir / target
+                    # 查看哪个存在
                     tmp_target = tmp_dir / target
+                    if not tmp_target.exists():
+                        tmp_target = word_dir / target
+
                     logger.info(f"{tmp_target=}")
 
                     if ignore_transparent_images and has_transparent_background(
@@ -180,7 +185,7 @@ class DocxParser(BaseParser):
         file_name: Optional[str] = None,
         extract_images: bool = True,
         include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
+        ignore_transparent_images: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -211,7 +216,7 @@ class DocxParser(BaseParser):
         file_name: Optional[str] = None,
         extract_images: bool = True,
         include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = True,
+        ignore_transparent_images: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
