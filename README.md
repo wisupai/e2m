@@ -6,8 +6,8 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.51">
-        <img src="https://img.shields.io/badge/version-0.1.51-blue" alt="E2M Version">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.52">
+        <img src="https://img.shields.io/badge/version-0.1.52-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
