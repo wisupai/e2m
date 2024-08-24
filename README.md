@@ -12,6 +12,9 @@
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
     </a>
+    <a href="https://github.com/wisupai/e2m/blob/main/README-zh.md">
+        <img src="https://img.shields.io/badge/docs-中文文档-red" alt="中文文档">
+    </a>
 </p>
 
 # 🚀 E2M: Everything to Markdown
