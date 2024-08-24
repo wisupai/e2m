@@ -11,7 +11,7 @@ def get_pptx_images(
     file_name: str,
     file: IO[bytes],
     target_image_dir: str,
-    ignore_transparent_images: bool = True,
+    ignore_transparent_images: bool = False,
 ) -> Dict[int, Any]:
     os.makedirs(target_image_dir, exist_ok=True)
     image_dict = {}
