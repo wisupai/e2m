@@ -33,18 +33,80 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
   <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
 </p>
 
-## 📂 支持的文件类型
+## 📂 所有的Parser和Converter
 
--   doc
--   docx
--   epub
--   html
--   htm
--   url
--   pdf
--   pptx
--   mp3
--   m4a
+<table>
+  <thead>
+    <tr>
+      <th colspan="3" style="text-align:center;">Parser</th>
+    </tr>
+    <tr>
+      <th>Parser Type</th>
+      <th>Engine</th>
+      <th>Supported File Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PdfParser</td>
+      <td>surya_layout, marker, unstructured</td>
+      <td>pdf</td>
+    </tr>
+    <tr>
+      <td>DocParser</td>
+      <td>xml</td>
+      <td>doc</td>
+    </tr>
+    <tr>
+      <td>DocxParser</td>
+      <td>xml</td>
+      <td>docx</td>
+    </tr>
+    <tr>
+      <td>PptParser</td>
+      <td>unstructured</td>
+      <td>ppt</td>
+    </tr>
+    <tr>
+      <td>PptxParser</td>
+      <td>unstructured</td>
+      <td>pptx</td>
+    </tr>
+    <tr>
+      <td>UrlParser</td>
+      <td>unstructured, jina, firecrawl</td>
+      <td>url</td>
+    </tr>
+    <tr>
+      <td>VoiceParser</td>
+      <td>openai_whisper_api, openai_whisper_local, SpeechRecognition</td>
+      <td>mp3, m4a</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="2" style="text-align:center;">Converter</th>
+    </tr>
+    <tr>
+      <th>Converter Type</th>
+      <th>Engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ImageConverter</td>
+      <td>litellm</td>
+    </tr>
+    <tr>
+      <td>TextConverter</td>
+      <td>litellm</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📦 安装
 

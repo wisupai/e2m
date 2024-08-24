@@ -33,18 +33,9 @@ Generally, for any type of file, the parser is run first to extract internal dat
   <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
 </p>
 
-## 📂 Supported File Types
+## 📂 All Converters and Parsers
 
--   doc
--   docx
--   epub
--   html
--   htm
--   url
--   pdf
--   pptx
--   mp3
--   m4a
+c
 
 ## 📦 Installation
 
