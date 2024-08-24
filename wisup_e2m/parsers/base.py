@@ -145,6 +145,10 @@ class BaseParser(ABC):
             self._load_openai_whisper_local_engine()
         elif self.config.engine == "openai_whisper_api":
             self._load_openai_whisper_api_engine()
+        elif self.config.engine == "xml":
+            pass
+        elif self.config.engine == "firecrawl":
+            self._load_firecrawl_engine()
 
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
@@ -156,7 +160,10 @@ class BaseParser(ABC):
                 "Surya not installed. Please install Surya by `pip install surya-ocr`"
             ) from None
 
-        from wisup_e2m.utils.pdf_util import surya_detect_layout, check_nltk_corpora_wordnet
+        from wisup_e2m.utils.pdf_util import (
+            surya_detect_layout,
+            check_nltk_corpora_wordnet,
+        )
 
         check_nltk_corpora_wordnet()
 
@@ -249,6 +256,29 @@ class BaseParser(ABC):
 
         self.openai_whisper_api_func = transcription
 
+    def _load_firecrawl_engine(self):
+        """
+        from firecrawl import FirecrawlApp
+
+        app = FirecrawlApp(api_key="fc-7f2b602e3c374ac2b0157a9444548b7b")
+
+        crawl_result = app.crawl_url(
+            "https://alexyancey.com/lost-airpods"
+        )
+
+        # Get the markdown
+        for result in crawl_result:
+            print(result["markdown"])
+        """
+        try:
+            from firecrawl import FirecrawlApp
+        except ImportError:
+            raise ImportError(
+                "Firecrawl not installed. Please install Firecrawl by `pip install firecrawl`"
+            ) from None
+        
+        self.firecrawl_app = FirecrawlApp(api_key=self.config.api_key) # FIRECRAWL_API_KEY
+
     def _prepare_unstructured_data_to_e2m_parsed_data(
         self,
         data: List[Any],  # List[unstructured.documents.elements.Element]
@@ -336,7 +366,9 @@ class BaseParser(ABC):
             "unstructured_metadata": unstructured_metadata,
         }
 
-        return E2MParsedData(text=text, attached_images=attached_images, metadata=metadata)
+        return E2MParsedData(
+            text=text, attached_images=attached_images, metadata=metadata
+        )
 
     def _prepare_surya_layout_data_to_e2m_parsed_data(
         self,
@@ -385,7 +417,9 @@ class BaseParser(ABC):
             page_width = image.width
             page_height = image.height
 
-            logger.info(f"Processing page {i}: width = {page_width}, height = {page_height}")
+            logger.info(
+                f"Processing page {i}: width = {page_width}, height = {page_height}"
+            )
 
             # Convert the image from RGB to BGR format
             image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
@@ -468,15 +502,21 @@ class BaseParser(ABC):
                 if (height * width) < (page_width * page_height * 3 / 100):
                     continue
 
-                if (label_type not in label_types) or (confidence < confidence_threshold):
+                if (label_type not in label_types) or (
+                    confidence < confidence_threshold
+                ):
                     continue
 
                 # 遍历 page_attached_image_infos，如果有重叠度大于 image_merge_threshold 的，合并
                 for img_info in page_attached_image_infos:
-                    overlap_percentage = check_overlap_percentage(img_info["points"], points)
+                    overlap_percentage = check_overlap_percentage(
+                        img_info["points"], points
+                    )
                     logger.info(f"overlap_percentage: {overlap_percentage}")
                     if overlap_percentage > image_merge_threshold:
-                        logger.info(f"Merging images: {img_info['points']} and {points}")
+                        logger.info(
+                            f"Merging images: {img_info['points']} and {points}"
+                        )
                         img_info["points"] = merge_images(img_info["points"], points)
                         break
 
@@ -541,7 +581,9 @@ class BaseParser(ABC):
             full_image_path_name = str(full_image_path)
             cv2.imwrite(full_image_path_name, image)
             layout_images.append(full_image_path_name)
-            attached_images.extend([img["image_path"] for img in page_attached_image_infos])
+            attached_images.extend(
+                [img["image_path"] for img in page_attached_image_infos]
+            )
             # image name -> attached image paths
             attached_images_map[full_image_path.name] = [
                 img["image_path"] for img in page_attached_image_infos
@@ -616,7 +658,9 @@ class BaseParser(ABC):
             "marker_metadata": metadata,
         }
 
-        return E2MParsedData(text=text, attached_images=attached_images, metadata=metadata)
+        return E2MParsedData(
+            text=text, attached_images=attached_images, metadata=metadata
+        )
 
     def _prepare_jina_data_to_e2m_parsed_data(
         self,
@@ -686,7 +730,9 @@ class BaseParser(ABC):
                     # attached_images.append(str(image_path.resolve()))
                     attached_images.append(md_image_path)
                     text = text.replace(image_link, f"![{image_name}]({md_image_path})")
-                logger.info(f"Finihsed downloading {len(attached_images)} images to {image_dir}")
+                logger.info(
+                    f"Finihsed downloading {len(attached_images)} images to {image_dir}"
+                )
 
         return E2MParsedData(
             text=text,
