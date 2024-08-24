@@ -95,21 +95,24 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
 <table>
   <thead>
     <tr>
-      <th colspan="2" style="text-align:center;">Converter</th>
+      <th colspan="3" style="text-align:center;">Converter</th>
     </tr>
     <tr>
       <th>Converter Type</th>
       <th>Engine</th>
+      <th>Strategy</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>ImageConverter</td>
       <td>litellm</td>
+      <td>default</td>
     </tr>
     <tr>
       <td>TextConverter</td>
       <td>litellm</td>
+      <td>default</td>
     </tr>
   </tbody>
 </table>
