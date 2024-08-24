@@ -29,6 +29,10 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
 
 一般来说，对于任意类型的文件，需要先运行解析器，获取文件内部的text、image等数据，然后再运行转换器，将数据转换为Markdown格式。
 
+<p align="center">
+  <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
+</p>
+
 ## 📂 支持的文件类型
 
 -   doc

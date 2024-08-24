@@ -29,6 +29,10 @@ E2M is a Python library that can parse and convert various file types into Markd
 
 Generally, for any type of file, the parser is run first to extract internal data such as text and images. Then, the converter is used to transform this data into Markdown format.
 
+<p align="center">
+  <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
+</p>
+
 ## 📂 Supported File Types
 
 -   doc
