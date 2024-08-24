@@ -60,7 +60,7 @@ async def get_web_content_async(url: str, client: Optional[httpx.AsyncClient] = 
 
 
 @api_error_handler
-def download_image(
+def download_internet_image(
     image_url: str,
     target_path: str,
     client: Optional[httpx.Client] = None,
@@ -80,7 +80,7 @@ def download_image(
 
 
 @api_error_handler_async
-async def download_image_async(
+async def download_internet_image_async(
     image_url: str, target_path: str, client: Optional[httpx.AsyncClient] = None
 ):
     if client is None:
@@ -92,7 +92,7 @@ async def download_image_async(
 
 
 if __name__ == "__main__":
-    download_image(
+    download_internet_image(
         image_url="https://www.techspot.com/images2/news/bigimage/2024/05/2024-05-05-image-j.webp",
         target_path="test.webp",
     )

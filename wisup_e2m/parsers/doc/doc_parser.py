@@ -1,7 +1,7 @@
 # /e2m/parsers/doc_parser.py
 import logging
 from pathlib import Path
-from typing import IO, Optional
+from typing import Optional
 from uuid import uuid4
 
 from wisup_e2m.parsers.base import E2MParsedData

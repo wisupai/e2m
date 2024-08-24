@@ -30,7 +30,7 @@ class DocxParser(BaseParser):
     SUPPERTED_FILE_TYPES = ["docx"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
-        '''
+        """
         :param config: BaseParserConfig
 
         :param engine: str, the engine to use for conversion, default is xml
@@ -38,14 +38,12 @@ class DocxParser(BaseParser):
         :param client_timeout: int, the client timeout, default is 30
         :param client_max_redirects: int, the client max redirects, default is 5
         :param client_proxy: Optional[str], the client proxy, default is None
-        '''
+        """
         super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
             self.config.engine = "xml"  # xml
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -123,9 +121,7 @@ class DocxParser(BaseParser):
 
                     logger.info(f"{tmp_target=}")
 
-                    if ignore_transparent_images and has_transparent_background(
-                        tmp_target
-                    ):
+                    if ignore_transparent_images and has_transparent_background(tmp_target):
                         logger.info(f"Ignore transparent image {tmp_target}")
                         continue
 
@@ -140,9 +136,7 @@ class DocxParser(BaseParser):
 
                     # 如果 type 的格式满足 http://schemas.openxmlformats.org/officeDocument/数字/relationships/image
 
-                    image_list.append(
-                        DocImage(id=id, target=target_image_path, type=type)
-                    )
+                    image_list.append(DocImage(id=id, target=target_image_path, type=type))
 
             except Exception as e:
                 logger.error(f"Error extracting images from docx file: {e}")
@@ -175,11 +169,11 @@ class DocxParser(BaseParser):
                                     text_list.append(
                                         f"![{img.target.name}]({img.target.relative_to(Path(work_dir))})"
                                     )
-                                    attached_images.append(str(img.target.relative_to(Path(work_dir))))
-                                else:
-                                    text_list.append(
-                                        f"![{img.target.name}]({img.target})"
+                                    attached_images.append(
+                                        str(img.target.relative_to(Path(work_dir)))
                                     )
+                                else:
+                                    text_list.append(f"![{img.target.name}]({img.target})")
                                     attached_images.append(str(img.target.resolve()))
                                     logger.info(f"Inserted image {img.target} in text")
 

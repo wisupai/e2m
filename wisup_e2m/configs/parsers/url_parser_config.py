@@ -1,5 +1,5 @@
 from wisup_e2m.configs.parsers.base import BaseParserConfig
-from typing import List, Optional
+from typing import Optional
 from pydantic import Field
 
 

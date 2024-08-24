@@ -16,6 +16,7 @@ _url_parser_params = [
     "encoding",
     "skip_headers_and_footers",
     "include_image_link_in_text",
+    "download_image",
     "work_dir",
     "image_dir",
     "relative_path",
@@ -42,9 +43,7 @@ class UrlParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "jina"  # unstructured / jina / firecrawl
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -119,6 +118,7 @@ class UrlParser(BaseParser):
         self,
         url: str = None,
         include_image_link_in_text: bool = True,
+        download_image: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -128,6 +128,7 @@ class UrlParser(BaseParser):
         return self._prepare_jina_data_to_e2m_parsed_data(
             parsed_text,
             include_image_link_in_text=include_image_link_in_text,
+            download_image=download_image,
             work_dir=work_dir,
             image_dir=image_dir,
             relative_path=relative_path,
@@ -137,6 +138,7 @@ class UrlParser(BaseParser):
         self,
         url: str = None,
         include_image_link_in_text: bool = True,
+        download_image: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -166,6 +168,7 @@ class UrlParser(BaseParser):
         return self._prepare_jina_data_to_e2m_parsed_data(
             text,
             include_image_link_in_text=include_image_link_in_text,
+            download_image=download_image,
             work_dir=work_dir,
             image_dir=image_dir,
             relative_path=relative_path,
@@ -180,6 +183,7 @@ class UrlParser(BaseParser):
         encoding: str = "utf-8",
         skip_headers_and_footers: bool = True,
         include_image_link_in_text: bool = True,
+        download_image: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
@@ -209,6 +213,7 @@ class UrlParser(BaseParser):
             return self._parse_by_jina(
                 url=url,
                 include_image_link_in_text=include_image_link_in_text,
+                download_image=download_image,
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
@@ -217,6 +222,7 @@ class UrlParser(BaseParser):
             return self._parse_by_firecrawl(
                 url=url,
                 include_image_link_in_text=include_image_link_in_text,
+                download_image=download_image,
                 work_dir=work_dir,
                 image_dir=image_dir,
                 relative_path=relative_path,
@@ -233,6 +239,7 @@ class UrlParser(BaseParser):
         encoding: str = "utf-8",
         skip_headers_and_footers: bool = True,
         include_image_link_in_text: bool = True,
+        download_image: bool = False,
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
