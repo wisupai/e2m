@@ -12,7 +12,7 @@ install:
 	poetry install
 
 install_all:
-	poetry install git+https://github.com/openai/whisper.git
+	poetry install git+https://github.com/openai/whisper.git firecrawl
 
 # Format code with ruff
 format:

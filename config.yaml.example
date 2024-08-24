@@ -31,7 +31,7 @@ parsers:
     engine: "openai_whisper_local"
     model: "large" # available models: https://github.com/openai/whisper#available-models-and-languages
 
-converter:
+converters:
   text_converter:
     engine: "litellm"
     model: "deepseek/deepseek-chat"

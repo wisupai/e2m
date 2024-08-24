@@ -283,7 +283,7 @@ parsers:
         engine: "openai_whisper_local"
         model: "large" # 可用模型: https://github.com/openai/whisper#available-models-and-languages
 
-converter:
+converters:
     text_converter:
         engine: "litellm"
         model: "deepseek/deepseek-chat"
