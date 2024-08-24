@@ -139,7 +139,7 @@ def has_transparent_background(image_input: Union[str, IO[bytes]]) -> bool:
     """
     with Image.open(image_input) as img:
         if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-            # 检查alpha通道
+            # check alpha channel
             alpha = img.split()[-1]
             if alpha.getextrema()[0] < 255:
                 return True

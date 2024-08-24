@@ -6,8 +6,8 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.41">
-        <img src="https://img.shields.io/badge/version-0.1.41-blue" alt="E2M Version">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.5">
+        <img src="https://img.shields.io/badge/version-0.1.5-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
@@ -78,7 +78,7 @@ print(pdf_data.text)
 from wisup_e2m import DocParser
 
 doc_path = "./test.doc"
-parser = DocParser(engine="unstructured") # doc engines: unstructured
+parser = DocParser(engine="xml") # doc engines: xml
 doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
@@ -89,7 +89,7 @@ print(doc_data.text)
 from wisup_e2m import DocxParser
 
 docx_path = "./test.docx"
-parser = DocxParser(engine="unstructured") # docx engines: unstructured
+parser = DocxParser(engine="xml") # docx engines: xml
 docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
@@ -242,10 +242,10 @@ You can use a `config.yaml` file to specify the parsers and converters you want 
 ```yaml
 parsers:
     doc_parser:
-        engine: "unstructured"
+        engine: "xml"
         langs: ["en", "zh"]
     docx_parser:
-        engine: "unstructured"
+        engine: "xml"
         langs: ["en", "zh"]
     epub_parser:
         engine: "unstructured"

@@ -6,8 +6,8 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M 代码仓库">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.41">
-        <img src="https://img.shields.io/badge/version-0.1.41-blue" alt="E2M 版本">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.5">
+        <img src="https://img.shields.io/badge/version-0.1.5-blue" alt="E2M 版本">
     </a>
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python 版本">
@@ -78,7 +78,7 @@ print(pdf_data.text)
 from wisup_e2m import DocParser
 
 doc_path = "./test.doc"
-parser = DocParser(engine="unstructured") # doc 引擎: unstructured
+parser = DocParser(engine="xml") # doc 引擎: unstructured
 doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
@@ -89,7 +89,7 @@ print(doc_data.text)
 from wisup_e2m import DocxParser
 
 docx_path = "./test.docx"
-parser = DocxParser(engine="unstructured") # docx 引擎: unstructured
+parser = DocxParser(engine="xml") # docx 引擎: unstructured
 docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
@@ -241,10 +241,10 @@ ec.convert(images=images)
 ```yaml
 parsers:
     doc_parser:
-        engine: "unstructured"
+        engine: "xml"
         langs: ["en", "zh"]
     docx_parser:
-        engine: "unstructured"
+        engine: "xml"
         langs: ["en", "zh"]
     epub_parser:
         engine: "unstructured"
