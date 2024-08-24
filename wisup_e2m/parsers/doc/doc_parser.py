@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 _doc_parser_params = [
     "file_name",
-    "file",
     "extract_images",
     "include_image_link_in_text",
     "ignore_transparent_images",
@@ -68,7 +67,6 @@ class DocParser(DocxParser):
     def parse(
         self,
         file_name: Optional[str] = None,
-        file: Optional[IO[bytes]] = None,
         extract_images: bool = True,
         include_image_link_in_text: bool = True,
         ignore_transparent_images: bool = True,
