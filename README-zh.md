@@ -447,6 +447,20 @@ converters:
         f.write(md_text)
     ```
 
+- 无法连接 'https://huggingface.co'
+  - 方法1: 尝试通过科学上网代理访问
+  - 方法2: 在代码中使用镜像
+      ```python
+      import os
+      os.environ['CURL_CA_BUNDLE'] = ''
+      os.environ['HF_ENDPOINT']= 'https://hf-mirror.com'
+      ```
+  - 方法3: 终端设置环境变量
+      ```bash
+      export CURL_CA_BUNDLE=''
+      export HF_ENDPOINT='https://hf-mirror.com'
+      ```
+
 - Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
   ```python
   import nltk

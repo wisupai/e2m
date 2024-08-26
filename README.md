@@ -449,6 +449,20 @@ converters:
         f.write(md_text)
     ```
 
+- Unable to connect to 'https://huggingface.co'
+  - Method 1: Try accessing through a VPN or proxy.
+  - Method 2: Use a mirror in your code:
+      ```python
+      import os
+      os.environ['CURL_CA_BUNDLE'] = ''
+      os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+      ```
+  - Method 3: Set environment variables in the terminal:
+      ```bash
+      export CURL_CA_BUNDLE=''
+      export HF_ENDPOINT='https://hf-mirror.com'
+      ```
+
 - Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
   ```python
     import nltk
