@@ -161,9 +161,10 @@ pip install wisup_e2m
 pip install git+https://github.com/wisupai/e2m.git --index-url https://pypi.org/simple
 # Option 3: Manual installation
 git clone https://github.com/wisupai/e2m.git
+cd e2m
 pip install poetry
 poetry build
-pip install dist/wisup_e2m-0.1.41-py3-none-any.whl
+pip install dist/wisup_e2m-0.1.55-py3-none-any.whl
 ```
 
 ## ⚡️ Parser Quick Start

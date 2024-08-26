@@ -161,9 +161,10 @@ pip install wisup_e2m
 pip install git+https://github.com/wisupai/e2m.git --index-url https://pypi.org/simple
 # 选项 3: 手动安装
 git clone https://github.com/wisupai/e2m.git
+cd e2m
 pip install poetry
 poetry build
-pip install dist/wisup_e2m-0.1.41-py3-none-any.whl
+pip install dist/wisup_e2m-0.1.55-py3-none-any.whl
 ```
 
 ## ⚡️ 解析器: 快速开始
