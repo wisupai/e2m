@@ -17,6 +17,7 @@ _pdf_parser_params = [
     "work_dir",
     "image_dir",
     "relative_path",
+    "layout_ignore_label_types",
 ]
 
 
@@ -38,7 +39,9 @@ class PdfParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"
-            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -121,6 +124,11 @@ class PdfParser(BaseParser):
         proc_count: int = 1,
         batch_size: int = None,
         dpi=180,
+        ignore_label_types=[
+            "Page-header",
+            "Page-footer",
+            "Footnote",
+        ],
         **kwargs,
     ):
         """
@@ -149,7 +157,9 @@ class PdfParser(BaseParser):
             images = [Image.open(image_file) for image_file in all_images]
 
             logger.info(f"Total {len(all_images)} images")
-            layout_predictions = self.surya_layout_func(str(tmp_dir), batch_size=batch_size)
+            layout_predictions = self.surya_layout_func(
+                str(tmp_dir), batch_size=batch_size
+            )
 
             # reorder layout predictions,依据name字段，要和  all_images 的文件stem对应
             new_layout_predictions = []
@@ -182,11 +192,7 @@ class PdfParser(BaseParser):
             confidence_threshold=confidence_threshold,
             image_merge_threshold=image_merge_threshold,
             label_types={"Figure": BLUE_BGR},
-            ignore_label_types=[
-                "Page-header",
-                "Page-footer",
-                "Footnote",
-            ],
+            ignore_label_types=ignore_label_types,
         )
 
     def _parse_by_marker(
@@ -262,6 +268,11 @@ class PdfParser(BaseParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        layout_ignore_label_types: List[str] = [
+            "Page-header",
+            "Page-footer",
+            "Footnote",
+        ],
         **kwargs,
     ) -> E2MParsedData:
         """
@@ -279,6 +290,9 @@ class PdfParser(BaseParser):
         :type image_dir: str
         :param relative_path: Use relative path
         :type relative_path: bool
+        :param layout_ignore_label_types: Ignore label types
+        :type layout_ignore_label_types: List[str], default ["Page-header", "Page-footer", "Footnote"]
+
         :return: Parsed data
         :rtype: E2MParsedData
         """
@@ -296,6 +310,7 @@ class PdfParser(BaseParser):
                 proc_count=kwargs.get("proc_count", 1),
                 batch_size=kwargs.get("batch_size", None),
                 dpi=kwargs.get("dpi", 180),
+                ignore_label_types=layout_ignore_label_types,
             )
         elif self.config.engine == "marker":
             return self._parse_by_marker(
@@ -330,9 +345,30 @@ class PdfParser(BaseParser):
         work_dir: str = "./",
         image_dir: str = "./figures",
         relative_path: bool = True,
+        layout_ignore_label_types: List[str] = [
+            "Page-header",
+            "Page-footer",
+            "Footnote",
+        ],
         **kwargs,
     ) -> E2MParsedData:
-        """Parse the data and return the parsed data
+        """
+        Parse the data and return the parsed data
+
+        :param file_name: File to parse
+        :type file_name: str
+        :param start_page: Start page
+        :type start_page: int
+        :param end_page: End page
+        :type end_page: int
+        :param include_image_link_in_text: Include image link in text
+        :type include_image_link_in_text: bool
+        :param image_dir: Image directory
+        :type image_dir: str
+        :param relative_path: Use relative path
+        :type relative_path: bool
+        :param layout_ignore_label_types: Ignore label types
+        :type layout_ignore_label_types: List[str], default ["Page-header", "Page-footer", "Footnote"]
 
         :return: Parsed data
         :rtype: E2MParsedData
