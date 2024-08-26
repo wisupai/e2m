@@ -35,6 +35,8 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
 
 一般来说，对于任意类型的文件，需要先运行解析器，获取文件内部的text、image等数据，然后再运行转换器，将数据转换为Markdown格式。
 
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=113018574734429&bvid=BV1HvWeenEYQ&cid=500001661179035&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" height="400""> </iframe>
+
 <p align="center">
   <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
 </p>
@@ -393,12 +395,12 @@ converters:
     ```python
     import os
     from wisup_e2m import PdfParser, ImageConverter
-
+    
     work_dir = os.getcwd() # 以当前的路径作为工作路径
     image_dir = os.path.join(work_dir, "figure")
-
+    
     pdf = "./test.pdf"
-
+    
     # 加载解析器
     pdf_parser = PdfParser(engine="surya_layout")
     # 加载转换器
@@ -410,7 +412,7 @@ converters:
         caching=True,
         cache_type="disk-cache",
     )
-
+    
     # 解析PDF为图片
     pdf_data = pdf_parser.parse(
         pdf,
@@ -420,14 +422,14 @@ converters:
         image_dir=image_dir, # 提取的图片保存的地方
         relative_path=True, # 图片路径是否为相对路径(相对于work_dir)
     )
-
+    
     # 通过 ImageConverter 将图片转换为文本
     md_text = image_converter.convert(
         images = pdf_data.images,
         attached_images_map= pdf_data.attached_images_map,
         work_dir=work_dir, # 图片在Markdown中的地址会相对于 workdir，默认是绝对路径
     )
-
+    
     # save test markdown
     with open("test.md", "w") as f:
         f.write(md_text)
