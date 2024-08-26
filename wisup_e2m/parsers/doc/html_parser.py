@@ -9,7 +9,6 @@ from wisup_e2m.utils.web_util import get_web_content
 logger = logging.getLogger(__name__)
 
 _html_parser_params = [
-    "url",
     "file_name",
     "file",
     "text",
@@ -40,7 +39,9 @@ class HtmlParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
-            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -61,7 +62,6 @@ class HtmlParser(BaseParser):
 
     def _parse_by_unstructured(
         self,
-        url: Optional[str] = None,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
         text: Optional[str] = None,
@@ -76,16 +76,6 @@ class HtmlParser(BaseParser):
         Parse the data using the unstructured engine
         """
         import unstructured
-
-        if url:
-            text = ""
-            try:
-                logger.info(f"Getting url content: {url}")
-                # get url content
-                text = get_web_content(url, self.client)
-                logger.info(f"Got url content from: {url}")
-            except Exception as e:
-                logger.error(f"Error getting url content: {e}")
 
         unstructured_elements: List[unstructured.documents.elements.Element] = (
             self.unstructured_parse_func(
@@ -110,7 +100,6 @@ class HtmlParser(BaseParser):
 
     def get_parsed_data(
         self,
-        url: Optional[str] = None,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
         text: Optional[str] = None,
@@ -131,7 +120,6 @@ class HtmlParser(BaseParser):
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(
-                url=url,
                 file_name=file_name,
                 file=file,
                 text=text,
@@ -147,7 +135,6 @@ class HtmlParser(BaseParser):
 
     def parse(
         self,
-        url: Optional[str] = None,
         file_name: Optional[str] = None,
         file: Optional[IO[bytes]] = None,
         text: Optional[str] = None,
