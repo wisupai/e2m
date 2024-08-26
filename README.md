@@ -15,6 +15,9 @@
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
     </a>
+    <a href="https://pypi.org/project/wisup_e2m/">
+        <img src="https://img.shields.io/badge/pypi-wisup__e2m-blue" alt="PyPI">
+    </a>
     <a href="https://github.com/wisupai/e2m/blob/main/README-zh.md">
         <img src="https://img.shields.io/badge/docs-中文文档-red" alt="中文文档">
     </a>

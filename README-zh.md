@@ -15,6 +15,9 @@
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
     </a>
+    <a href="https://pypi.org/project/wisup_e2m/">
+        <img src="https://img.shields.io/badge/pypi-wisup__e2m-blue" alt="PyPI">
+    </a>
     <a href="https://github.com/wisupai/e2m/blob/main/README-zh.md">
         <img src="https://img.shields.io/badge/docs-中文文档-red" alt="中文文档">
     </a>
@@ -24,16 +27,16 @@
 
 **Everything to Markdown**
 
-E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python库，通过解析器+转换器的架构，实现对doc, docx, epub, html, htm, url, pdf, ppt, pptx, mp3, m4a等多种文件格式的转换。
+E2M 是一个能够把多种文件类型解析并转换成 Markdown 格式的 Python 库，通过解析器+转换器的架构，实现对 doc, docx, epub, html, htm, url, pdf, ppt, pptx, mp3, m4a 等多种文件格式的转换。
 
-✨E2M项目的终极目标是为了RAG和模型训练、微调，提供高质量的数据。
+✨E2M 项目的终极目标是为了 RAG 和模型训练、微调，提供高质量的数据。
 
 项目的核心架构：
 
-- 解析器：负责将各种文件类型解析为文本或图片数据
-- 转换器：负责将文本或图片数据转换为Markdown格式
+-   解析器：负责将各种文件类型解析为文本或图片数据
+-   转换器：负责将文本或图片数据转换为 Markdown 格式
 
-一般来说，对于任意类型的文件，需要先运行解析器，获取文件内部的text、image等数据，然后再运行转换器，将数据转换为Markdown格式。
+一般来说，对于任意类型的文件，需要先运行解析器，获取文件内部的 text、image 等数据，然后再运行转换器，将数据转换为 Markdown 格式。
 
 <p align="center">
   <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
@@ -47,8 +50,7 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
   </a>
 </div>
 
-
-## 📂 所有的Parser和Converter
+## 📂 所有的 Parser 和 Converter
 
 <table>
   <thead>
@@ -110,7 +112,6 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
   </tbody>
 </table>
 
-
 <table>
   <thead>
     <tr>
@@ -139,12 +140,14 @@ E2M是一个能够把多种文件类型解析并转换成Markdown格式的Python
 ## 📦 安装
 
 创建环境:
+
 ```bash
 conda create -n e2m python=3.10
 conda activate e2m
 ```
 
-更新pip:
+更新 pip:
+
 ```bash
 pip install --upgrade pip
 ```
@@ -393,79 +396,84 @@ converters:
 
 ## ❓ 问答
 
-- 为什么要设置解析器和转换器，为什么不能直接一步到位实现markdown转换？
-  - 解析器的核心核心目的是为了获取文本、图片等数据，而不对数据进行过多的处理。在一些知识库等项目中，并不是所有的文件都有转换成Markdown的需要，可能通过解析出来的文件、图片内容，已经能满足基本RAG等检索需要，那么便不需要额外开销在格式转换上。
-  - 在解析出来的图片、文本的基础上，转换器可以进一步修复和格式化数据，使其更适合用于RAG等模型的训练和微调。
+-   为什么要设置解析器和转换器，为什么不能直接一步到位实现 markdown 转换？
 
-- 为什么`PdfParser`解析出来的Markdown文本效果不佳，如何实现效果最佳的转换？
-  - `PdfParser`的核心功能是解析而非直接转换成Markdown。
-  - `PdfParser`支持三个引擎:
-    - `marker`，参考了著名的`marker`项目，虽然能直接实现markdown的转换，但是因为在复杂文本上效果欠佳，所以做为解析器的一部分。
-    - `unstructured`，解析出来的文本是原始文本，在格式排版上几乎没有什么效果，推荐在格式比较整齐的pdf解析上使用。
-    - `surya_layout`，解析出来的并非文本而是标记了布局信息的图片，需要再配合`ImageConverter`进行转换，如果`ImageConverter`使用的是`gpt-4o`等多模态模型，转换成Markdown的效果是最好的，可匹配某些商用转换软件。
-  - 以下是转换效果最好的代码示例:
+    -   解析器的核心核心目的是为了获取文本、图片等数据，而不对数据进行过多的处理。在一些知识库等项目中，并不是所有的文件都有转换成 Markdown 的需要，可能通过解析出来的文件、图片内容，已经能满足基本 RAG 等检索需要，那么便不需要额外开销在格式转换上。
+    -   在解析出来的图片、文本的基础上，转换器可以进一步修复和格式化数据，使其更适合用于 RAG 等模型的训练和微调。
+
+-   为什么`PdfParser`解析出来的 Markdown 文本效果不佳，如何实现效果最佳的转换？
+
+    -   `PdfParser`的核心功能是解析而非直接转换成 Markdown。
+    -   `PdfParser`支持三个引擎:
+        -   `marker`，参考了著名的`marker`项目，虽然能直接实现 markdown 的转换，但是因为在复杂文本上效果欠佳，所以做为解析器的一部分。
+        -   `unstructured`，解析出来的文本是原始文本，在格式排版上几乎没有什么效果，推荐在格式比较整齐的 pdf 解析上使用。
+        -   `surya_layout`，解析出来的并非文本而是标记了布局信息的图片，需要再配合`ImageConverter`进行转换，如果`ImageConverter`使用的是`gpt-4o`等多模态模型，转换成 Markdown 的效果是最好的，可匹配某些商用转换软件。
+    -   以下是转换效果最好的代码示例:
+
+        ```python
+        import os
+        from wisup_e2m import PdfParser, ImageConverter
+
+        work_dir = os.getcwd() # 以当前的路径作为工作路径
+        image_dir = os.path.join(work_dir, "figure")
+
+        pdf = "./test.pdf"
+
+        # 加载解析器
+        pdf_parser = PdfParser(engine="surya_layout")
+        # 加载转换器
+        image_converter = ImageConverter(
+            engine="litellm",
+            api_key="<you api key>", # 修改为你的API key
+            model="gpt-4o",
+            base_url="<you base url>", # 如果使用了模型代理，需要填写base url
+            caching=True,
+            cache_type="disk-cache",
+        )
+
+        # 解析PDF为图片
+        pdf_data = pdf_parser.parse(
+            pdf,
+            start_page=0, # 开始页码
+            end_page=20, # 结束页码
+            work_dir=work_dir,
+            image_dir=image_dir, # 提取的图片保存的地方
+            relative_path=True, # 图片路径是否为相对路径(相对于work_dir)
+        )
+
+        # 通过 ImageConverter 将图片转换为文本
+        md_text = image_converter.convert(
+            images = pdf_data.images,
+            attached_images_map= pdf_data.attached_images_map,
+            work_dir=work_dir, # 图片在Markdown中的地址会相对于 workdir，默认是绝对路径
+        )
+
+        # save test markdown
+        with open("test.md", "w") as f:
+            f.write(md_text)
+        ```
+
+-   无法连接 'https://huggingface.co'
+
+    -   方法 1: 尝试通过科学上网代理访问
+    -   方法 2: 在代码中使用镜像
+        ```python
+        import os
+        os.environ['CURL_CA_BUNDLE'] = ''
+        os.environ['HF_ENDPOINT']= 'https://hf-mirror.com'
+        ```
+    -   方法 3: 终端设置环境变量
+        ```bash
+        export CURL_CA_BUNDLE=''
+        export HF_ENDPOINT='https://hf-mirror.com'
+        ```
+
+-   Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
+
     ```python
-    import os
-    from wisup_e2m import PdfParser, ImageConverter
-    
-    work_dir = os.getcwd() # 以当前的路径作为工作路径
-    image_dir = os.path.join(work_dir, "figure")
-    
-    pdf = "./test.pdf"
-    
-    # 加载解析器
-    pdf_parser = PdfParser(engine="surya_layout")
-    # 加载转换器
-    image_converter = ImageConverter(
-        engine="litellm",
-        api_key="<you api key>", # 修改为你的API key
-        model="gpt-4o",
-        base_url="<you base url>", # 如果使用了模型代理，需要填写base url
-        caching=True,
-        cache_type="disk-cache",
-    )
-    
-    # 解析PDF为图片
-    pdf_data = pdf_parser.parse(
-        pdf,
-        start_page=0, # 开始页码
-        end_page=20, # 结束页码
-        work_dir=work_dir,
-        image_dir=image_dir, # 提取的图片保存的地方
-        relative_path=True, # 图片路径是否为相对路径(相对于work_dir)
-    )
-    
-    # 通过 ImageConverter 将图片转换为文本
-    md_text = image_converter.convert(
-        images = pdf_data.images,
-        attached_images_map= pdf_data.attached_images_map,
-        work_dir=work_dir, # 图片在Markdown中的地址会相对于 workdir，默认是绝对路径
-    )
-    
-    # save test markdown
-    with open("test.md", "w") as f:
-        f.write(md_text)
+    import nltk
+    nltk.download('all') # 最好直接下载所有资源,3.57G
     ```
-
-- 无法连接 'https://huggingface.co'
-  - 方法1: 尝试通过科学上网代理访问
-  - 方法2: 在代码中使用镜像
-      ```python
-      import os
-      os.environ['CURL_CA_BUNDLE'] = ''
-      os.environ['HF_ENDPOINT']= 'https://hf-mirror.com'
-      ```
-  - 方法3: 终端设置环境变量
-      ```bash
-      export CURL_CA_BUNDLE=''
-      export HF_ENDPOINT='https://hf-mirror.com'
-      ```
-
-- Resource xxx not found. Please use the NLTK Downloader to obtain the resource:
-  ```python
-  import nltk
-  nltk.download('all') # 最好直接下载所有资源,3.57G
-  ```
 
 -   未找到资源 wordnet。
     -   完全卸载 `nltk`：`pip uninstall nltk`
@@ -480,7 +488,7 @@ converters:
 
 ## 📧 联系我们
 
-扫描以下二维码加入我们的微信群(备注来自e2m项目):
+扫描以下二维码加入我们的微信群(备注来自 e2m 项目):
 
 <p align="center">
   <img src="docs/images/wechat_QR.png" width="200px" alt="wisup_e2m Logo">
