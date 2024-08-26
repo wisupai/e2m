@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/wisup_e2m_banner.jpg" width="800px" alt="wisup_e2m Logo">
+  <img src="https://github.com/wisupai/e2m/blob/main/docs/images/wisup_e2m_banner.jpg?raw=true" width="800px" alt="wisup_e2m Logo">
 </p>
 
 <p align="center">
@@ -39,7 +39,7 @@ E2M 是一个能够把多种文件类型解析并转换成 Markdown 格式的 Py
 一般来说，对于任意类型的文件，需要先运行解析器，获取文件内部的 text、image 等数据，然后再运行转换器，将数据转换为 Markdown 格式。
 
 <p align="center">
-  <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
+  <img src="https://github.com/wisupai/e2m/blob/main/docs/images/e2m_pipeline.jpg?raw=true" width="400px" alt="wisup_e2m Logo">
 </p>
 
 ## 📹 视频介绍

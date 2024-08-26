@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/wisup_e2m_banner.jpg" width="800px" alt="wisup_e2m Logo">
+  <img src="https://github.com/wisupai/e2m/blob/main/docs/images/wisup_e2m_banner.jpg?raw=true" width="800px" alt="wisup_e2m Logo">
 </p>
 
 <p align="center">
@@ -40,7 +40,7 @@ Generally, for any type of file, the parser is run first to extract internal dat
 
 
 <p align="center">
-  <img src="docs/images/e2m_pipeline.jpg" width="400px" alt="wisup_e2m Logo">
+  <img src="https://github.com/wisupai/e2m/blob/main/docs/images/e2m_pipeline.jpg?raw=true" width="400px" alt="wisup_e2m Logo">
 </p>
 
 ## 📹 Video Introduction
