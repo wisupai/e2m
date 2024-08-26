@@ -179,7 +179,7 @@ print(pdf_data.text)
 from wisup_e2m import DocParser
 
 doc_path = "./test.doc"
-parser = DocParser(engine="xml") # doc 引擎: unstructured
+parser = DocParser(engine="xml") # doc 引擎: xml
 doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
@@ -190,7 +190,7 @@ print(doc_data.text)
 from wisup_e2m import DocxParser
 
 docx_path = "./test.docx"
-parser = DocxParser(engine="xml") # docx 引擎: unstructured
+parser = DocxParser(engine="xml") # docx 引擎: xml
 docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
@@ -223,7 +223,7 @@ print(html_data.text)
 from wisup_e2m import UrlParser
 
 url = "https://www.example.com"
-parser = UrlParser(engine="jina") # url 引擎: jina
+parser = UrlParser(engine="jina") # url 引擎: jina, firecrawl, unstructured
 url_data = parser.parse(url)
 print(url_data.text)
 ```

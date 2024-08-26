@@ -223,7 +223,7 @@ print(html_data.text)
 from wisup_e2m import UrlParser
 
 url = "https://www.example.com"
-parser = UrlParser(engine="jina") # url engines: jina
+parser = UrlParser(engine="jina") # url engines: jina, firecrawl, unstructured
 url_data = parser.parse(url)
 print(url_data.text)
 ```
