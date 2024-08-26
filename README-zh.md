@@ -144,6 +144,11 @@ conda create -n e2m python=3.10
 conda activate e2m
 ```
 
+更新pip:
+```bash
+pip install --upgrade pip
+```
+
 使用 pip 安装 E2M：
 
 ```bash
