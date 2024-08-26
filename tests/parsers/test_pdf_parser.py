@@ -46,7 +46,8 @@ def test_parse_by_unstructured(mocker, unstructured_pdf_parser):
 
 def test_parse_by_surya_layout(mocker, surya_layout_pdf_parser):
     mock_convert_pdf_to_images = mocker.patch(
-        "wisup_e2m.parsers.doc.pdf_parser.convert_pdf_to_images", return_value=[test_image_path]
+        "wisup_e2m.parsers.doc.pdf_parser.convert_pdf_to_images",
+        return_value=[test_image_path],
     )
     mock_image_open = mocker.patch("PIL.Image.open", return_value=MagicMock())
     mocker.patch.object(
@@ -70,10 +71,13 @@ def test_parse_by_surya_layout(mocker, surya_layout_pdf_parser):
 
 def test_parse_by_marker(mocker, marker_pdf_parser):
     mock_convert_single_pdf = mocker.patch(
-        "marker.convert.convert_single_pdf", return_value=("full_text", [test_image_path], {})
+        "marker.convert.convert_single_pdf",
+        return_value=("full_text", [test_image_path], {}),
     )
     mocker.patch.object(
-        marker_pdf_parser, "_prepare_marker_data_to_e2m_parsed_data", return_value=E2MParsedData()
+        marker_pdf_parser,
+        "_prepare_marker_data_to_e2m_parsed_data",
+        return_value=E2MParsedData(),
     )
 
     parsed_data = marker_pdf_parser._parse_by_marker(file=test_pdf_path)
