@@ -155,7 +155,7 @@ pip install --upgrade pip
 # 选项 1: 通过pip安装
 pip install wisup_e2m
 # 选项 2: 通过git安装
-pip install git+https://github.com/wisupai/e2m.git
+pip install git+https://github.com/wisupai/e2m.git --index-url https://pypi.org/simple
 # 选项 3: 手动安装
 git clone https://github.com/wisupai/e2m.git
 pip install poetry
