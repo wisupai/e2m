@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from zhipuai import ZhipuAI
 
 from wisup_e2m.converters.strategies.base import BaseStrategy
@@ -193,9 +192,7 @@ class ZhipuaiStrategy(BaseStrategy):
                         "type": "image_url",
                         "image_url": {
                             "url": (
-                                image_to_base64(image)
-                                if not image.startswith("http")
-                                else image
+                                image_to_base64(image) if not image.startswith("http") else image
                             ),
                         },
                     }
@@ -208,11 +205,7 @@ class ZhipuaiStrategy(BaseStrategy):
         max_tokens = kwargs.get("max_tokens", None)
 
         inferenced_text_format = self.text_format_inference(
-            text=text[
-                : LlmUtils.estimate_token_to_char(
-                    get_model_info(model)["max_input_tokens"]
-                )
-            ],
+            text=text[: LlmUtils.estimate_token_to_char(get_model_info(model)["max_input_tokens"])],
             verbose=verbose,
             **kwargs,
         )
@@ -257,9 +250,7 @@ class ZhipuaiStrategy(BaseStrategy):
             logger.info(f"Sending messages to the model: \n{messages}")
 
             converted_text.append(
-                LlmUtils.clean_to_markdown(
-                    self._query(messages, verbose=verbose, **kwargs)
-                )
+                LlmUtils.clean_to_markdown(self._query(messages, verbose=verbose, **kwargs))
             )
 
         # 去除所有的`<CONTINUE>`和`<END>`,  <CONTINUE> -> "", <END> -> "\n"
@@ -312,9 +303,7 @@ class ZhipuaiStrategy(BaseStrategy):
                         "type": "image_url",
                         "image_url": {
                             "url": (
-                                image_to_base64(image)
-                                if not image.startswith("http")
-                                else image
+                                image_to_base64(image) if not image.startswith("http") else image
                             ),
                         },
                     }
@@ -342,9 +331,7 @@ class ZhipuaiStrategy(BaseStrategy):
                 )
 
             converted_text.append(
-                LlmUtils.clean_to_markdown(
-                    self._query(messages, verbose=verbose, **kwargs)
-                )
+                LlmUtils.clean_to_markdown(self._query(messages, verbose=verbose, **kwargs))
             )
 
         return "".join(
@@ -364,9 +351,7 @@ class ZhipuaiStrategy(BaseStrategy):
 
         raise NotImplementedError("Not implemented yet.")
 
-    def with_toc_image_convert(
-        self, images: List[str], verbose: bool = True, **kwargs
-    ) -> str:
+    def with_toc_image_convert(self, images: List[str], verbose: bool = True, **kwargs) -> str:
         # 先识别出目录
 
         # 根据目录来修复文本
