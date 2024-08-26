@@ -184,6 +184,14 @@ print(pdf_data.text)
 
 ### 📝 DOC 解析器
 
+> [!NOTE]  
+> 如果没有科学上网，可能连接huggingface失败，可以使用设置以下镜像:
+> ```python
+> import os
+> os.environ['CURL_CA_BUNDLE'] = ''
+> os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+> ```
+
 ```python
 from wisup_e2m import DocParser
 
