@@ -153,6 +153,33 @@ class DocxParser(BaseParser):
         attached_images = []
 
         for ele in doc.element.body:
+            # 如果是 bookmarkEnd 则跳过
+            print(ele.tag)
+            if ele.tag.endswith("bookmarkEnd"):
+                text_list.append("---")
+                continue
+            if ele.tag.endswith("tbl"):
+                row_list = []
+
+                for idx, tr in enumerate(ele.tr_lst):
+                    for tc in tr.tc_lst:
+                        for p in tc.p_lst:
+                            p_list = []
+                            for r in p.r_lst:
+                                r_list = []
+                                for t in r.t_lst:
+                                    r_list.append(t.text)
+                                p_list.append("".join(r_list))
+                            row_list.append("".join(p_list))
+
+                    text_list.append("|" + " | ".join(row_list) + "|")
+                    if idx == 0:
+                        text_list.append("|" + " | ".join(["---"] * len(row_list)) + "|")
+                    row_list = []
+                # 分隔符
+                text_list.append("---")
+                continue
+
             xml = ele.xml
             if ele.text:
                 text_list.append(ele.text)
