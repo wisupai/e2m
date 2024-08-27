@@ -5,6 +5,7 @@ from typing import List, Optional
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
 from wisup_e2m.utils.pdf_util import convert_pdf_to_images
+from wisup_e2m.utils.image_util import base64_to_image
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ _pdf_parser_params = [
     "image_dir",
     "relative_path",
     "layout_ignore_label_types",
+    "batch_multiplier",
 ]
 
 
@@ -39,7 +41,9 @@ class PdfParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"
-            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -155,7 +159,9 @@ class PdfParser(BaseParser):
             images = [Image.open(image_file) for image_file in all_images]
 
             logger.info(f"Total {len(all_images)} images")
-            layout_predictions = self.surya_layout_func(str(tmp_dir), batch_size=batch_size)
+            layout_predictions = self.surya_layout_func(
+                str(tmp_dir), batch_size=batch_size
+            )
 
             # reorder layout predictions,依据name字段，要和  all_images 的文件stem对应
             new_layout_predictions = []
@@ -193,7 +199,7 @@ class PdfParser(BaseParser):
 
     def _parse_by_marker(
         self,
-        file,
+        file_name: str,
         start_page: int = None,
         end_page: int = None,
         include_image_link_in_text: bool = True,
@@ -225,24 +231,23 @@ class PdfParser(BaseParser):
         :return: Full text, images, out meta
         :rtype: Tuple[str, List[Image], Dict]
         """
-        from marker.convert import convert_single_pdf
 
-        full_text, images, out_meta = "", [], {}  # Initialize variables
+        marker_result = self.marker_parse_func(
+            filename=file_name,
+            start_page=start_page,
+            max_pages=end_page,
+            batch_multiplier=batch_multiplier,
+            # langs=self.langs, # TODO: add langs
+            debug=False,
+        )
 
-        try:
-            full_text, images, out_meta = convert_single_pdf(
-                file,
-                self.marker_models,
-                start_page=start_page,
-                max_pages=end_page,
-                # langs=self.config.langs, # todo: lang map
-                batch_multiplier=batch_multiplier,
-            )
+        full_text = marker_result["full_text"]
+        images = marker_result["images"]  # Dict[str, str] 文件名 + base64编码的图片
+        out_meta = marker_result["out_meta"]
 
-            logger.info(f"images: {images}")
-            logging.info(f"out_meta: {out_meta}")
-        except Exception as e:
-            logger.error(f"Error parsing pdf with marker engine: {e}")
+        if images:
+            for k, v in images.items():
+                images[k] = base64_to_image(v)
 
         return self._prepare_marker_data_to_e2m_parsed_data(
             text=full_text,
@@ -310,9 +315,9 @@ class PdfParser(BaseParser):
             )
         elif self.config.engine == "marker":
             return self._parse_by_marker(
-                file_name,
-                start_page,
-                end_page,
+                file_name=file_name,
+                start_page=start_page,
+                end_page=end_page,
                 include_image_link_in_text=include_image_link_in_text,
                 work_dir=work_dir,
                 image_dir=image_dir,
@@ -346,6 +351,7 @@ class PdfParser(BaseParser):
             "Page-footer",
             "Footnote",
         ],
+        batch_multiplier: int = 1,  # for marker
         **kwargs,
     ) -> E2MParsedData:
         """
@@ -365,6 +371,8 @@ class PdfParser(BaseParser):
         :type relative_path: bool
         :param layout_ignore_label_types: Ignore label types
         :type layout_ignore_label_types: List[str], default ["Page-header", "Page-footer", "Footnote"]
+        :param batch_multiplier: batch multiplier for marker
+        :type batch_multiplier: int, default 1, only for marker
 
         :return: Parsed data
         :rtype: E2MParsedData

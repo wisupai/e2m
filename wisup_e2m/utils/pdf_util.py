@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import httpx
 import zipfile
-from typing import Dict
+from typing import Dict, List
 
 
 logger = logging.getLogger(__name__)
@@ -124,6 +124,64 @@ def surya_detect_layout(
     logger.info(f"Layout detected: {result}")
     return result
 
+
+
+def marker_convert_single(
+    filename: str,
+    start_page: int = None,
+    max_pages: int = None,
+    langs: List[str] = None,
+    batch_multiplier: int = 2,
+    debug: bool = False
+) -> None:
+    script_path = Path(__file__).parent / "scripts" / "marker_convert_single.py"
+
+    logger.info(f"Running script {script_path} to convert PDF to markdown")
+    
+    # 构建命令行参数
+    cmd = ["python", str(script_path.resolve()), filename]
+
+    if start_page is not None:
+        cmd.extend(["--start_page", str(start_page)])
+
+    if max_pages is not None:
+        cmd.extend(["--max_pages", str(max_pages)])
+
+    if langs:
+        # 将列表转换为逗号分隔的字符串
+        lang_str = ",".join(langs)
+        cmd.extend(["--langs", lang_str])
+
+    if batch_multiplier:
+        cmd.extend(["--batch_multiplier", str(batch_multiplier)])
+
+    if debug:
+        cmd.append("--debug")
+
+    print(f"Start running marker, it may take {(max_pages - start_page + 1) / batch_multiplier * 25} seconds.")
+
+    # 运行脚本
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        logger.error(f"Error during PDF conversion: {stderr.decode()}")
+        raise RuntimeError(f"PDF conversion failed: {stderr.decode()}")
+    else:
+        logger.info("PDF conversion completed successfully.")
+
+    logger.debug(f"stdout: {stdout.decode()}")
+    logger.debug(f"stderr: {stderr.decode()}")
+    
+    # 解析返回的 JSON 结果
+    try:
+        result = json.loads(stdout.decode())  # list
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse JSON output: {str(e)}")
+        raise RuntimeError(f"Failed to parse JSON output, stdout.decode() = {stdout.decode()}")
+    
+    logger.info(f"PDF converted to markdown: {result}")
+    return result
 
 def convert_pdf_to_images(file, start_page, end_page, proc_count, save_dir, dpi=200):
     # pdf_to_image_script.py

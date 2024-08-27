@@ -168,9 +168,7 @@ class BaseParser(ABC):
         check_nltk_corpora_wordnet()
 
         logger.info("Loading Surya layout model and processor..")
-
         self.surya_layout_func = surya_detect_layout
-
         logger.info("Surya engine loaded successfully.")
 
     def _load_marker_engine(self):
@@ -187,14 +185,15 @@ class BaseParser(ABC):
                 "Marker not installed. Please install Marker by `pip install marker-pdf`"
             ) from None
 
-        from wisup_e2m.utils.pdf_util import check_nltk_corpora_wordnet
+        from wisup_e2m.utils.pdf_util import (
+            marker_convert_single,
+            check_nltk_corpora_wordnet,
+        )
 
         check_nltk_corpora_wordnet()
 
         logger.info("Loading Marker models...")
-        self.marker_models: List[Any] = load_all_models(
-            # langs=self.config.langs
-        )
+        self.marker_parse_func = marker_convert_single
         logger.info("Marker engine loaded successfully.")
 
     def _load_unstructured_engine(self):
@@ -277,7 +276,9 @@ class BaseParser(ABC):
                 "Firecrawl not installed. Please install Firecrawl by `pip install firecrawl`"
             ) from None
 
-        self.firecrawl_app = FirecrawlApp(api_key=self.config.api_key)  # FIRECRAWL_API_KEY
+        self.firecrawl_app = FirecrawlApp(
+            api_key=self.config.api_key
+        )  # FIRECRAWL_API_KEY
 
     def _prepare_unstructured_data_to_e2m_parsed_data(
         self,
@@ -366,7 +367,9 @@ class BaseParser(ABC):
             "unstructured_metadata": unstructured_metadata,
         }
 
-        return E2MParsedData(text=text, attached_images=attached_images, metadata=metadata)
+        return E2MParsedData(
+            text=text, attached_images=attached_images, metadata=metadata
+        )
 
     def _prepare_surya_layout_data_to_e2m_parsed_data(
         self,
@@ -415,7 +418,9 @@ class BaseParser(ABC):
             page_width = image.width
             page_height = image.height
 
-            logger.info(f"Processing page {i}: width = {page_width}, height = {page_height}")
+            logger.info(
+                f"Processing page {i}: width = {page_width}, height = {page_height}"
+            )
 
             # Convert the image from RGB to BGR format
             image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
@@ -498,15 +503,21 @@ class BaseParser(ABC):
                 if (height * width) < (page_width * page_height * 3 / 100):
                     continue
 
-                if (label_type not in label_types) or (confidence < confidence_threshold):
+                if (label_type not in label_types) or (
+                    confidence < confidence_threshold
+                ):
                     continue
 
                 # 遍历 page_attached_image_infos，如果有重叠度大于 image_merge_threshold 的，合并
                 for img_info in page_attached_image_infos:
-                    overlap_percentage = check_overlap_percentage(img_info["points"], points)
+                    overlap_percentage = check_overlap_percentage(
+                        img_info["points"], points
+                    )
                     logger.info(f"overlap_percentage: {overlap_percentage}")
                     if overlap_percentage > image_merge_threshold:
-                        logger.info(f"Merging images: {img_info['points']} and {points}")
+                        logger.info(
+                            f"Merging images: {img_info['points']} and {points}"
+                        )
                         img_info["points"] = merge_images(img_info["points"], points)
                         break
 
@@ -571,7 +582,9 @@ class BaseParser(ABC):
             full_image_path_name = str(full_image_path)
             cv2.imwrite(full_image_path_name, image)
             layout_images.append(full_image_path_name)
-            attached_images.extend([img["image_path"] for img in page_attached_image_infos])
+            attached_images.extend(
+                [img["image_path"] for img in page_attached_image_infos]
+            )
             # image name -> attached image paths
             attached_images_map[full_image_path.name] = [
                 img["image_path"] for img in page_attached_image_infos
@@ -646,7 +659,9 @@ class BaseParser(ABC):
             "marker_metadata": metadata,
         }
 
-        return E2MParsedData(text=text, attached_images=attached_images, metadata=metadata)
+        return E2MParsedData(
+            text=text, attached_images=attached_images, metadata=metadata
+        )
 
     def _prepare_jina_data_to_e2m_parsed_data(
         self,
@@ -721,9 +736,13 @@ class BaseParser(ABC):
                     # attached_images.append(str(image_path.resolve()))
                     logging.info(f"{md_image_path=}")
                     attached_images.append(md_image_path)
-                    logger.info(f"Replaced image link {image_link} with {md_image_path}")
+                    logger.info(
+                        f"Replaced image link {image_link} with {md_image_path}"
+                    )
                     text = text.replace(image_link, md_image_path)
-                logger.info(f"Finihsed downloading {len(attached_images)} images to {image_dir}")
+                logger.info(
+                    f"Finihsed downloading {len(attached_images)} images to {image_dir}"
+                )
 
         return E2MParsedData(
             text=text,

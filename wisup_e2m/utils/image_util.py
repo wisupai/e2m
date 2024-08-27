@@ -1,5 +1,6 @@
 import base64
 from mimetypes import guess_type
+import io
 from typing import IO, Tuple, Union
 
 from PIL import Image
@@ -128,6 +129,16 @@ def local_image_to_data_url(image_path):
 
     # Construct the data URL
     return f"data:{mime_type};base64,{base64_encoded_data}"
+
+def base64_to_image(base64_data: str) -> Image:
+    """
+    将 base64 编码的字符串转换为 PIL Image 对象。
+
+    :param base64_data: base64 编码的字符串
+    :return: PIL Image 对象
+    """
+    image_data = base64.b64decode(base64_data)
+    return Image.open(io.BytesIO(image_data))
 
 
 def image_to_base64(image_input: str) -> str:
