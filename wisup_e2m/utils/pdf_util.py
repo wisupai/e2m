@@ -158,7 +158,7 @@ def marker_convert_single(
     if debug:
         cmd.append("--debug")
 
-    print(f"Start running marker, it may take {(max_pages - start_page + 1) / batch_multiplier * 25} seconds.")
+    print(f"Start running marker, it may take several minutes, please wait...")
 
     # 运行脚本
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
