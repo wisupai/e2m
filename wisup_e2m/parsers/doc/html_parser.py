@@ -4,7 +4,6 @@ from typing import IO, List, Optional
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
 from wisup_e2m.parsers.base import BaseParser, E2MParsedData
-from wisup_e2m.utils.web_util import get_web_content
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +38,7 @@ class HtmlParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"  # unstructured / jina
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()

@@ -5,6 +5,7 @@ from pathlib import Path
 pwd = Path(__file__).parent
 url = "https://docusaurus.io/docs"
 
+
 def test_jina_engine():
     parser = UrlParser(engine="jina")
     parsed_data = parser.parse(url)

@@ -125,19 +125,18 @@ def surya_detect_layout(
     return result
 
 
-
 def marker_convert_single(
     filename: str,
     start_page: int = None,
     max_pages: int = None,
     langs: List[str] = None,
     batch_multiplier: int = 2,
-    debug: bool = False
+    debug: bool = False,
 ) -> None:
     script_path = Path(__file__).parent / "scripts" / "marker_convert_single.py"
 
     logger.info(f"Running script {script_path} to convert PDF to markdown")
-    
+
     # 构建命令行参数
     cmd = ["python", str(script_path.resolve()), filename]
 
@@ -158,7 +157,7 @@ def marker_convert_single(
     if debug:
         cmd.append("--debug")
 
-    print(f"Start running marker, it may take several minutes, please wait...")
+    print("Start running marker, it may take several minutes, please wait...")
 
     # 运行脚本
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -172,16 +171,17 @@ def marker_convert_single(
 
     logger.debug(f"stdout: {stdout.decode()}")
     logger.debug(f"stderr: {stderr.decode()}")
-    
+
     # 解析返回的 JSON 结果
     try:
         result = json.loads(stdout.decode())  # list
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse JSON output: {str(e)}")
         raise RuntimeError(f"Failed to parse JSON output, stdout.decode() = {stdout.decode()}")
-    
+
     logger.info(f"PDF converted to markdown: {result}")
     return result
+
 
 def convert_pdf_to_images(file, start_page, end_page, proc_count, save_dir, dpi=200):
     # pdf_to_image_script.py

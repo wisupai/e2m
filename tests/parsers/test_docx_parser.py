@@ -5,6 +5,7 @@ from pathlib import Path
 pwd = Path(__file__).parent
 test_docx_path = str(pwd / "test.docx")
 
+
 def test_xml_engine():
     parser = DocxParser(engine="xml")
     parsed_data = parser.parse(test_docx_path)

@@ -5,6 +5,7 @@ from pathlib import Path
 pwd = Path(__file__).parent
 test_pdf_path = str(pwd / "test.pdf")
 
+
 def test_marker_engine():
     parser = PdfParser(engine="marker")
     parsed_data = parser.parse(test_pdf_path)

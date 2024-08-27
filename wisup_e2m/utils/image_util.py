@@ -130,6 +130,7 @@ def local_image_to_data_url(image_path):
     # Construct the data URL
     return f"data:{mime_type};base64,{base64_encoded_data}"
 
+
 def base64_to_image(base64_data: str) -> Image:
     """
     将 base64 编码的字符串转换为 PIL Image 对象。

@@ -5,6 +5,7 @@ from pathlib import Path
 pwd = Path(__file__).parent
 test_pptx_path = str(pwd / "test.pptx")
 
+
 def test_unstructured_engine():
     parser = PptxParser(engine="unstructured")
     parsed_data = parser.parse(test_pptx_path)

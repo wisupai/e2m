@@ -1,10 +1,8 @@
-import time
 import os
 import argparse
 import json
 import base64
 from io import BytesIO
-from PIL import Image
 import sys
 
 from marker.convert import convert_single_pdf
@@ -36,13 +34,9 @@ def main():
 
     python marker_convert_single.py test.pdf output --start_page 0 --max_pages 1 --langs en --batch_multiplier 1
     """
-    parser = argparse.ArgumentParser(
-        description="Convert a PDF to markdown with optional OCR."
-    )
+    parser = argparse.ArgumentParser(description="Convert a PDF to markdown with optional OCR.")
     parser.add_argument("filename", help="PDF file to parse")
-    parser.add_argument(
-        "--start_page", type=int, default=None, help="Page to start processing at"
-    )
+    parser.add_argument("--start_page", type=int, default=None, help="Page to start processing at")
     parser.add_argument(
         "--max_pages", type=int, default=None, help="Maximum number of pages to parse"
     )
@@ -58,9 +52,7 @@ def main():
         default=2,
         help="How much to increase batch sizes",
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="Enable debug logging", default=False
-    )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging", default=False)
     args = parser.parse_args()
 
     # Suppress all output except print
@@ -98,7 +90,7 @@ def main():
         # Prepare the output dictionary with only the required fields
         result = {
             "full_text": full_text,
-            "images": images, # Dict[str, str]
+            "images": images,  # Dict[str, str]
             "out_meta": out_meta,
         }
 

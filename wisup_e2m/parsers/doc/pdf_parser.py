@@ -41,9 +41,7 @@ class PdfParser(BaseParser):
 
         if not self.config.engine:
             self.config.engine = "unstructured"
-            logger.info(
-                f"No engine specified. Defaulting to {self.config.engine} engine."
-            )
+            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
 
         self._ensure_engine_exists()
         self._load_engine()
@@ -159,9 +157,7 @@ class PdfParser(BaseParser):
             images = [Image.open(image_file) for image_file in all_images]
 
             logger.info(f"Total {len(all_images)} images")
-            layout_predictions = self.surya_layout_func(
-                str(tmp_dir), batch_size=batch_size
-            )
+            layout_predictions = self.surya_layout_func(str(tmp_dir), batch_size=batch_size)
 
             # reorder layout predictions,依据name字段，要和  all_images 的文件stem对应
             new_layout_predictions = []
