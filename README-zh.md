@@ -9,8 +9,8 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.55">
-        <img src="https://img.shields.io/badge/version-0.1.55-blue" alt="E2M Version">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.56">
+        <img src="https://img.shields.io/badge/version-0.1.56-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
@@ -164,8 +164,23 @@ git clone https://github.com/wisupai/e2m.git
 cd e2m
 pip install poetry
 poetry build
-pip install dist/wisup_e2m-0.1.55-py3-none-any.whl
+pip install dist/wisup_e2m-0.1.56-py3-none-any.whl
 ```
+
+## CLI 命令行工具
+
+### 使用marker转换pdf
+
+转换单个pdf:
+```bash
+marker_single /path/to/file.pdf /path/to/output/folder --batch_multiplier 2 --max_pages 10 
+```
+
+批量转换pdf:
+```bash
+marker /path/to/input/folder /path/to/output/folder --workers 4 --max 10 --min_length 10000
+```
+
 
 ## ⚡️ 解析器: 快速开始
 
