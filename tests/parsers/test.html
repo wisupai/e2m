@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Linux Pipes are Slow | Quentin Santos</title>
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<link rel="pingback" href="https://qsantos.fr/xmlrpc.php">
+	<meta name='robots' content='max-image-preview:large' />
+<link rel='dns-prefetch' href='//stats.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="Quentin Santos &raquo; Feed" href="https://qsantos.fr/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Quentin Santos &raquo; Comments Feed" href="https://qsantos.fr/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Quentin Santos &raquo; Linux Pipes are Slow Comments Feed" href="https://qsantos.fr/2024/08/25/linux-pipes-are-slow/feed/" />
+<script>
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/qsantos.fr\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.6.1"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+</script>
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://qsantos.fr/wp-includes/css/dist/block-library/style.min.css?ver=6.6.1' media='all' />
+<style id='wp-block-library-theme-inline-css'>
+.wp-block-audio :where(figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-audio :where(figcaption){color:#ffffffa6}.wp-block-audio{margin:0 0 1em}.wp-block-code{border:1px solid #ccc;border-radius:4px;font-family:Menlo,Consolas,monaco,monospace;padding:.8em 1em}.wp-block-embed :where(figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-embed :where(figcaption){color:#ffffffa6}.wp-block-embed{margin:0 0 1em}.blocks-gallery-caption{color:#555;font-size:13px;text-align:center}.is-dark-theme .blocks-gallery-caption{color:#ffffffa6}:root :where(.wp-block-image figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme :root :where(.wp-block-image figcaption){color:#ffffffa6}.wp-block-image{margin:0 0 1em}.wp-block-pullquote{border-bottom:4px solid;border-top:4px solid;color:currentColor;margin-bottom:1.75em}.wp-block-pullquote cite,.wp-block-pullquote footer,.wp-block-pullquote__citation{color:currentColor;font-size:.8125em;font-style:normal;text-transform:uppercase}.wp-block-quote{border-left:.25em solid;margin:0 0 1.75em;padding-left:1em}.wp-block-quote cite,.wp-block-quote footer{color:currentColor;font-size:.8125em;font-style:normal;position:relative}.wp-block-quote.has-text-align-right{border-left:none;border-right:.25em solid;padding-left:0;padding-right:1em}.wp-block-quote.has-text-align-center{border:none;padding-left:0}.wp-block-quote.is-large,.wp-block-quote.is-style-large,.wp-block-quote.is-style-plain{border:none}.wp-block-search .wp-block-search__label{font-weight:700}.wp-block-search__button{border:1px solid #ccc;padding:.375em .625em}:where(.wp-block-group.has-background){padding:1.25em 2.375em}.wp-block-separator.has-css-opacity{opacity:.4}.wp-block-separator{border:none;border-bottom:2px solid;margin-left:auto;margin-right:auto}.wp-block-separator.has-alpha-channel-opacity{opacity:1}.wp-block-separator:not(.is-style-wide):not(.is-style-dots){width:100px}.wp-block-separator.has-background:not(.is-style-dots){border-bottom:none;height:1px}.wp-block-separator.has-background:not(.is-style-wide):not(.is-style-dots){height:2px}.wp-block-table{margin:0 0 1em}.wp-block-table td,.wp-block-table th{word-break:normal}.wp-block-table :where(figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-table :where(figcaption){color:#ffffffa6}.wp-block-video :where(figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-video :where(figcaption){color:#ffffffa6}.wp-block-video{margin:0 0 1em}:root :where(.wp-block-template-part.has-background){margin-bottom:0;margin-top:0;padding:1.25em 2.375em}
+</style>
+<link rel='stylesheet' id='jetpack-layout-grid-css' href='https://qsantos.fr/wp-content/plugins/layout-grid/style.css?ver=1692007201' media='all' />
+<link rel='stylesheet' id='mediaelement-css' href='https://qsantos.fr/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17' media='all' />
+<link rel='stylesheet' id='wp-mediaelement-css' href='https://qsantos.fr/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.6.1' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #fff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #141412;--wp--preset--color--red: #bc360a;--wp--preset--color--medium-orange: #db572f;--wp--preset--color--light-orange: #ea9629;--wp--preset--color--yellow: #fbca3c;--wp--preset--color--dark-brown: #220e10;--wp--preset--color--medium-brown: #722d19;--wp--preset--color--light-brown: #eadaa6;--wp--preset--color--beige: #e8e5ce;--wp--preset--color--off-white: #f7f5e7;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--gradient--autumn-brown: linear-gradient(135deg, rgba(226,45,15,1) 0%, rgba(158,25,13,1) 100%);--wp--preset--gradient--sunset-yellow: linear-gradient(135deg, rgba(233,139,41,1) 0%, rgba(238,179,95,1) 100%);--wp--preset--gradient--light-sky: linear-gradient(135deg,rgba(228,228,228,1.0) 0%,rgba(208,225,252,1.0) 100%);--wp--preset--gradient--dark-sky: linear-gradient(135deg,rgba(0,0,0,1.0) 0%,rgba(56,61,69,1.0) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='mkaz-code-syntax-prism-css-css' href='https://qsantos.fr/wp-content/plugins/code-syntax-block/assets/prism-a11y-dark.css?ver=1716237844' media='all' />
+<link rel='stylesheet' id='twentythirteen-fonts-css' href='https://qsantos.fr/wp-content/themes/twentythirteen/fonts/source-sans-pro-plus-bitter.css?ver=20230328' media='all' />
+<link rel='stylesheet' id='genericons-css' href='https://qsantos.fr/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' media='all' />
+<link rel='stylesheet' id='twentythirteen-style-css' href='https://qsantos.fr/wp-content/themes/twentythirteen/style.css?ver=20240716' media='all' />
+<link rel='stylesheet' id='twentythirteen-block-style-css' href='https://qsantos.fr/wp-content/themes/twentythirteen/css/blocks.css?ver=20240520' media='all' />
+<script src="https://qsantos.fr/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script src="https://qsantos.fr/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script src="https://qsantos.fr/wp-content/themes/twentythirteen/js/functions.js?ver=20230526" id="twentythirteen-script-js" defer data-wp-strategy="defer"></script>
+<link rel="https://api.w.org/" href="https://qsantos.fr/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://qsantos.fr/wp-json/wp/v2/posts/4517" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://qsantos.fr/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.6.1" />
+<link rel="canonical" href="https://qsantos.fr/2024/08/25/linux-pipes-are-slow/" />
+<link rel='shortlink' href='https://qsantos.fr/?p=4517' />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://qsantos.fr/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fqsantos.fr%2F2024%2F08%2F25%2Flinux-pipes-are-slow%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://qsantos.fr/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fqsantos.fr%2F2024%2F08%2F25%2Flinux-pipes-are-slow%2F&#038;format=xml" />
+	<style>img#wpstats{display:none}</style>
+		<link rel="icon" href="https://qsantos.fr/wp-content/uploads/2022/07/avatar.png" sizes="32x32" />
+<link rel="icon" href="https://qsantos.fr/wp-content/uploads/2022/07/avatar.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://qsantos.fr/wp-content/uploads/2022/07/avatar.png" />
+<meta name="msapplication-TileImage" content="https://qsantos.fr/wp-content/uploads/2022/07/avatar.png" />
+<style type="text/css" id="wp-custom-css">.wp-block-code {
+  padding: .8em 1em;
+}
+*:not(pre) > code {
+	background-color: #fef9ec;
+	font-size: 80%
+}
+#page, #navbar {
+	max-width: none;
+}
+.widget {
+	hyphens: none;
+}
+
+.alignwide {
+	margin-left:calc(0px - min(302px, 100vw / 2 - 1040px / 2 + 60px));
+	width: calc(100vw / 2 - 1040px / 2 + 60px);
+	width: 1208px;
+	max-width: 100vw
+}</style></head>
+
+<body class="post-template-default single single-post postid-4517 single-format-standard wp-embed-responsive single-author sidebar">
+		<div id="page" class="hfeed site">
+		<header id="masthead" class="site-header">
+			<a class="home-link" href="https://qsantos.fr/" rel="home">
+				<h1 class="site-title">Quentin Santos</h1>
+				<h2 class="site-description">Make it work. Make it right. Make it fast.</h2>
+			</a>
+
+			<div id="navbar" class="navbar">
+				<nav id="site-navigation" class="navigation main-navigation">
+					<button class="menu-toggle">Menu</button>
+					<a class="screen-reader-text skip-link" href="#content">
+						Skip to content					</a>
+					<div id="primary-menu" class="nav-menu"><ul>
+<li class="page_item page-item-53"><a href="https://qsantos.fr/contact/">Contact</a></li>
+<li class="page_item page-item-504"><a href="https://qsantos.fr/my-favorites/">Favorites</a></li>
+<li class="page_item page-item-897"><a href="https://qsantos.fr/portfolio/">Portfolio</a></li>
+</ul></div>
+					<form role="search" method="get" class="search-form" action="https://qsantos.fr/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form>				</nav><!-- #site-navigation -->
+			</div><!-- #navbar -->
+		</header><!-- #masthead -->
+
+		<div id="main" class="site-main">
+
+	<div id="primary" class="content-area">
+		<div id="content" class="site-content" role="main">
+
+			
+				
+<article id="post-4517" class="post-4517 post type-post status-publish format-standard hentry category-pipes category-programming">
+	<header class="entry-header">
+		
+				<h1 class="entry-title">Linux Pipes are Slow</h1>
+		
+		<div class="entry-meta">
+			<span class="date"><a href="https://qsantos.fr/2024/08/25/linux-pipes-are-slow/" title="Permalink to Linux Pipes are Slow" rel="bookmark"><time class="entry-date" datetime="2024-08-25T18:44:43+02:00">August 25, 2024</time></a></span><span class="categories-links"><a href="https://qsantos.fr/category/programming/pipes/" rel="category tag">Pipes</a>, <a href="https://qsantos.fr/category/programming/" rel="category tag">Programming</a></span><span class="author vcard"><a class="url fn n" href="https://qsantos.fr/author/qsantos/" title="View all posts by Quentin Santos" rel="author">Quentin Santos</a></span>					</div><!-- .entry-meta -->
+	</header><!-- .entry-header -->
+
+		<div class="entry-content">
+		
+<h2 class="wp-block-heading"><code>vmsplice</code> is <em>too</em> fast</h2>
+
+
+
+<p>Some programs use a particular system call “<code>vmsplice</code>” to move data faster through a pipe. Francesco already did <a href="https://mazzo.li/posts/fast-pipes.html">a deep dive on using <code>vmsplice</code> to make things fast</a>. However, while experimenting with it, I noticed that, when not using <code>vmsplice</code>, Linux pipes are slower than what I would have expected. Since you cannot always use it, I wanted to understand exactly why that was, and whether it could be improved.</p>
+
+
+
+<p>The reason I want to move data through pipes is that I am writing a program <a href="https://github.com/qsantos/ripmors/">encode/decode Morse code blazingly fast</a>.</p>
+
+
+
+<p>To get a point of reference, the obvious candidate is the <a href="https://codegolf.stackexchange.com/questions/215216/high-throughput-fizz-buzz/">Fizz Buzz throughput competition at the Code Golf StackExchange</a>. There are two kinds of solutions:</p>
+
+
+
+<ol class="wp-block-list">
+<li>the ones that manage to reach up to a few gigabytes per second, with <a href="https://codegolf.stackexchange.com/a/215231">neil&#8217;s</a> reaching 8.4 GiB/s;</li>
+
+
+
+<li>the ones which largely surpass that, from <a href="https://codegolf.stackexchange.com/a/256115">tkluck&#8217;s</a> at 15.5 GiB/s to <a href="https://codegolf.stackexchange.com/questions/215216/high-throughput-fizz-buzz/236630#236630">ais523&#8217;s</a> at 60.8 GiB/s, to <a href="https://codegolf.stackexchange.com/a/269772">david&#8217;s</a> at 208.3 GiB/s using multiple cores.</li>
+</ol>
+
+
+
+<p>The difference between the first and the second group is that the second is using <code>vmsplice</code>, while the first is not<sup data-fn="25bc32bc-4b79-41b9-87b3-0db6adcecbbf" class="fn"><a href="#25bc32bc-4b79-41b9-87b3-0db6adcecbbf" id="25bc32bc-4b79-41b9-87b3-0db6adcecbbf-link">1</a></sup>. But how can using <code>vmsplice</code> enable such a large gain in performance? My intuition about <code>vmsplice</code> is that it allows you to avoid copying data to and from kernel space. Surely, copying data cannot be slower than generating it? Even assuming it is not faster, and that you have to copy the data twice to get it through the pipe, you would assume a throughput gain of 3×, at best. But here, we have 7, even just looking at single-core solutions.</p>
+
+
+
+<p>Something is missing in my mental model, I want to know what.</p>
+
+
+
+<p>First, I&#8217;ll need to perform my own measurements to easily compare with what I&#8217;ll do afterward. Compiling and running aie523&#8217;s solution on my computer<sup data-fn="9f242c74-a611-49a2-9265-07d5945c4750" class="fn"><a href="#9f242c74-a611-49a2-9265-07d5945c4750" id="9f242c74-a611-49a2-9265-07d5945c4750-link">2</a></sup>, I get:</p>
+
+
+
+<pre class="wp-block-code"><code class="">$ ./fizzbuzz | pv >/dev/null
+96.4GiB 0:00:01 [96.4GiB/s]</code></pre>
+
+
+
+<p>With david&#8217;s solution, I reach 277 GB/s when using 7 cores (40 GB/s per core).</p>
+
+
+
+<p>Now, to understand what&#8217;s going on, we need to find the answer to these questions:</p>
+
+
+
+<ol class="wp-block-list">
+<li>How fast can we write data <em>ideally</em>?</li>
+
+
+
+<li>How fast can we <em>actually</em> write data to a pipe?</li>
+
+
+
+<li>How does <code>vmsplice</code> help?</li>
+</ol>
+
+
+
+<h2 class="wp-block-heading">Writing Data in the Ideal Wonderland</h2>
+
+
+
+<p>First, let&#8217;s consider the program below, which just copies data without doing any system call. I use <code><a href="https://doc.rust-lang.org/std/hint/fn.black_box.html">std::hint::black_box</a></code> to stop the compiler from noticing that we are not using the result. Without this, the compiler would optimize the program to nothing.</p>
+
+
+
+<pre class="wp-block-code"><code lang="rust" class="language-rust">fn main() {
+    let dst = [0u8; 1 &lt;&lt; 15];
+    let src = [0u8; 1 &lt;&lt; 15];
+    let mut copied = 0;
+    while copied &lt; (1000 &lt;&lt; 30) {
+        std::hint::black_box(dst).copy_from_slice(&amp;src);
+        copied += src.len();
+    }
+}</code></pre>
+
+
+
+<p>On my system, this runs at 167 GB/s. This is consistent with the speed of writing to L1 cache for my CPU<sup data-fn="e22c8070-2784-40d4-81ae-6916566ce03a" class="fn"><a href="#e22c8070-2784-40d4-81ae-6916566ce03a" id="e22c8070-2784-40d4-81ae-6916566ce03a-link">3</a></sup>.</p>
+
+
+
+<p>When <a href="https://jvns.ca/blog/2017/03/19/getting-started-with-ftrace/">profiling this with <code>ftrace</code></a>, we see that 99.9% of the time is spent in <code>__memset_avx512_unaligned_erms</code>, directly called by <code>main</code>, and calling no other functions. The flamegraph is pretty much flat. If you do not feel like running a full-fledged profiler, you can just <a href="https://yosefk.com/blog/profiling-with-ctrl-c.html">use <code>gdb</code> and hit Ctrl+C at a random time</a>:</p>
+
+
+
+<pre class="wp-block-code"><code lang="bash" class="language-bash">$ cargo build --release
+$ gdb target/release/copy 
+…
+(gdb) run
+…
+^C (hitting Ctrl+C)
+Program received signal SIGINT, Interrupt.
+__memset_avx512_unaligned_erms () at ../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:236
+…
+=> 0x00007ffff7f15dba    f3 aa    rep stos %al,%es:(%rdi)</code></pre>
+
+
+
+<p>In any case, note that we are using AVX-512. The reference to <code>memset</code> in the names can be surprising, but this is just because part of the logic is common with <code>memcpy</code>. The implementation is in a <a href="https://github.com/lattera/glibc/blob/master/sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S">generic file dedicated to  SIMD <strong>vec</strong>torization</a> that supports SSE, AVX2 and AVX-512. In our case, <a href="https://github.com/lattera/glibc/blob/895ef79e04a953cac1493863bcae29ad85657ee1/sysdeps/x86_64/multiarch/memset-avx512-unaligned-erms.S#L4">the AVX-512 specialization</a> is used.</p>
+
+
+
+<p>As an aside, note that the implementation of <code>memcpy</code> in glibc uses <a href="https://web.mit.edu/darwin/src/modules/xnu/osfmk/man/vm_copy.html">vm_copy</a> to copy pages directly on Mach-based systems (mostly Apply products) <a href="https://github.com/lattera/glibc/blob/master/string/memcpy.c#L44">uses a kernel feature to copy pages directly</a>.</p>
+
+
+
+<p>However, AVX-512 is quite niche. According to <a href="https://store.steampowered.com/hwsurvey">Steam&#8217;s hardware survey</a> (section “Other Settings”), only about 12% of Steam users have it. In fact, Intel only included AVX-512 for consumer-grade processors in the 11th generation; and now reserves it for servers. AMD CPUs support AVX-512 since the Ryzen 7000 series (Zen 4).</p>
+
+
+
+<p>So I tested this same program while disabling AVX-512. For this, I used the Linux kernel option <code><a href="https://www.phoronix.com/review/amd-zen4-avx512">clearcpuid=304</a></code>. I was able to check that it used <code>__memset_avx2_unaligned_erms</code> using the <code>gdb</code> and Ctrl+C trick. I then did the same to disable AVX2 with <code><a href="https://www.phoronix.com/news/Linux-5.19-Better-clearcpuid">clearcpuid=304,avx2,avx</a></code>, making it use <code>__memset_sse2_unaligned_erms</code>.</p>
+
+
+
+<p>Although SSE2 is always available on x86-64, I also disabled the <code>cpuid</code> bit for SSE2 and SSE to see if it could nudge <code>glibc</code> into using scalar registers to copy data. I immediately got a kernel panic. Ah, well.</p>
+
+
+
+<p>When using AVX2, the throughput was… 167 GB/s. When using only SSE2, the throughput was… still 167 GB/s. To an extent, it makes sense: even SSE2 is quite enough to fully use the bus and saturate L1 bandwidth. Using wider registers only helps when performing ALU operations.</p>
+
+
+
+<p>The conclusion from this experiment is that, as long as vectorization is used, I should reach 167 GB/s.</p>
+
+
+
+<h2 class="wp-block-heading">Actually Writing Data to a Pipe</h2>
+
+
+
+<p>So, let&#8217;s look at what happen when we write to a pipe instead of to user space memory:</p>
+
+
+
+<pre class="wp-block-code"><code lang="rust" class="language-rust">use std::io::Write;
+use std::os::fd::FromRawFd;
+fn main() {
+    let vec = vec![b'\0'; 1 &lt;&lt; 15];
+    let mut total_written = 0;
+    let mut stdout = unsafe { std::fs::File::from_raw_fd(1) };
+    while let Ok(n) = stdout.write(&amp;vec) {
+        total_written += n;
+        if total_written >= (100 &lt;&lt; 30) {
+            break;
+        }
+    }
+}</code></pre>
+
+
+
+<p>We then measure the throughput using:</p>
+
+
+
+<pre class="wp-block-code"><code lang="bash" class="language-bash">cargo run --release | pv >/dev/null</code></pre>
+
+
+
+<p>On my computer, this reaches 17 GB/s. This is 10 times as slow as just writing to a buffer! How can a system call which basically writes to a kernel buffer be so much slower? And no, context switches don&#8217;t take that much time.</p>
+
+
+
+<p>So let&#8217;s do some profiling of this program.</p>
+
+
+
+<svg version="1.1" class="alignwide" onload="init(evt)" viewBox="0 0 1200 646" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><br><br><br><defs><br>	<lineargradient id="background" y1="0" y2="1" x1="0" x2="0"><br>		<stop stop-color="#eeeeee" offset="5%"></stop><br>		<stop stop-color="#eeeeb0" offset="95%"></stop><br>	</lineargradient><br></defs><br><style type="text/css"><br>	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }<br>	#search, #ignorecase { opacity:0.1; cursor:pointer; }<br>	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }<br>	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }<br>	#title { text-anchor:middle; font-size:17px}<br>	#unzoom { cursor:pointer; }<br>	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }<br>	.hide { display:none; }<br>	.parent { opacity:0.5; }<br></style><br><script>
+// no CDATA because of https://core.trac.wordpress.org/ticket/3670
+	"use strict";
+	function init(evt) {
+		var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+		svg = evt.target;
+		details = svg.getElementById("details").firstChild;
+		searchbtn = svg.getElementById("search");
+		ignorecaseBtn = svg.getElementById("ignorecase");
+		unzoombtn = svg.getElementById("unzoom");
+		matchedtxt = svg.getElementById("matched");
+		searching = 0;
+		currentSearchTerm = null;
+
+		// event listeners
+		svg.addEventListener("click", function(e) {
+			var target = find_group(e.target);
+			if (target) {
+				if (target.nodeName == "a") {
+					if (e.ctrlKey === false) return;
+					e.preventDefault();
+				}
+				if (target.classList.contains("parent")) unzoom(true);
+				zoom(target);
+				if (!svg.querySelector('.parent')) {
+					// we have basically done a clearzoom so clear the url
+					var params = get_params();
+					if (params.x) delete params.x;
+					if (params.y) delete params.y;
+					unzoombtn.classList.add("hide");
+					return;
+				}
+
+				// set parameters for zoom state
+				var el = target.querySelector("rect");
+				if (el &amp;&amp; el.attributes &amp;&amp; el.attributes.y &amp;&amp; el.attributes._orig_x) {
+					var params = get_params()
+					params.x = el.attributes._orig_x.value;
+					params.y = el.attributes.y.value;
+				}
+			}
+			else if (e.target.id == "unzoom") clearzoom();
+			else if (e.target.id == "search") search_prompt();
+			else if (e.target.id == "ignorecase") toggle_ignorecase();
+		}, false)
+
+		// mouse-over for info
+		// show
+		svg.addEventListener("mouseover", function(e) {
+			var target = find_group(e.target);
+			if (target) details.nodeValue = "Function: " + g_to_text(target);
+		}, false)
+
+		// clear
+		svg.addEventListener("mouseout", function(e) {
+			var target = find_group(e.target);
+			if (target) details.nodeValue = ' ';
+		}, false)
+
+		// ctrl-F for search
+		// ctrl-I to toggle case-sensitive search
+		svg.addEventListener("keydown",function (e) {
+			if (e.keyCode === 114 || (e.ctrlKey &amp;&amp; e.keyCode === 70)) {
+				e.preventDefault();
+				search_prompt();
+			}
+			else if (e.ctrlKey &amp;&amp; e.keyCode === 73) {
+				e.preventDefault();
+				toggle_ignorecase();
+			}
+		}, false)
+
+		// functions
+		function get_params() {
+			var params = {};
+			var paramsarr = window.location.search.substr(1).split('&amp;');
+			for (var i = 0; i &lt; paramsarr.length; ++i) {
+				var tmp = paramsarr[i].split("=");
+				if (!tmp[0] || !tmp[1]) continue;
+				params[tmp[0]]  = decodeURIComponent(tmp[1]);
+			}
+			return params;
+		}
+		function parse_params(params) {
+			var uri = "?";
+			for (var key in params) {
+				uri += key + '=' + encodeURIComponent(params[key]) + '&amp;';
+			}
+			if (uri.slice(-1) == "&amp;")
+				uri = uri.substring(0, uri.length - 1);
+			if (uri == '?')
+				uri = window.location.href.split('?')[0];
+			return uri;
+		}
+		function find_child(node, selector) {
+			var children = node.querySelectorAll(selector);
+			if (children.length) return children[0];
+		}
+		function find_group(node) {
+			var parent = node.parentElement;
+			if (!parent) return;
+			if (parent.id == "frames") return node;
+			return find_group(parent);
+		}
+		function orig_save(e, attr, val) {
+			if (e.attributes["_orig_" + attr] != undefined) return;
+			if (e.attributes[attr] == undefined) return;
+			if (val == undefined) val = e.attributes[attr].value;
+			e.setAttribute("_orig_" + attr, val);
+		}
+		function orig_load(e, attr) {
+			if (e.attributes["_orig_"+attr] == undefined) return;
+			e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+			e.removeAttribute("_orig_"+attr);
+		}
+		function g_to_text(e) {
+			var text = find_child(e, "title").firstChild.nodeValue;
+			return (text)
+		}
+		function g_to_func(e) {
+			var func = g_to_text(e);
+			// if there's any manipulation we want to do to the function
+			// name before it's searched, do it here before returning.
+			return (func);
+		}
+		function update_text(e) {
+			var r = find_child(e, "rect");
+			var t = find_child(e, "text");
+			var w = parseFloat(r.attributes.width.value) -3;
+			var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+			t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+			// Smaller than this size won't fit anything
+			if (w &lt; 2 * 12 * 0.59) {
+				t.textContent = "";
+				return;
+			}
+
+			t.textContent = txt;
+			var sl = t.getSubStringLength(0, txt.length);
+			// check if only whitespace or if we can fit the entire string into width w
+			if (/^ *$/.test(txt) || sl &lt; w)
+				return;
+
+			// this isn't perfect, but gives a good starting point
+			// and avoids calling getSubStringLength too often
+			var start = Math.floor((w/sl) * txt.length);
+			for (var x = start; x &gt; 0; x = x-2) {
+				if (t.getSubStringLength(0, x + 2) &lt;= w) {
+					t.textContent = txt.substring(0, x) + "..";
+					return;
+				}
+			}
+			t.textContent = "";
+		}
+
+		// zoom
+		function zoom_reset(e) {
+			if (e.attributes != undefined) {
+				orig_load(e, "x");
+				orig_load(e, "width");
+			}
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_reset(c[i]);
+			}
+		}
+		function zoom_child(e, x, ratio) {
+			if (e.attributes != undefined) {
+				if (e.attributes.x != undefined) {
+					orig_save(e, "x");
+					e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+					if (e.tagName == "text")
+						e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+				}
+				if (e.attributes.width != undefined) {
+					orig_save(e, "width");
+					e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+				}
+			}
+
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_child(c[i], x - 10, ratio);
+			}
+		}
+		function zoom_parent(e) {
+			if (e.attributes) {
+				if (e.attributes.x != undefined) {
+					orig_save(e, "x");
+					e.attributes.x.value = 10;
+				}
+				if (e.attributes.width != undefined) {
+					orig_save(e, "width");
+					e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+				}
+			}
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_parent(c[i]);
+			}
+		}
+		function zoom(node) {
+			var attr = find_child(node, "rect").attributes;
+			var width = parseFloat(attr.width.value);
+			var xmin = parseFloat(attr.x.value);
+			var xmax = parseFloat(xmin + width);
+			var ymin = parseFloat(attr.y.value);
+			var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+			// XXX: Workaround for JavaScript float issues (fix me)
+			var fudge = 0.0001;
+
+			unzoombtn.classList.remove("hide");
+
+			var el = svg.getElementById("frames").children;
+			for (var i = 0; i &lt; el.length; i++) {
+				var e = el[i];
+				var a = find_child(e, "rect").attributes;
+				var ex = parseFloat(a.x.value);
+				var ew = parseFloat(a.width.value);
+				var upstack;
+				// Is it an ancestor
+				if (0 == 0) {
+					upstack = parseFloat(a.y.value) &gt; ymin;
+				} else {
+					upstack = parseFloat(a.y.value) &lt; ymin;
+				}
+				if (upstack) {
+					// Direct ancestor
+					if (ex &lt;= xmin &amp;&amp; (ex+ew+fudge) &gt;= xmax) {
+						e.classList.add("parent");
+						zoom_parent(e);
+						update_text(e);
+					}
+					// not in current path
+					else
+						e.classList.add("hide");
+				}
+				// Children maybe
+				else {
+					// no common path
+					if (ex &lt; xmin || ex + fudge &gt;= xmax) {
+						e.classList.add("hide");
+					}
+					else {
+						zoom_child(e, xmin, ratio);
+						update_text(e);
+					}
+				}
+			}
+			search();
+		}
+		function unzoom(dont_update_text) {
+			unzoombtn.classList.add("hide");
+			var el = svg.getElementById("frames").children;
+			for(var i = 0; i &lt; el.length; i++) {
+				el[i].classList.remove("parent");
+				el[i].classList.remove("hide");
+				zoom_reset(el[i]);
+				if(!dont_update_text) update_text(el[i]);
+			}
+			search();
+		}
+		function clearzoom() {
+			unzoom();
+
+			// remove zoom state
+			var params = get_params();
+			if (params.x) delete params.x;
+			if (params.y) delete params.y;
+		}
+
+		// search
+		function toggle_ignorecase() {
+			ignorecase = !ignorecase;
+			if (ignorecase) {
+				ignorecaseBtn.classList.add("show");
+			} else {
+				ignorecaseBtn.classList.remove("show");
+			}
+			reset_search();
+			search();
+		}
+		function reset_search() {
+			var el = svg.querySelectorAll("#frames rect");
+			for (var i = 0; i &lt; el.length; i++) {
+				orig_load(el[i], "fill")
+			}
+			var params = get_params();
+			delete params.s;
+		}
+		function search_prompt() {
+			if (!searching) {
+				var term = prompt("Enter a search term (regexp " +
+				    "allowed, eg: ^ext4_)"
+				    + (ignorecase ? ", ignoring case" : "")
+				    + "\nPress Ctrl-i to toggle case sensitivity", "");
+				if (term != null) search(term);
+			} else {
+				reset_search();
+				searching = 0;
+				currentSearchTerm = null;
+				searchbtn.classList.remove("show");
+				searchbtn.firstChild.nodeValue = "Search"
+				matchedtxt.classList.add("hide");
+				matchedtxt.firstChild.nodeValue = ""
+			}
+		}
+		function search(term) {
+			if (term) currentSearchTerm = term;
+
+			var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+			var el = svg.getElementById("frames").children;
+			var matches = new Object();
+			var maxwidth = 0;
+			for (var i = 0; i &lt; el.length; i++) {
+				var e = el[i];
+				var func = g_to_func(e);
+				var rect = find_child(e, "rect");
+				if (func == null || rect == null)
+					continue;
+
+				// Save max width. Only works as we have a root frame
+				var w = parseFloat(rect.attributes.width.value);
+				if (w &gt; maxwidth)
+					maxwidth = w;
+
+				if (func.match(re)) {
+					// highlight
+					var x = parseFloat(rect.attributes.x.value);
+					orig_save(rect, "fill");
+					rect.attributes.fill.value = "rgb(230,0,230)";
+
+					// remember matches
+					if (matches[x] == undefined) {
+						matches[x] = w;
+					} else {
+						if (w &gt; matches[x]) {
+							// overwrite with parent
+							matches[x] = w;
+						}
+					}
+					searching = 1;
+				}
+			}
+			if (!searching)
+				return;
+			var params = get_params();
+			params.s = currentSearchTerm;
+
+			searchbtn.classList.add("show");
+			searchbtn.firstChild.nodeValue = "Reset Search";
+
+			// calculate percent matched, excluding vertical overlap
+			var count = 0;
+			var lastx = -1;
+			var lastw = 0;
+			var keys = Array();
+			for (k in matches) {
+				if (matches.hasOwnProperty(k))
+					keys.push(k);
+			}
+			// sort the matched frames by their x location
+			// ascending, then width descending
+			keys.sort(function(a, b){
+				return a - b;
+			});
+			// Step through frames saving only the biggest bottom-up frames
+			// thanks to the sort order. This relies on the tree property
+			// where children are always smaller than their parents.
+			var fudge = 0.0001;	// JavaScript floating point
+			for (var k in keys) {
+				var x = parseFloat(keys[k]);
+				var w = matches[keys[k]];
+				if (x &gt;= lastx + lastw - fudge) {
+					count += w;
+					lastx = x;
+					lastw = w;
+				}
+			}
+			// display matched percent
+			matchedtxt.classList.remove("hide");
+			var pct = 100 * count / maxwidth;
+			if (pct != 100) pct = pct.toFixed(1)
+			matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+		}
+	}
+</script><br><rect x="0.0" y="0" width="1200.0" height="646.0" fill="url(#background)"></rect><br><text id="title" x="600.00" y="24">./zeroes | pv >/dev/null</text><br><text id="subtitle" x="600.00" y="48">Profiling of ./zeroes</text><br><text id="details" x="10.00" y="629"> </text><br><text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text><br><text id="search" x="1090.00" y="24">Search</text><br><text id="ignorecase" x="1174.00" y="24">ic</text><br><text id="matched" x="1090.00" y="629"> </text><br><g id="frames"><br><g><br><title>__x86_return_thunk (4,202,612 samples, 0.01%)</title><rect x="213.3" y="325" width="0.1" height="23.0" fill="rgb(253,221,53)" rx="2" ry="2"></rect><br><text x="216.26" y="339.5"></text><br></g><br><g><br><title>exit_to_user_mode_prepare (23,309,116 samples, 0.07%)</title><rect x="1187.8" y="397" width="0.8" height="23.0" fill="rgb(228,108,25)" rx="2" ry="2"></rect><br><text x="1190.80" y="411.5"></text><br></g><br><g><br><title>_raw_spin_lock_irqsave (25,962,963 samples, 0.08%)</title><rect x="504.7" y="277" width="0.9" height="23.0" fill="rgb(247,195,46)" rx="2" ry="2"></rect><br><text x="507.67" y="291.5"></text><br></g><br><g><br><title>__x86_return_thunk (32,381,871 samples, 0.09%)</title><rect x="259.4" y="301" width="1.1" height="23.0" fill="rgb(253,221,53)" rx="2" ry="2"></rect><br><text x="262.38" y="315.5"></text><br></g><br><g><br><title>try_charge_memcg (846,277,863 samples, 2.46%)</title><rect x="184.2" y="301" width="29.1" height="23.0" fill="rgb(210,27,6)" rx="2" ry="2"></rect><br><text x="187.24" y="315.5">tr..</text><br></g><br><g><br><title>_raw_spin_unlock_irq (288,030,674 samples, 0.84%)</title><rect x="892.0" y="349" width="9.9" height="23.0" fill="rgb(215,47,11)" rx="2" ry="2"></rect><br><text x="895.00" y="363.5"></text><br></g><br><g><br><title>check_new_pages (310,465,336 samples, 0.90%)</title><rect x="505.7" y="277" width="10.6" height="23.0" fill="rgb(249,202,48)" rx="2" ry="2"></rect><br><text x="508.70" y="291.5"></text><br></g><br><g><br><title>osq_lock (117,185,036 samples, 0.34%)</title><rect x="803.0" y="325" width="4.1" height="23.0" fill="rgb(214,43,10)" rx="2" ry="2"></rect><br><text x="806.04" y="339.5"></text><br></g><br><g><br><title>__rcu_read_lock (226,040,208 samples, 0.66%)</title><rect x="145.4" y="301" width="7.7" height="23.0" fill="rgb(220,69,16)" rx="2" ry="2"></rect><br><text x="148.37" y="315.5"></text><br></g><br><g><br><title>__GI___libc_write (34,368,952,857 samples, 99.89%)</title><rect x="11.3" y="493" width="1178.7" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="14.30" y="507.5">__GI___libc_write</text><br></g><br><g><br><title>&lt;std::os::unix::net::stream::UnixStream as std::io::Write>::write (12,137,904 samples, 0.04%)</title><rect x="10.0" y="517" width="0.4" height="23.0" fill="rgb(239,160,38)" rx="2" ry="2"></rect><br><text x="13.00" y="531.5"></text><br></g><br><g><br><title>__hrtimer_run_queues (11,254,762 samples, 0.03%)</title><rect x="802.6" y="205" width="0.3" height="23.0" fill="rgb(237,150,35)" rx="2" ry="2"></rect><br><text x="805.56" y="219.5"></text><br></g><br><g><br><title>_raw_spin_unlock_irqrestore (16,388,541 samples, 0.05%)</title><rect x="830.2" y="325" width="0.5" height="23.0" fill="rgb(228,106,25)" rx="2" ry="2"></rect><br><text x="833.16" y="339.5"></text><br></g><br><g><br><title>fpregs_assert_state_consistent (4,142,862 samples, 0.01%)</title><rect x="1188.5" y="373" width="0.1" height="23.0" fill="rgb(228,109,26)" rx="2" ry="2"></rect><br><text x="1191.45" y="387.5"></text><br></g><br><g><br><title>vfs_write (33,501,533,082 samples, 97.36%)</title><rect x="36.1" y="397" width="1148.9" height="23.0" fill="rgb(250,209,50)" rx="2" ry="2"></rect><br><text x="39.07" y="411.5">vfs_write</text><br></g><br><g><br><title>__x86_return_thunk (15,219,222 samples, 0.04%)</title><rect x="183.7" y="253" width="0.5" height="23.0" fill="rgb(253,221,53)" rx="2" ry="2"></rect><br><text x="186.72" y="267.5"></text><br></g><br><g><br><title>aa_file_perm (30,051,576 samples, 0.09%)</title><rect x="1183.1" y="325" width="1.0" height="23.0" fill="rgb(229,110,26)" rx="2" ry="2"></rect><br><text x="1186.09" y="339.5"></text><br></g><br><g><br><title>_find_first_bit (57,390,916 samples, 0.17%)</title><rect x="908.8" y="301" width="2.0" height="23.0" fill="rgb(252,216,51)" rx="2" ry="2"></rect><br><text x="911.79" y="315.5"></text><br></g><br><g><br><title>__list_del_entry_valid (120,783,301 samples, 0.35%)</title><rect x="255.2" y="301" width="4.2" height="23.0" fill="rgb(239,158,37)" rx="2" ry="2"></rect><br><text x="258.24" y="315.5"></text><br></g><br><g><br><title>hrtimer_interrupt (12,658,212 samples, 0.04%)</title><rect x="802.6" y="229" width="0.4" height="23.0" fill="rgb(228,109,26)" rx="2" ry="2"></rect><br><text x="805.56" y="243.5"></text><br></g><br><g><br><title>_raw_spin_trylock (959,948,236 samples, 2.79%)</title><rect x="260.5" y="301" width="32.9" height="23.0" fill="rgb(222,80,19)" rx="2" ry="2"></rect><br><text x="263.49" y="315.5">_r..</text><br></g><br><g><br><title>file_update_time (4,074,965 samples, 0.01%)</title><rect x="1151.6" y="349" width="0.1" height="23.0" fill="rgb(210,27,6)" rx="2" ry="2"></rect><br><text x="1154.60" y="363.5"></text><br></g><br><g><br><title>__mod_zone_page_state (32,134,035 samples, 0.09%)</title><rect x="503.6" y="277" width="1.1" height="23.0" fill="rgb(221,74,17)" rx="2" ry="2"></rect><br><text x="506.57" y="291.5"></text><br></g><br><g><br><title>_raw_spin_unlock_irqrestore (4,140,183 samples, 0.01%)</title><rect x="505.6" y="277" width="0.1" height="23.0" fill="rgb(228,106,25)" rx="2" ry="2"></rect><br><text x="508.56" y="291.5"></text><br></g><br><g><br><title>syscall_exit_to_user_mode (30,099,876 samples, 0.09%)</title><rect x="1187.7" y="421" width="1.0" height="23.0" fill="rgb(251,211,50)" rx="2" ry="2"></rect><br><text x="1190.66" y="435.5"></text><br></g><br><g><br><title>all (34,408,358,444 samples, 100%)</title><rect x="10.0" y="589" width="1180.0" height="23.0" fill="rgb(213,39,9)" rx="2" ry="2"></rect><br><text x="13.00" y="603.5"></text><br></g><br><g><br><title>__x86_return_thunk (16,313,413 samples, 0.05%)</title><rect x="906.1" y="325" width="0.5" height="23.0" fill="rgb(253,221,53)" rx="2" ry="2"></rect><br><text x="909.05" y="339.5"></text><br></g><br><g><br><title>entry_SYSCALL_64 (134,570,535 samples, 0.39%)</title><rect x="16.9" y="469" width="4.6" height="23.0" fill="rgb(239,156,37)" rx="2" ry="2"></rect><br><text x="19.92" y="483.5"></text><br></g><br><g><br><title>__sysvec_apic_timer_interrupt (12,658,212 samples, 0.04%)</title><rect x="802.6" y="253" width="0.4" height="23.0" fill="rgb(242,173,41)" rx="2" ry="2"></rect><br><text x="805.56" y="267.5"></text><br></g><br><g><br><title>asm_sysvec_apic_timer_interrupt (16,786,362 samples, 0.05%)</title><rect x="802.4" y="301" width="0.6" height="23.0" fill="rgb(232,127,30)" rx="2" ry="2"></rect><br><text x="805.41" y="315.5"></text><br></g><br><g><br><title>update_process_times (7,029,218 samples, 0.02%)</title><rect x="802.7" y="133" width="0.2" height="23.0" fill="rgb(250,209,50)" rx="2" ry="2"></rect><br><text x="805.70" y="147.5"></text><br></g><br><g><br><title>policy_nodemask (33,222,227 samples, 0.10%)</title><rect x="910.8" y="325" width="1.1" height="23.0" fill="rgb(221,74,17)" rx="2" ry="2"></rect><br><text x="913.76" y="339.5"></text><br></g><br><g><br><title>cgroup_rstat_updated (79,560,370 samples, 0.23%)</title><rect x="181.0" y="229" width="2.7" height="23.0" fill="rgb(244,180,43)" rx="2" ry="2"></rect><br><text x="183.99" y="243.5"></text><br></g><br><g><br><title>_copy_from_iter (6,966,591,966 samples, 20.25%)</title><rect x="912.7" y="325" width="238.9" height="23.0" fill="rgb(227,104,24)" rx="2" ry="2"></rect><br><text x="915.69" y="339.5">_copy_from_iter</text><br></g><br><g><br><title>__list_del_entry_valid (400,133,559 samples, 1.16%)</title><rect x="489.8" y="277" width="13.8" height="23.0" fill="rgb(239,158,37)" rx="2" ry="2"></rect><br><text x="492.84" y="291.5"></text><br></g><br><g><br><title>clear_page_erms (4,655,903,634 samples, 13.53%)</title><rect x="296.0" y="301" width="159.7" height="23.0" fill="rgb(229,113,27)" rx="2" ry="2"></rect><br><text x="299.01" y="315.5">clear_page_erms</text><br></g><br><g><br><title>update_wall_time (4,225,544 samples, 0.01%)</title><rect x="802.6" y="133" width="0.1" height="23.0" fill="rgb(207,11,2)" rx="2" ry="2"></rect><br><text x="805.56" y="147.5"></text><br></g><br><g><br><title>__rcu_read_unlock (6,832,345 samples, 0.02%)</title><rect x="1183.9" y="301" width="0.2" height="23.0" fill="rgb(253,224,53)" rx="2" ry="2"></rect><br><text x="1186.89" y="315.5"></text><br></g><br><g><br><title>refill_stock (17,620,376 samples, 0.05%)</title><rect x="212.7" y="277" width="0.6" height="23.0" fill="rgb(238,153,36)" rx="2" ry="2"></rect><br><text x="215.66" y="291.5"></text><br></g><br><g><br><title>ksys_write (33,653,152,549 samples, 97.81%)</title><rect x="30.9" y="421" width="1154.1" height="23.0" fill="rgb(205,4,1)" rx="2" ry="2"></rect><br><text x="33.87" y="435.5">ksys_write</text><br></g><br><g><br><title>sysvec_apic_timer_interrupt (13,980,036 samples, 0.04%)</title><rect x="802.5" y="277" width="0.5" height="23.0" fill="rgb(220,69,16)" rx="2" ry="2"></rect><br><text x="805.51" y="291.5"></text><br></g><br><g><br><title>__memcg_kmem_charge_page (2,947,262,302 samples, 8.57%)</title><rect x="112.2" y="325" width="101.1" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="115.19" y="339.5">__memcg_kmem..</text><br></g><br><g><br><title>sysvec_apic_timer_interrupt (4,214,752 samples, 0.01%)</title><rect x="455.5" y="253" width="0.2" height="23.0" fill="rgb(220,69,16)" rx="2" ry="2"></rect><br><text x="458.53" y="267.5"></text><br></g><br><g><br><title>get_page_from_freelist (8,833,731,051 samples, 25.67%)</title><rect x="213.4" y="325" width="302.9" height="23.0" fill="rgb(252,218,52)" rx="2" ry="2"></rect><br><text x="216.40" y="339.5">get_page_from_freelist</text><br></g><br><g><br><title>rw_verify_area (10,800,291 samples, 0.03%)</title><rect x="1170.5" y="373" width="0.4" height="23.0" fill="rgb(218,64,15)" rx="2" ry="2"></rect><br><text x="1173.54" y="387.5"></text><br></g><br><g><br><title>tick_sched_handle (7,029,218 samples, 0.02%)</title><rect x="802.7" y="157" width="0.2" height="23.0" fill="rgb(219,68,16)" rx="2" ry="2"></rect><br><text x="805.70" y="171.5"></text><br></g><br><g><br><title>tick_sched_do_timer (4,225,544 samples, 0.01%)</title><rect x="802.6" y="157" width="0.1" height="23.0" fill="rgb(227,104,25)" rx="2" ry="2"></rect><br><text x="805.56" y="171.5"></text><br></g><br><g><br><title>__get_obj_cgroup_from_memcg (460,978,258 samples, 1.34%)</title><rect x="129.6" y="301" width="15.8" height="23.0" fill="rgb(209,21,5)" rx="2" ry="2"></rect><br><text x="132.56" y="315.5"></text><br></g><br><g><br><title>asm_sysvec_apic_timer_interrupt (4,105,206 samples, 0.01%)</title><rect x="295.9" y="301" width="0.1" height="23.0" fill="rgb(232,127,30)" rx="2" ry="2"></rect><br><text x="298.87" y="315.5"></text><br></g><br><g><br><title>__mutex_lock.constprop.0 (8,703,282,714 samples, 25.29%)</title><rect x="516.3" y="349" width="298.5" height="23.0" fill="rgb(225,95,22)" rx="2" ry="2"></rect><br><text x="519.35" y="363.5">__mutex_lock.constprop.0</text><br></g><br><g><br><title>timekeeping_advance (4,225,544 samples, 0.01%)</title><rect x="802.6" y="109" width="0.1" height="23.0" fill="rgb(227,104,25)" rx="2" ry="2"></rect><br><text x="805.56" y="123.5"></text><br></g><br><g><br><title>security_file_permission (410,026,776 samples, 1.19%)</title><rect x="1170.9" y="373" width="14.1" height="23.0" fill="rgb(225,96,23)" rx="2" ry="2"></rect><br><text x="1173.91" y="387.5"></text><br></g><br><g><br><title>apparmor_file_permission (317,347,965 samples, 0.92%)</title><rect x="1173.3" y="349" width="10.9" height="23.0" fill="rgb(218,60,14)" rx="2" ry="2"></rect><br><text x="1176.29" y="363.5"></text><br></g><br><g><br><title>zeroes::main (34,396,128,845 samples, 99.96%)</title><rect x="10.4" y="517" width="1179.6" height="23.0" fill="rgb(205,1,0)" rx="2" ry="2"></rect><br><text x="13.42" y="531.5">zeroes::main</text><br></g><br><g><br><title>alloc_pages (292,194,676 samples, 0.85%)</title><rect x="901.9" y="349" width="10.0" height="23.0" fill="rgb(210,25,6)" rx="2" ry="2"></rect><br><text x="904.88" y="363.5"></text><br></g><br><g><br><title>copy_page_from_iter (6,986,960,281 samples, 20.31%)</title><rect x="912.0" y="349" width="239.6" height="23.0" fill="rgb(209,22,5)" rx="2" ry="2"></rect><br><text x="914.99" y="363.5">copy_page_from_iter</text><br></g><br><g><br><title>mutex_lock (389,788,556 samples, 1.13%)</title><rect x="1151.8" y="349" width="13.4" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="1154.79" y="363.5"></text><br></g><br><g><br><title>&lt;std::os::unix::net::stream::UnixStream as std::io::Write>::write (21,805,012 samples, 0.06%)</title><rect x="10.6" y="493" width="0.7" height="23.0" fill="rgb(239,160,38)" rx="2" ry="2"></rect><br><text x="13.56" y="507.5"></text><br></g><br><g><br><title>_raw_spin_lock_irqsave (431,015,735 samples, 1.25%)</title><rect x="815.4" y="325" width="14.8" height="23.0" fill="rgb(247,195,46)" rx="2" ry="2"></rect><br><text x="818.37" y="339.5"></text><br></g><br><g><br><title>policy_node (119,598,949 samples, 0.35%)</title><rect x="906.7" y="325" width="4.1" height="23.0" fill="rgb(236,143,34)" rx="2" ry="2"></rect><br><text x="909.66" y="339.5"></text><br></g><br><g><br><title>__sysvec_apic_timer_interrupt (4,214,752 samples, 0.01%)</title><rect x="455.5" y="229" width="0.2" height="23.0" fill="rgb(242,173,41)" rx="2" ry="2"></rect><br><text x="458.53" y="243.5"></text><br></g><br><g><br><title>mutex_spin_on_owner (7,651,102,789 samples, 22.24%)</title><rect x="540.7" y="325" width="262.3" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="543.65" y="339.5">mutex_spin_on_owner</text><br></g><br><g><br><title>mutex_unlock (154,311,955 samples, 0.45%)</title><rect x="1165.2" y="349" width="5.2" height="23.0" fill="rgb(251,212,50)" rx="2" ry="2"></rect><br><text x="1168.15" y="363.5"></text><br></g><br><g><br><title>entry_SYSRETQ_unsafe_stack (4,116,333 samples, 0.01%)</title><rect x="1188.8" y="469" width="0.2" height="23.0" fill="rgb(206,7,1)" rx="2" ry="2"></rect><br><text x="1191.83" y="483.5"></text><br></g><br><g><br><title>__wake_up_common_lock (463,608,242 samples, 1.35%)</title><rect x="814.8" y="349" width="15.9" height="23.0" fill="rgb(238,155,37)" rx="2" ry="2"></rect><br><text x="817.82" y="363.5"></text><br></g><br><g><br><title>__mod_memcg_state (156,325,243 samples, 0.45%)</title><rect x="178.4" y="253" width="5.3" height="23.0" fill="rgb(205,1,0)" rx="2" ry="2"></rect><br><text x="181.36" y="267.5"></text><br></g><br><g><br><title>__fdget_pos (131,186,857 samples, 0.38%)</title><rect x="31.6" y="397" width="4.5" height="23.0" fill="rgb(216,55,13)" rx="2" ry="2"></rect><br><text x="34.57" y="411.5"></text><br></g><br><g><br><title>__rcu_read_unlock (256,610,337 samples, 0.75%)</title><rect x="136.5" y="277" width="8.8" height="23.0" fill="rgb(253,224,53)" rx="2" ry="2"></rect><br><text x="139.48" y="291.5"></text><br></g><br><g><br><title>update_vsyscall (4,225,544 samples, 0.01%)</title><rect x="802.6" y="61" width="0.1" height="23.0" fill="rgb(254,229,54)" rx="2" ry="2"></rect><br><text x="805.56" y="75.5"></text><br></g><br><g><br><title>__alloc_pages (12,488,057,959 samples, 36.29%)</title><rect x="88.1" y="349" width="428.2" height="23.0" fill="rgb(233,129,30)" rx="2" ry="2"></rect><br><text x="91.08" y="363.5">__alloc_pages</text><br></g><br><g><br><title>copy_user_enhanced_fast_string (6,911,972,451 samples, 20.09%)</title><rect x="914.6" y="301" width="237.0" height="23.0" fill="rgb(238,155,37)" rx="2" ry="2"></rect><br><text x="917.56" y="315.5">copy_user_enhanced_fast_string</text><br></g><br><g><br><title>mod_memcg_state (483,429,269 samples, 1.40%)</title><rect x="167.7" y="277" width="16.5" height="23.0" fill="rgb(232,127,30)" rx="2" ry="2"></rect><br><text x="170.66" y="291.5"></text><br></g><br><g><br><title>__wake_up_common (7,952,263 samples, 0.02%)</title><rect x="815.1" y="325" width="0.3" height="23.0" fill="rgb(248,197,47)" rx="2" ry="2"></rect><br><text x="818.10" y="339.5"></text><br></g><br><g><br><title>page_counter_try_charge (100,471,631 samples, 0.29%)</title><rect x="209.2" y="277" width="3.5" height="23.0" fill="rgb(233,132,31)" rx="2" ry="2"></rect><br><text x="212.21" y="291.5"></text><br></g><br><g><br><title>__x64_sys_write (103,208,079 samples, 0.30%)</title><rect x="27.3" y="421" width="3.6" height="23.0" fill="rgb(246,189,45)" rx="2" ry="2"></rect><br><text x="30.33" y="435.5"></text><br></g><br><g><br><title>syscall_enter_from_user_mode (78,405,130 samples, 0.23%)</title><rect x="1185.0" y="421" width="2.7" height="23.0" fill="rgb(254,229,54)" rx="2" ry="2"></rect><br><text x="1187.97" y="435.5"></text><br></g><br><g><br><title>asm_sysvec_apic_timer_interrupt (5,629,654 samples, 0.02%)</title><rect x="455.5" y="277" width="0.2" height="23.0" fill="rgb(232,127,30)" rx="2" ry="2"></rect><br><text x="458.49" y="291.5"></text><br></g><br><g><br><title>osq_unlock (226,312,628 samples, 0.66%)</title><rect x="807.1" y="325" width="7.7" height="23.0" fill="rgb(248,198,47)" rx="2" ry="2"></rect><br><text x="810.06" y="339.5"></text><br></g><br><g><br><title>timekeeping_update (4,225,544 samples, 0.01%)</title><rect x="802.6" y="85" width="0.1" height="23.0" fill="rgb(238,152,36)" rx="2" ry="2"></rect><br><text x="805.56" y="99.5"></text><br></g><br><g><br><title>zeroes (34,408,355,195 samples, 100.00%)</title><rect x="10.0" y="565" width="1180.0" height="23.0" fill="rgb(224,88,21)" rx="2" ry="2"></rect><br><text x="13.00" y="579.5">zeroes</text><br></g><br><g><br><title>__list_add_valid (119,183,921 samples, 0.35%)</title><rect x="485.8" y="277" width="4.0" height="23.0" fill="rgb(211,28,6)" rx="2" ry="2"></rect><br><text x="488.76" y="291.5"></text><br></g><br><g><br><title>__fget_light (122,843,196 samples, 0.36%)</title><rect x="31.9" y="373" width="4.2" height="23.0" fill="rgb(233,132,31)" rx="2" ry="2"></rect><br><text x="34.85" y="387.5"></text><br></g><br><g><br><title>propagate_protected_usage (5,505,752 samples, 0.02%)</title><rect x="212.5" y="253" width="0.2" height="23.0" fill="rgb(206,5,1)" rx="2" ry="2"></rect><br><text x="215.47" y="267.5"></text><br></g><br><g><br><title>__cond_resched (11,051,020 samples, 0.03%)</title><rect x="540.3" y="325" width="0.4" height="23.0" fill="rgb(217,58,14)" rx="2" ry="2"></rect><br><text x="543.27" y="339.5"></text><br></g><br><g><br><title>_raw_spin_unlock (71,553,131 samples, 0.21%)</title><rect x="293.4" y="301" width="2.5" height="23.0" fill="rgb(223,85,20)" rx="2" ry="2"></rect><br><text x="296.42" y="315.5"></text><br></g><br><g><br><title>do_syscall_64 (33,995,562,642 samples, 98.80%)</title><rect x="22.8" y="445" width="1165.9" height="23.0" fill="rgb(209,20,4)" rx="2" ry="2"></rect><br><text x="25.85" y="459.5">do_syscall_64</text><br></g><br><g><br><title>memcg_account_kmem (495,700,356 samples, 1.44%)</title><rect x="167.2" y="301" width="17.0" height="23.0" fill="rgb(230,115,27)" rx="2" ry="2"></rect><br><text x="170.24" y="315.5"></text><br></g><br><g><br><title>entry_SYSCALL_64_safe_stack (4,103,934 samples, 0.01%)</title><rect x="1188.7" y="469" width="0.1" height="23.0" fill="rgb(231,120,28)" rx="2" ry="2"></rect><br><text x="1191.69" y="483.5"></text><br></g><br><g><br><title>__rcu_read_lock (131,786,573 samples, 0.38%)</title><rect x="132.0" y="277" width="4.5" height="23.0" fill="rgb(220,69,16)" rx="2" ry="2"></rect><br><text x="134.96" y="291.5"></text><br></g><br><g><br><title>tick_sched_timer (11,254,762 samples, 0.03%)</title><rect x="802.6" y="181" width="0.3" height="23.0" fill="rgb(254,227,54)" rx="2" ry="2"></rect><br><text x="805.56" y="195.5"></text><br></g><br><g><br><title>entry_SYSCALL_64_after_hwframe (34,033,680,043 samples, 98.91%)</title><rect x="21.5" y="469" width="1167.2" height="23.0" fill="rgb(218,63,15)" rx="2" ry="2"></rect><br><text x="24.54" y="483.5">entry_SYSCALL_64_after_hwframe</text><br></g><br><g><br><title>__get_task_ioprio (65,612,447 samples, 0.19%)</title><rect x="41.6" y="373" width="2.3" height="23.0" fill="rgb(230,119,28)" rx="2" ry="2"></rect><br><text x="44.64" y="387.5"></text><br></g><br><g><br><title>rmqueue_bulk (1,769,082,103 samples, 5.14%)</title><rect x="455.7" y="301" width="60.6" height="23.0" fill="rgb(235,138,33)" rx="2" ry="2"></rect><br><text x="458.68" y="315.5">rmqueu..</text><br></g><br><g><br><title>__cond_resched (5,443,361 samples, 0.02%)</title><rect x="1164.9" y="325" width="0.2" height="23.0" fill="rgb(217,58,14)" rx="2" ry="2"></rect><br><text x="1167.92" y="339.5"></text><br></g><br><g><br><title>__rcu_read_unlock (394,985,353 samples, 1.15%)</title><rect x="153.1" y="301" width="13.6" height="23.0" fill="rgb(253,224,53)" rx="2" ry="2"></rect><br><text x="156.12" y="315.5"></text><br></g><br><g><br><title>__x86_indirect_thunk_array (11,044,363 samples, 0.03%)</title><rect x="16.5" y="469" width="0.3" height="23.0" fill="rgb(231,123,29)" rx="2" ry="2"></rect><br><text x="19.45" y="483.5"></text><br></g><br><g><br><title>pipe_write (32,852,709,554 samples, 95.48%)</title><rect x="43.9" y="373" width="1126.6" height="23.0" fill="rgb(236,146,35)" rx="2" ry="2"></rect><br><text x="46.89" y="387.5">pipe_write</text><br></g><br><g><br><title>bpf_lsm_file_permission (23,314,251 samples, 0.07%)</title><rect x="1184.2" y="349" width="0.8" height="23.0" fill="rgb(238,154,36)" rx="2" ry="2"></rect><br><text x="1187.17" y="363.5"></text><br></g><br><g><br><title>main (34,408,266,749 samples, 100.00%)</title><rect x="10.0" y="541" width="1180.0" height="23.0" fill="rgb(243,179,42)" rx="2" ry="2"></rect><br><text x="13.00" y="555.5">main</text><br></g><br><g><br><title>__x86_return_thunk (16,610,051 samples, 0.05%)</title><rect x="166.7" y="301" width="0.5" height="23.0" fill="rgb(253,221,53)" rx="2" ry="2"></rect><br><text x="169.67" y="315.5"></text><br></g><br><g><br><title>syscall_return_via_sysret (28,605,764 samples, 0.08%)</title><rect x="1189.0" y="469" width="1.0" height="23.0" fill="rgb(229,113,27)" rx="2" ry="2"></rect><br><text x="1191.97" y="483.5"></text><br></g><br><g><br><title>_raw_spin_lock_irq (1,785,614,251 samples, 5.19%)</title><rect x="830.8" y="349" width="61.2" height="23.0" fill="rgb(231,122,29)" rx="2" ry="2"></rect><br><text x="833.76" y="363.5">_raw_s..</text><br></g><br><g><br><title>__cond_resched (43,770,418 samples, 0.13%)</title><rect x="110.7" y="325" width="1.5" height="23.0" fill="rgb(217,58,14)" rx="2" ry="2"></rect><br><text x="113.69" y="339.5"></text><br></g><br></g><br></svg>
+
+
+
+<p>Note that <code>__GI___libc_write</code> is the <code>glibc</code> wrapper that performs the system call. It and everything below is in user land. Everything above is in the kernel.</p>
+
+
+
+<p>As expected, we are spending virtually all our time calling <code>write</code>. In particular, we are spending 95% of our time inside <code>pipe_write</code>. Inside this function, we are spending 36% of our total time in <code>__alloc_pages</code>, which provisions new memory pages for the pipe. We cannot just reuse a handful of pages in a loop because <code>pv</code> moves these pages using <code>splice</code> to <code>/dev/null</code>, which consume them.</p>
+
+
+
+<p>Next to it are <code>__mutex_lock.constprop.0</code> that takes 25% of the time and <code>_raw_spin_lock_irq</code> that takes 5%. They lock the pipe for writing.</p>
+
+
+
+<p>This leaves just 20% of the time for the copying of data itself in <code>copy_user_enhanced_fast_string</code>. But, even with only 20% of the CPU time, we would expect to be able to move 167 GB/s * 20% = 33 GB/s. It means that, even taken separately, this function is still twice as slow as <code>__memset_avx512_unaligned_erms</code>, which was used in the program that just wrote to user space memory.</p>
+
+
+
+<p>What is <code>copy_user_enhanced_fast_string</code> doing to be so slow? We need to dig deeper. For this, <a href="https://blog.packagecloud.io/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/">I disassembled my Linux kernel</a><sup data-fn="ce4dcb58-ec87-4707-ba7b-fd4c521c97da" class="fn"><a href="#ce4dcb58-ec87-4707-ba7b-fd4c521c97da" id="ce4dcb58-ec87-4707-ba7b-fd4c521c97da-link">4</a></sup>, and looked at that function.</p>
+
+
+
+<pre class="wp-block-code alignwide"><code class="">$ grep -w copy_user_enhanced_fast_string /usr/lib/debug/boot/System.map-6.1.0-18-amd64 
+ffffffff819d3d90 T copy_user_enhanced_fast_string
+$ objdump -d --start-address=0xffffffff819d3d90 vmlinuz | less   
+    
+vmlinuz:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+ffffffff819d3d90 &lt;.text+0x9d3d90>:
+
+ffffffff819d3d90:       90                      nop
+ffffffff819d3d91:       90                      nop
+ffffffff819d3d92:       90                      nop
+ffffffff819d3d93:       83 fa 40                cmp    $0x40,%edx
+ffffffff819d3d96:       72 48                   jb     0xffffffff819d3de0
+ffffffff819d3d98:       89 d1                   mov    %edx,%ecx
+ffffffff819d3d9a:       f3 a4                   rep movsb %ds:(%rsi),%es:(%rdi)
+ffffffff819d3d9c:       31 c0                   xor    %eax,%eax
+ffffffff819d3d9e:       90                      nop
+ffffffff819d3d9f:       90                      nop
+ffffffff819d3da0:       90                      nop
+ffffffff819d3da1:       e9 9a dd 42 00          jmp    0xffffffff81e01b40
+...
+ffffffff81e01b40:       c3                      ret
+</code></pre>
+
+
+
+<p>The <code>NOP</code> instructions at the beginning and at the end of the function allow <code>ftrace</code> to insert tracing instructions when needed. This lets it collect data about specific kernel function calls without inducing any slow down for kernel functions that are not being profiled. The CPU instruction decoding pipeline takes care of <code>NOP</code> early, so they have basically no impact on performance (other than taking room in the L1i cache).</p>
+
+
+
+<p>I do not know why the <code>JMP</code> is not just a <code>RET</code>, however<sup data-fn="2c23c626-8ef3-4b59-af5c-4093048ce5dd" class="fn"><a href="#2c23c626-8ef3-4b59-af5c-4093048ce5dd" id="2c23c626-8ef3-4b59-af5c-4093048ce5dd-link">5</a></sup>.</p>
+
+
+
+<p>In any case, the <code>CMP</code> test and <code>JB</code> jump handle the case of buffers that are smaller than 64 bytes by jumping to another function that copy 8 bytes at a time with 64-bit registers, then 1 byte at a time with 8 bit register in two loops. For large buffers, the copying is handled by a <code>REP MOV</code> instruction. That&#8217;s definitely not vectorized code.</p>
+
+
+
+<p>In fact, <a href="https://github.com/torvalds/linux/blob/830b3c68c1fb1e9176028d02ef86f3cf76aa2476/arch/x86/lib/copy_user_64.S#L161">this function is not implemented in C but directly in Assembly</a>! This means that there is no need to look at the result of compilation; we can just look at the source code. And it&#8217;s not just a missed optimization when compiling, it was written like that.</p>
+
+
+
+<p>But is the lack of vector instruction the only reason why <code>copy_user_enhanced_fast_string</code> is twice as slow as <code>__memset_avx512_unaligned_erms</code>? To check this, I adapted the initial Rust program to explicitly use <code>REP MOVS</code>:</p>
+
+
+
+<pre class="wp-block-code"><code lang="rust" class="language-rust">use std::arch::asm;
+
+fn main() {
+    let src = [0u8; 1 &lt;&lt; 15];
+    let mut dst = [0u8; 1 &lt;&lt; 15];
+    let mut copied = 0;
+    while copied &lt; (1000u64 &lt;&lt; 30) {
+        unsafe {
+            asm!(
+                "rep movsb",
+                inout("rsi") src.as_ptr() => _,
+                inout("rdi") dst.as_mut_ptr() => _,
+                inout("ecx") 1 &lt;&lt; 15 => _,
+            );
+        }
+        copied += 1 &lt;&lt; 15;
+    }
+}</code></pre>
+
+
+
+<p>The throughput is 80 GB/s. This is a factor 2 slow down, exactly what we observe with the kernel function!</p>
+
+
+
+<p>Now, we know that the Linux kernel is not using SIMD to copy memory and that this makes <code>copy_user_enhanced_fast_string</code> twice as slow as it could be.</p>
+
+
+
+<p>But why is that? Over at Stack Overflow, <a href="https://stackoverflow.com/questions/59525762/why-doesnt-copy-user-enhanced-fast-string-use-avx-if-it-is-available">Peter Cordes explains that using SSE/AVX instructions is not worth it in most cases</a>, because of the cost of saving and restoring the SIMD context.</p>
+
+
+
+<p>In summary: the kernel is spending quite a bit of time on managing memory, and it is not even using SIMD when actually copying the bytes. This is the source of the 10× slow-down we see when comparing with the ideal case.</p>
+
+
+
+<h2 class="wp-block-heading"><code>vmsplice</code> to the Rescue</h2>
+
+
+
+<p>We now have an upper bound (167 GB/s to write the data in memory once) and a lower bound (17 GB/s when using <code>write</code> on a pipe). Let&#8217;s look in details at the effect of usng <code>vmsplice</code>. It mitigates the cost of using a pipe by moving entire buffers from user space to the kernel without copying them.</p>
+
+
+
+<p>To understand how it works, again, read <a href="https://mazzo.li/posts/fast-pipes.html">the excellent article by Francesco</a>. We&#8217;ll be using the <a href="https://github.com/bitonic/pipes-speed-test"><code>./write</code> program</a> from that article to get a minimal example of using <code>vmsplice</code>. This program just writes an infinite number of <code>'X'</code>s. This will simplify the profiling by not having any time dedicated to compute Fizz Buzz data or something else.</p>
+
+
+
+<p><code>./write</code> actually achieves 210 GB/s, well above our upper bound, but that&#8217;s because the program is kind of cheating by reusing the same buffers to pass to <code>vmsplice</code>. For anything other than a stream of constant bytes, we will actually have to fill the buffers with new data, which is where the upper bound actually applies. In any case, we only care about what <code>vmsplice</code> does:</p>
+
+
+
+<svg version="1.1" class="alignwide" onload="init(evt)" viewBox="0 0 1200 430" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><br><br><br><defs><br>	<lineargradient id="background" y1="0" y2="1" x1="0" x2="0"><br>		<stop stop-color="#eeeeee" offset="5%"></stop><br>		<stop stop-color="#eeeeb0" offset="95%"></stop><br>	</lineargradient><br></defs><br><style type="text/css"><br>	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }<br>	#search, #ignorecase { opacity:0.1; cursor:pointer; }<br>	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }<br>	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }<br>	#title { text-anchor:middle; font-size:17px}<br>	#unzoom { cursor:pointer; }<br>	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }<br>	.hide { display:none; }<br>	.parent { opacity:0.5; }<br></style><br><script>
+// no CDATA because of https://core.trac.wordpress.org/ticket/3670
+	"use strict";
+	function init(evt) {
+		var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+		svg = evt.target;
+		details = svg.getElementById("details").firstChild;
+		searchbtn = svg.getElementById("search");
+		ignorecaseBtn = svg.getElementById("ignorecase");
+		unzoombtn = svg.getElementById("unzoom");
+		matchedtxt = svg.getElementById("matched");
+		searching = 0;
+		currentSearchTerm = null;
+
+		// event listeners
+		svg.addEventListener("click", function(e) {
+			var target = find_group(e.target);
+			if (target) {
+				if (target.nodeName == "a") {
+					if (e.ctrlKey === false) return;
+					e.preventDefault();
+				}
+				if (target.classList.contains("parent")) unzoom(true);
+				zoom(target);
+				if (!svg.querySelector('.parent')) {
+					// we have basically done a clearzoom so clear the url
+					var params = get_params();
+					if (params.x) delete params.x;
+					if (params.y) delete params.y;
+					unzoombtn.classList.add("hide");
+					return;
+				}
+
+				// set parameters for zoom state
+				var el = target.querySelector("rect");
+				if (el &amp;&amp; el.attributes &amp;&amp; el.attributes.y &amp;&amp; el.attributes._orig_x) {
+					var params = get_params()
+					params.x = el.attributes._orig_x.value;
+					params.y = el.attributes.y.value;
+				}
+			}
+			else if (e.target.id == "unzoom") clearzoom();
+			else if (e.target.id == "search") search_prompt();
+			else if (e.target.id == "ignorecase") toggle_ignorecase();
+		}, false)
+
+		// mouse-over for info
+		// show
+		svg.addEventListener("mouseover", function(e) {
+			var target = find_group(e.target);
+			if (target) details.nodeValue = "Function: " + g_to_text(target);
+		}, false)
+
+		// clear
+		svg.addEventListener("mouseout", function(e) {
+			var target = find_group(e.target);
+			if (target) details.nodeValue = ' ';
+		}, false)
+
+		// ctrl-F for search
+		// ctrl-I to toggle case-sensitive search
+		svg.addEventListener("keydown",function (e) {
+			if (e.keyCode === 114 || (e.ctrlKey &amp;&amp; e.keyCode === 70)) {
+				e.preventDefault();
+				search_prompt();
+			}
+			else if (e.ctrlKey &amp;&amp; e.keyCode === 73) {
+				e.preventDefault();
+				toggle_ignorecase();
+			}
+		}, false)
+
+		// functions
+		function get_params() {
+			var params = {};
+			var paramsarr = window.location.search.substr(1).split('&amp;');
+			for (var i = 0; i &lt; paramsarr.length; ++i) {
+				var tmp = paramsarr[i].split("=");
+				if (!tmp[0] || !tmp[1]) continue;
+				params[tmp[0]]  = decodeURIComponent(tmp[1]);
+			}
+			return params;
+		}
+		function parse_params(params) {
+			var uri = "?";
+			for (var key in params) {
+				uri += key + '=' + encodeURIComponent(params[key]) + '&amp;';
+			}
+			if (uri.slice(-1) == "&amp;")
+				uri = uri.substring(0, uri.length - 1);
+			if (uri == '?')
+				uri = window.location.href.split('?')[0];
+			return uri;
+		}
+		function find_child(node, selector) {
+			var children = node.querySelectorAll(selector);
+			if (children.length) return children[0];
+		}
+		function find_group(node) {
+			var parent = node.parentElement;
+			if (!parent) return;
+			if (parent.id == "frames") return node;
+			return find_group(parent);
+		}
+		function orig_save(e, attr, val) {
+			if (e.attributes["_orig_" + attr] != undefined) return;
+			if (e.attributes[attr] == undefined) return;
+			if (val == undefined) val = e.attributes[attr].value;
+			e.setAttribute("_orig_" + attr, val);
+		}
+		function orig_load(e, attr) {
+			if (e.attributes["_orig_"+attr] == undefined) return;
+			e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+			e.removeAttribute("_orig_"+attr);
+		}
+		function g_to_text(e) {
+			var text = find_child(e, "title").firstChild.nodeValue;
+			return (text)
+		}
+		function g_to_func(e) {
+			var func = g_to_text(e);
+			// if there's any manipulation we want to do to the function
+			// name before it's searched, do it here before returning.
+			return (func);
+		}
+		function update_text(e) {
+			var r = find_child(e, "rect");
+			var t = find_child(e, "text");
+			var w = parseFloat(r.attributes.width.value) -3;
+			var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+			t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+			// Smaller than this size won't fit anything
+			if (w &lt; 2 * 12 * 0.59) {
+				t.textContent = "";
+				return;
+			}
+
+			t.textContent = txt;
+			var sl = t.getSubStringLength(0, txt.length);
+			// check if only whitespace or if we can fit the entire string into width w
+			if (/^ *$/.test(txt) || sl &lt; w)
+				return;
+
+			// this isn't perfect, but gives a good starting point
+			// and avoids calling getSubStringLength too often
+			var start = Math.floor((w/sl) * txt.length);
+			for (var x = start; x &gt; 0; x = x-2) {
+				if (t.getSubStringLength(0, x + 2) &lt;= w) {
+					t.textContent = txt.substring(0, x) + "..";
+					return;
+				}
+			}
+			t.textContent = "";
+		}
+
+		// zoom
+		function zoom_reset(e) {
+			if (e.attributes != undefined) {
+				orig_load(e, "x");
+				orig_load(e, "width");
+			}
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_reset(c[i]);
+			}
+		}
+		function zoom_child(e, x, ratio) {
+			if (e.attributes != undefined) {
+				if (e.attributes.x != undefined) {
+					orig_save(e, "x");
+					e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+					if (e.tagName == "text")
+						e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+				}
+				if (e.attributes.width != undefined) {
+					orig_save(e, "width");
+					e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+				}
+			}
+
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_child(c[i], x - 10, ratio);
+			}
+		}
+		function zoom_parent(e) {
+			if (e.attributes) {
+				if (e.attributes.x != undefined) {
+					orig_save(e, "x");
+					e.attributes.x.value = 10;
+				}
+				if (e.attributes.width != undefined) {
+					orig_save(e, "width");
+					e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+				}
+			}
+			if (e.childNodes == undefined) return;
+			for (var i = 0, c = e.childNodes; i &lt; c.length; i++) {
+				zoom_parent(c[i]);
+			}
+		}
+		function zoom(node) {
+			var attr = find_child(node, "rect").attributes;
+			var width = parseFloat(attr.width.value);
+			var xmin = parseFloat(attr.x.value);
+			var xmax = parseFloat(xmin + width);
+			var ymin = parseFloat(attr.y.value);
+			var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+			// XXX: Workaround for JavaScript float issues (fix me)
+			var fudge = 0.0001;
+
+			unzoombtn.classList.remove("hide");
+
+			var el = svg.getElementById("frames").children;
+			for (var i = 0; i &lt; el.length; i++) {
+				var e = el[i];
+				var a = find_child(e, "rect").attributes;
+				var ex = parseFloat(a.x.value);
+				var ew = parseFloat(a.width.value);
+				var upstack;
+				// Is it an ancestor
+				if (0 == 0) {
+					upstack = parseFloat(a.y.value) &gt; ymin;
+				} else {
+					upstack = parseFloat(a.y.value) &lt; ymin;
+				}
+				if (upstack) {
+					// Direct ancestor
+					if (ex &lt;= xmin &amp;&amp; (ex+ew+fudge) &gt;= xmax) {
+						e.classList.add("parent");
+						zoom_parent(e);
+						update_text(e);
+					}
+					// not in current path
+					else
+						e.classList.add("hide");
+				}
+				// Children maybe
+				else {
+					// no common path
+					if (ex &lt; xmin || ex + fudge &gt;= xmax) {
+						e.classList.add("hide");
+					}
+					else {
+						zoom_child(e, xmin, ratio);
+						update_text(e);
+					}
+				}
+			}
+			search();
+		}
+		function unzoom(dont_update_text) {
+			unzoombtn.classList.add("hide");
+			var el = svg.getElementById("frames").children;
+			for(var i = 0; i &lt; el.length; i++) {
+				el[i].classList.remove("parent");
+				el[i].classList.remove("hide");
+				zoom_reset(el[i]);
+				if(!dont_update_text) update_text(el[i]);
+			}
+			search();
+		}
+		function clearzoom() {
+			unzoom();
+
+			// remove zoom state
+			var params = get_params();
+			if (params.x) delete params.x;
+			if (params.y) delete params.y;
+		}
+
+		// search
+		function toggle_ignorecase() {
+			ignorecase = !ignorecase;
+			if (ignorecase) {
+				ignorecaseBtn.classList.add("show");
+			} else {
+				ignorecaseBtn.classList.remove("show");
+			}
+			reset_search();
+			search();
+		}
+		function reset_search() {
+			var el = svg.querySelectorAll("#frames rect");
+			for (var i = 0; i &lt; el.length; i++) {
+				orig_load(el[i], "fill")
+			}
+			var params = get_params();
+			delete params.s;
+		}
+		function search_prompt() {
+			if (!searching) {
+				var term = prompt("Enter a search term (regexp " +
+				    "allowed, eg: ^ext4_)"
+				    + (ignorecase ? ", ignoring case" : "")
+				    + "\nPress Ctrl-i to toggle case sensitivity", "");
+				if (term != null) search(term);
+			} else {
+				reset_search();
+				searching = 0;
+				currentSearchTerm = null;
+				searchbtn.classList.remove("show");
+				searchbtn.firstChild.nodeValue = "Search"
+				matchedtxt.classList.add("hide");
+				matchedtxt.firstChild.nodeValue = ""
+			}
+		}
+		function search(term) {
+			if (term) currentSearchTerm = term;
+
+			var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+			var el = svg.getElementById("frames").children;
+			var matches = new Object();
+			var maxwidth = 0;
+			for (var i = 0; i &lt; el.length; i++) {
+				var e = el[i];
+				var func = g_to_func(e);
+				var rect = find_child(e, "rect");
+				if (func == null || rect == null)
+					continue;
+
+				// Save max width. Only works as we have a root frame
+				var w = parseFloat(rect.attributes.width.value);
+				if (w &gt; maxwidth)
+					maxwidth = w;
+
+				if (func.match(re)) {
+					// highlight
+					var x = parseFloat(rect.attributes.x.value);
+					orig_save(rect, "fill");
+					rect.attributes.fill.value = "rgb(230,0,230)";
+
+					// remember matches
+					if (matches[x] == undefined) {
+						matches[x] = w;
+					} else {
+						if (w &gt; matches[x]) {
+							// overwrite with parent
+							matches[x] = w;
+						}
+					}
+					searching = 1;
+				}
+			}
+			if (!searching)
+				return;
+			var params = get_params();
+			params.s = currentSearchTerm;
+
+			searchbtn.classList.add("show");
+			searchbtn.firstChild.nodeValue = "Reset Search";
+
+			// calculate percent matched, excluding vertical overlap
+			var count = 0;
+			var lastx = -1;
+			var lastw = 0;
+			var keys = Array();
+			for (k in matches) {
+				if (matches.hasOwnProperty(k))
+					keys.push(k);
+			}
+			// sort the matched frames by their x location
+			// ascending, then width descending
+			keys.sort(function(a, b){
+				return a - b;
+			});
+			// Step through frames saving only the biggest bottom-up frames
+			// thanks to the sort order. This relies on the tree property
+			// where children are always smaller than their parents.
+			var fudge = 0.0001;	// JavaScript floating point
+			for (var k in keys) {
+				var x = parseFloat(keys[k]);
+				var w = matches[keys[k]];
+				if (x &gt;= lastx + lastw - fudge) {
+					count += w;
+					lastx = x;
+					lastw = w;
+				}
+			}
+			// display matched percent
+			matchedtxt.classList.remove("hide");
+			var pct = 100 * count / maxwidth;
+			if (pct != 100) pct = pct.toFixed(1)
+			matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+		}
+	}
+</script><br><rect x="0.0" y="0" width="1200.0" height="430.0" fill="url(#background)"></rect><br><text id="title" x="600.00" y="24">./write &#8211;write_with_vmsplice &#8211;huge_page &#8211;busy_loop | ./read &#8211;read_with_splice &#8211;busy_loop</text><br><text id="subtitle" x="600.00" y="48">Profiling of ./write</text><br><text id="details" x="10.00" y="413"> </text><br><text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text><br><text id="search" x="1090.00" y="24">Search</text><br><text id="ignorecase" x="1174.00" y="24">ic</text><br><text id="matched" x="1090.00" y="413"> </text><br><g id="frames"><br><g><br><title>__iov_iter_get_pages_alloc (3,949,231,497 samples, 14.88%)</title><rect x="963.5" y="205" width="175.6" height="23.0" fill="rgb(250,210,50)" rx="2" ry="2"></rect><br><text x="966.49" y="219.5">__iov_iter_get_pages_a..</text><br></g><br><g><br><title>__fget_light (62,561,929 samples, 0.24%)</title><rect x="243.3" y="229" width="2.8" height="23.0" fill="rgb(233,132,31)" rx="2" ry="2"></rect><br><text x="246.34" y="243.5"></text><br></g><br><g><br><title>internal_get_user_pages_fast (3,133,200,714 samples, 11.81%)</title><rect x="975.8" y="181" width="139.3" height="23.0" fill="rgb(253,223,53)" rx="2" ry="2"></rect><br><text x="978.83" y="195.5">internal_get_user..</text><br></g><br><g><br><title>write (26,541,239,090 samples, 100.00%)</title><rect x="10.0" y="349" width="1180.0" height="23.0" fill="rgb(228,107,25)" rx="2" ry="2"></rect><br><text x="13.00" y="363.5">write</text><br></g><br><g><br><title>__check_object_size (130,746,843 samples, 0.49%)</title><rect x="911.9" y="157" width="5.8" height="23.0" fill="rgb(226,98,23)" rx="2" ry="2"></rect><br><text x="914.91" y="171.5"></text><br></g><br><g><br><title>osq_lock (197,341,424 samples, 0.74%)</title><rect x="634.9" y="205" width="8.8" height="23.0" fill="rgb(214,43,10)" rx="2" ry="2"></rect><br><text x="637.91" y="219.5"></text><br></g><br><g><br><title>import_iovec (1,716,063,086 samples, 6.47%)</title><rect x="886.6" y="229" width="76.3" height="23.0" fill="rgb(241,168,40)" rx="2" ry="2"></rect><br><text x="889.58" y="243.5">import_i..</text><br></g><br><g><br><title>__import_iovec (1,666,122,831 samples, 6.28%)</title><rect x="888.8" y="205" width="74.1" height="23.0" fill="rgb(214,42,10)" rx="2" ry="2"></rect><br><text x="891.80" y="219.5">__import..</text><br></g><br><g><br><title>do_mmap (2,892,862 samples, 0.01%)</title><rect x="10.0" y="229" width="0.1" height="23.0" fill="rgb(228,107,25)" rx="2" ry="2"></rect><br><text x="13.00" y="243.5"></text><br></g><br><g><br><title>iov_iter_advance (538,480,611 samples, 2.03%)</title><rect x="1115.1" y="181" width="24.0" height="23.0" fill="rgb(248,197,47)" rx="2" ry="2"></rect><br><text x="1118.13" y="195.5">i..</text><br></g><br><g><br><title>pipe_lock (150,603,536 samples, 0.57%)</title><rect x="1147.6" y="229" width="6.7" height="23.0" fill="rgb(226,99,23)" rx="2" ry="2"></rect><br><text x="1150.62" y="243.5"></text><br></g><br><g><br><title>syscall_enter_from_user_mode (4,006,940 samples, 0.02%)</title><rect x="1187.3" y="253" width="0.2" height="23.0" fill="rgb(254,229,54)" rx="2" ry="2"></rect><br><text x="1190.34" y="267.5"></text><br></g><br><g><br><title>kill_fasync (2,756,081 samples, 0.01%)</title><rect x="1139.1" y="229" width="0.1" height="23.0" fill="rgb(224,91,21)" rx="2" ry="2"></rect><br><text x="1142.07" y="243.5"></text><br></g><br><g><br><title>do_syscall_64 (2,892,862 samples, 0.01%)</title><rect x="10.0" y="277" width="0.1" height="23.0" fill="rgb(209,20,4)" rx="2" ry="2"></rect><br><text x="13.00" y="291.5"></text><br></g><br><g><br><title>vm_mmap_pgoff (2,892,862 samples, 0.01%)</title><rect x="10.0" y="253" width="0.1" height="23.0" fill="rgb(237,150,35)" rx="2" ry="2"></rect><br><text x="13.00" y="267.5"></text><br></g><br><g><br><title>do_syscall_64 (26,020,596,200 samples, 98.04%)</title><rect x="32.6" y="277" width="1156.8" height="23.0" fill="rgb(209,20,4)" rx="2" ry="2"></rect><br><text x="35.59" y="291.5">do_syscall_64</text><br></g><br><g><br><title>arch_get_unmapped_area_topdown (2,892,862 samples, 0.01%)</title><rect x="10.0" y="181" width="0.1" height="23.0" fill="rgb(250,208,49)" rx="2" ry="2"></rect><br><text x="13.00" y="195.5"></text><br></g><br><g><br><title>mutex_lock (30,726,118 samples, 0.12%)</title><rect x="1139.2" y="229" width="1.4" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="1142.19" y="243.5"></text><br></g><br><g><br><title>entry_SYSRETQ_unsafe_stack (8,363,819 samples, 0.03%)</title><rect x="1189.4" y="301" width="0.4" height="23.0" fill="rgb(206,7,1)" rx="2" ry="2"></rect><br><text x="1192.44" y="315.5"></text><br></g><br><g><br><title>mutex_spin_on_owner (5,495,045,988 samples, 20.70%)</title><rect x="390.6" y="205" width="244.3" height="23.0" fill="rgb(217,57,13)" rx="2" ry="2"></rect><br><text x="393.60" y="219.5">mutex_spin_on_owner</text><br></g><br><g><br><title>update_process_times (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="61" width="0.1" height="23.0" fill="rgb(250,209,50)" rx="2" ry="2"></rect><br><text x="1190.40" y="75.5"></text><br></g><br><g><br><title>__cond_resched (5,668,335 samples, 0.02%)</title><rect x="390.4" y="205" width="0.2" height="23.0" fill="rgb(217,58,14)" rx="2" ry="2"></rect><br><text x="393.35" y="219.5"></text><br></g><br><g><br><title>__fdget (18,709,007 samples, 0.07%)</title><rect x="242.5" y="229" width="0.8" height="23.0" fill="rgb(214,41,10)" rx="2" ry="2"></rect><br><text x="245.51" y="243.5"></text><br></g><br><g><br><title>osq_unlock (817,653,660 samples, 3.08%)</title><rect x="643.7" y="205" width="36.3" height="23.0" fill="rgb(248,198,47)" rx="2" ry="2"></rect><br><text x="646.68" y="219.5">osq..</text><br></g><br><g><br><title>syscall_exit_to_user_mode (43,203,238 samples, 0.16%)</title><rect x="1187.5" y="253" width="1.9" height="23.0" fill="rgb(251,211,50)" rx="2" ry="2"></rect><br><text x="1190.52" y="267.5"></text><br></g><br><g><br><title>__sysvec_apic_timer_interrupt (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="181" width="0.1" height="23.0" fill="rgb(242,173,41)" rx="2" ry="2"></rect><br><text x="1190.40" y="195.5"></text><br></g><br><g><br><title>_copy_from_user (1,015,660,918 samples, 3.83%)</title><rect x="917.7" y="157" width="45.2" height="23.0" fill="rgb(206,7,1)" rx="2" ry="2"></rect><br><text x="920.72" y="171.5">_cop..</text><br></g><br><g><br><title>get_pipe_info (88,389,900 samples, 0.33%)</title><rect x="882.7" y="229" width="3.9" height="23.0" fill="rgb(226,98,23)" rx="2" ry="2"></rect><br><text x="885.65" y="243.5"></text><br></g><br><g><br><title>tick_sched_handle (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="85" width="0.1" height="23.0" fill="rgb(219,68,16)" rx="2" ry="2"></rect><br><text x="1190.40" y="99.5"></text><br></g><br><g><br><title>asm_sysvec_apic_timer_interrupt (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="229" width="0.1" height="23.0" fill="rgb(232,127,30)" rx="2" ry="2"></rect><br><text x="1190.40" y="243.5"></text><br></g><br><g><br><title>vm_unmapped_area (2,892,862 samples, 0.01%)</title><rect x="10.0" y="157" width="0.1" height="23.0" fill="rgb(235,138,33)" rx="2" ry="2"></rect><br><text x="13.00" y="171.5"></text><br></g><br><g><br><title>try_grab_folio (289,286,952 samples, 1.09%)</title><rect x="1102.3" y="157" width="12.8" height="23.0" fill="rgb(238,153,36)" rx="2" ry="2"></rect><br><text x="1105.27" y="171.5"></text><br></g><br><g><br><title>get_user_pages_fast (7,086,063 samples, 0.03%)</title><rect x="975.5" y="181" width="0.3" height="23.0" fill="rgb(229,111,26)" rx="2" ry="2"></rect><br><text x="978.52" y="195.5"></text><br></g><br><g><br><title>page_cache_pipe_buf_release (43,300,058 samples, 0.16%)</title><rect x="880.7" y="205" width="2.0" height="23.0" fill="rgb(224,89,21)" rx="2" ry="2"></rect><br><text x="883.73" y="219.5"></text><br></g><br><g><br><title>__mutex_lock.constprop.0 (9,759,850,719 samples, 36.77%)</title><rect x="246.1" y="229" width="433.9" height="23.0" fill="rgb(225,95,22)" rx="2" ry="2"></rect><br><text x="249.12" y="243.5">__mutex_lock.constprop.0</text><br></g><br><g><br><title>with_vmsplice (4,241,758 samples, 0.02%)</title><rect x="1189.8" y="325" width="0.2" height="23.0" fill="rgb(230,119,28)" rx="2" ry="2"></rect><br><text x="1192.81" y="339.5"></text><br></g><br><g><br><title>exit_to_user_mode_prepare (30,683,997 samples, 0.12%)</title><rect x="1188.0" y="229" width="1.3" height="23.0" fill="rgb(228,108,25)" rx="2" ry="2"></rect><br><text x="1190.95" y="243.5"></text><br></g><br><g><br><title>pud_huge (4,099,890 samples, 0.02%)</title><rect x="1102.1" y="157" width="0.2" height="23.0" fill="rgb(229,110,26)" rx="2" ry="2"></rect><br><text x="1105.09" y="171.5"></text><br></g><br><g><br><title>mas_empty_area_rev (2,892,862 samples, 0.01%)</title><rect x="10.0" y="133" width="0.1" height="23.0" fill="rgb(244,181,43)" rx="2" ry="2"></rect><br><text x="13.00" y="147.5"></text><br></g><br><g><br><title>copy_user_enhanced_fast_string (76,785,562 samples, 0.29%)</title><rect x="959.5" y="133" width="3.4" height="23.0" fill="rgb(238,155,37)" rx="2" ry="2"></rect><br><text x="962.46" y="147.5"></text><br></g><br><g><br><title>entry_SYSCALL_64_after_hwframe (26,054,316,296 samples, 98.17%)</title><rect x="31.1" y="301" width="1158.3" height="23.0" fill="rgb(218,63,15)" rx="2" ry="2"></rect><br><text x="34.09" y="315.5">entry_SYSCALL_64_after_hwframe</text><br></g><br><g><br><title>__do_sys_vmsplice (25,963,594,680 samples, 97.82%)</title><rect x="33.0" y="253" width="1154.3" height="23.0" fill="rgb(227,104,24)" rx="2" ry="2"></rect><br><text x="36.02" y="267.5">__do_sys_vmsplice</text><br></g><br><g><br><title>wait_for_space (742,762,247 samples, 2.80%)</title><rect x="1154.3" y="229" width="33.0" height="23.0" fill="rgb(215,49,11)" rx="2" ry="2"></rect><br><text x="1157.32" y="243.5">wa..</text><br></g><br><g><br><title>__hrtimer_run_queues (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="133" width="0.1" height="23.0" fill="rgb(237,150,35)" rx="2" ry="2"></rect><br><text x="1190.40" y="147.5"></text><br></g><br><g><br><title>check_stack_object (58,579,278 samples, 0.22%)</title><rect x="915.1" y="133" width="2.6" height="23.0" fill="rgb(215,49,11)" rx="2" ry="2"></rect><br><text x="918.12" y="147.5"></text><br></g><br><g><br><title>get_unmapped_area (2,892,862 samples, 0.01%)</title><rect x="10.0" y="205" width="0.1" height="23.0" fill="rgb(234,134,32)" rx="2" ry="2"></rect><br><text x="13.00" y="219.5"></text><br></g><br><g><br><title>entry_SYSCALL_64 (259,954,397 samples, 0.98%)</title><rect x="19.5" y="301" width="11.6" height="23.0" fill="rgb(239,156,37)" rx="2" ry="2"></rect><br><text x="22.53" y="315.5"></text><br></g><br><g><br><title>syscall_exit_to_user_mode_prepare (2,750,376 samples, 0.01%)</title><rect x="1189.3" y="229" width="0.1" height="23.0" fill="rgb(235,142,34)" rx="2" ry="2"></rect><br><text x="1192.32" y="243.5"></text><br></g><br><g><br><title>entry_SYSCALL_64_after_hwframe (2,892,862 samples, 0.01%)</title><rect x="10.0" y="301" width="0.1" height="23.0" fill="rgb(218,63,15)" rx="2" ry="2"></rect><br><text x="13.00" y="315.5"></text><br></g><br><g><br><title>add_to_pipe (4,557,388,711 samples, 17.17%)</title><rect x="680.0" y="229" width="202.7" height="23.0" fill="rgb(223,84,20)" rx="2" ry="2"></rect><br><text x="683.04" y="243.5">add_to_pipe</text><br></g><br><g><br><title>__mmap (2,892,862 samples, 0.01%)</title><rect x="10.0" y="325" width="0.1" height="23.0" fill="rgb(227,104,25)" rx="2" ry="2"></rect><br><text x="13.00" y="339.5"></text><br></g><br><g><br><title>iovec_from_user.part.0 (1,403,501,367 samples, 5.29%)</title><rect x="900.5" y="181" width="62.4" height="23.0" fill="rgb(242,171,40)" rx="2" ry="2"></rect><br><text x="903.48" y="195.5">iovec_..</text><br></g><br><g><br><title>hrtimer_interrupt (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="157" width="0.1" height="23.0" fill="rgb(228,109,26)" rx="2" ry="2"></rect><br><text x="1190.40" y="171.5"></text><br></g><br><g><br><title>all (26,541,242,666 samples, 100%)</title><rect x="10.0" y="373" width="1180.0" height="23.0" fill="rgb(213,39,9)" rx="2" ry="2"></rect><br><text x="13.00" y="387.5"></text><br></g><br><g><br><title>tick_sched_timer (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="109" width="0.1" height="23.0" fill="rgb(254,227,54)" rx="2" ry="2"></rect><br><text x="1190.40" y="123.5"></text><br></g><br><g><br><title>sysvec_apic_timer_interrupt (2,662,881 samples, 0.01%)</title><rect x="1187.4" y="205" width="0.1" height="23.0" fill="rgb(220,69,16)" rx="2" ry="2"></rect><br><text x="1190.40" y="219.5"></text><br></g><br><g><br><title>iov_iter_get_pages2 (3,963,033,797 samples, 14.93%)</title><rect x="962.9" y="229" width="176.2" height="23.0" fill="rgb(247,194,46)" rx="2" ry="2"></rect><br><text x="965.88" y="243.5">iov_iter_get_pages2</text><br></g><br><g><br><title>mutex_unlock (158,874,728 samples, 0.60%)</title><rect x="1140.6" y="229" width="7.0" height="23.0" fill="rgb(251,212,50)" rx="2" ry="2"></rect><br><text x="1143.56" y="243.5"></text><br></g><br><g><br><title>vmsplice (26,534,006,381 samples, 99.97%)</title><rect x="10.1" y="325" width="1179.7" height="23.0" fill="rgb(212,35,8)" rx="2" ry="2"></rect><br><text x="13.13" y="339.5">vmsplice</text><br></g><br></g><br></svg>
+
+
+
+<p>Like with <code>write</code>, we are spending a significant amount of time (37%) in <code>__mutex_lock.constprop.0</code>. However, there is no <code>_alloc_pages</code> and no <code>_raw_spin_lock_irq</code>. And, instead of <code>copy_user_enhanced_fast_string</code>, we find <code>add_to_pipe</code>, <code>import_iovec</code> and <code>iov_iter_get_pages2</code>. From this, we can see that how <code>vmsplice</code> bypasses the expensive parts of the <code>write</code> system call.</p>
+
+
+
+<p>As an aside, I was a bit surprised about the effect of the buffer size, especially when not using <code>vmsplice</code>. It looks like minimizing the number of system calls is not always the most important thing to do.</p>
+
+
+
+<figure class="wp-block-table is-style-stripes"><table><thead><tr><th>What</th><th class="has-text-align-right" data-align="right">Buffer size</th><th class="has-text-align-right" data-align="right">Throughput (GB/s)</th><th class="has-text-align-right" data-align="right">System calls</th><th class="has-text-align-right" data-align="right">Instructions</th><th class="has-text-align-right" data-align="right">ins/syscall</th></tr></thead><tbody><tr><td>./write</td><td class="has-text-align-right" data-align="right">32768</td><td class="has-text-align-right" data-align="right">99</td><td class="has-text-align-right" data-align="right">3276822</td><td class="has-text-align-right" data-align="right">7373684904</td><td class="has-text-align-right" data-align="right">2250</td></tr><tr><td>./write</td><td class="has-text-align-right" data-align="right">65536</td><td class="has-text-align-right" data-align="right">150</td><td class="has-text-align-right" data-align="right">1638466</td><td class="has-text-align-right" data-align="right">5438514152</td><td class="has-text-align-right" data-align="right">3319</td></tr><tr><td>./write</td><td class="has-text-align-right" data-align="right">131072</td><td class="has-text-align-right" data-align="right">207</td><td class="has-text-align-right" data-align="right">819270</td><td class="has-text-align-right" data-align="right">4288897413</td><td class="has-text-align-right" data-align="right">5235</td></tr><tr><td>zeroes</td><td class="has-text-align-right" data-align="right">32768</td><td class="has-text-align-right" data-align="right">17</td><td class="has-text-align-right" data-align="right">3276800</td><td class="has-text-align-right" data-align="right">31859864089</td><td class="has-text-align-right" data-align="right">9723</td></tr><tr><td>zeroes</td><td class="has-text-align-right" data-align="right">65536</td><td class="has-text-align-right" data-align="right">13</td><td class="has-text-align-right" data-align="right">1638400</td><td class="has-text-align-right" data-align="right">31750857264</td><td class="has-text-align-right" data-align="right">19379</td></tr><tr><td>zeroes</td><td class="has-text-align-right" data-align="right">131072</td><td class="has-text-align-right" data-align="right">12</td><td class="has-text-align-right" data-align="right">819200</td><td class="has-text-align-right" data-align="right">35002733773</td><td class="has-text-align-right" data-align="right">42728</td></tr></tbody></table></figure>
+
+
+
+<h1 class="wp-block-heading">Wrapping Up</h1>
+
+
+
+<p>There you have it. Writing to a pipe is ten times slower than writing to raw memory. And this is because, when writing to a pipe, we need to spend a lot of time taking a lock, and we cannot use vector instructions efficiently.</p>
+
+
+
+<p>In principle, we could move data at 167 GB/s, but we need to avoid the cost of locking the buffer, and the cost of saving and restoring the SIMD context. This is exactly what <code>splice</code> and <code>vmsplice</code> do. They are often described as avoiding copying data between buffers, and this is true, but, most importantly, they completely bypass the conservative kernel code with extensive procedures and scalar code.</p>
+
+
+<ol class="wp-block-footnotes"><li id="25bc32bc-4b79-41b9-87b3-0db6adcecbbf">Of course, they need to write code fast enough for exploit what <code>vmsplice</code> enables, but the point is that the first group&#8217;s performance is limited by not using <code>vmsplice</code>. <a href="#25bc32bc-4b79-41b9-87b3-0db6adcecbbf-link" aria-label="Jump to footnote reference 1">↩︎</a></li><li id="9f242c74-a611-49a2-9265-07d5945c4750">All benchmarks were performed on my personal desktop computer, which features a 7950X3D and DDR5 RAM overclocked to 6000T/s. And I am running Debian 12 with a 6.1.0-18-amd64 Linux kernel. CPU mitigations were disabled using the Linux kernel option <code>mitigations=off</code>.<br>As mentioned by ais523, it is important to pin the processes to specific cores. I have used logical cores 27 and 29, but I trim <code>taskset -c 27</code> and <code>taskset -c 29</code> from the commands in this article for the sake of readability. Look into <code>/sys/devices/system/cpu/cpu*/acpi_cppc/highest_perf</code> to know the relative performance of your cores. <a href="#9f242c74-a611-49a2-9265-07d5945c4750-link" aria-label="Jump to footnote reference 2">↩︎</a></li><li id="e22c8070-2784-40d4-81ae-6916566ce03a">See “L1 Cache write” in the last row of the second table from the bottom of the <a href="https://lanoc.org/review/cpus/8673-amd-ryzen-9-7950x3d?start=2">LanOC review</a>. This gives 2,518.4 GB/s for all 16 physical cores, or 157.4 GB/s per physical core.  <a href="#e22c8070-2784-40d4-81ae-6916566ce03a-link" aria-label="Jump to footnote reference 3">↩︎</a></li><li id="ce4dcb58-ec87-4707-ba7b-fd4c521c97da">I had to install <code>linux-image-6.1.0-18-amd64-dbg</code> to get the file <code>/usr/lib/debug/boot/System.map-6.1.0-18-amd64</code> with the symbols. <a href="#ce4dcb58-ec87-4707-ba7b-fd4c521c97da-link" aria-label="Jump to footnote reference 4">↩︎</a></li><li id="2c23c626-8ef3-4b59-af5c-4093048ce5dd"><a href="https://news.ycombinator.com/item?id=41356133">Someone at Hacker News has the answer!</a> <a href="#2c23c626-8ef3-4b59-af5c-4093048ce5dd-link" aria-label="Jump to footnote reference 5">↩︎</a></li></ol>	</div><!-- .entry-content -->
+	
+	<footer class="entry-meta">
+		
+			</footer><!-- .entry-meta -->
+</article><!-- #post -->
+						<nav class="navigation post-navigation">
+		<h1 class="screen-reader-text">
+			Post navigation		</h1>
+		<div class="nav-links">
+
+			<a href="https://qsantos.fr/2024/05/01/git-super-power-the-three-way-merge/" rel="prev"><span class="meta-nav">&larr;</span> Git Super-Power: The Three-Way Merge</a>			
+		</div><!-- .nav-links -->
+	</nav><!-- .navigation -->
+						
+<div id="comments" class="comments-area">
+
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2024/08/25/linux-pipes-are-slow/#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://qsantos.fr/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate><p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> <span class="required-field-message">Required fields are marked <span class="required">*</span></span></p><p class="comment-form-comment"><label for="comment">Comment <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" autocomplete="name" required /></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" autocomplete="email" required /></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url" /></p>
+<p class="comment-form-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes" /> <label for="wp-comment-cookies-consent">Save my name, email, and website in this browser for the next time I comment.</label></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='4517' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="608c410aab" /></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="162"/><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+			
+		</div><!-- #content -->
+	</div><!-- #primary -->
+
+	<div id="tertiary" class="sidebar-container" role="complementary">
+		<div class="sidebar-inner">
+			<div class="widget-area">
+				<aside id="block-31" class="widget widget_block">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<figure class="wp-block-image size-full is-style-rounded"><img loading="lazy" decoding="async" width="1536" height="1536" src="https://qsantos.fr/wp-content/uploads/2020/07/profil.jpg" alt="" class="wp-image-70"/></figure>
+
+
+
+<h2 class="wp-block-heading">About Me</h2>
+
+
+
+<p>I have always been fascinated with computers. Nowadays, I mostly use Rust, but I started out with a <a href="https://en.wikipedia.org/wiki/QuickBASIC">QuickBASIC</a> book from the local library when I was in elementary school. I also got a Master in computer science from <a href="https://en.wikipedia.org/wiki/École_normale_supérieure_de_Lyon">ENSL</a> and a PhD in cryptography from <a href="https://en.wikipedia.org/wiki/École_normale_supérieure_(Paris)">ENS</a>.</p>
+
+
+
+<ul class="wp-block-social-links is-layout-flex wp-block-social-links-is-layout-flex"></ul>
+
+
+
+<ul class="wp-block-social-links is-layout-flex wp-block-social-links-is-layout-flex"></ul>
+
+
+
+<ul class="wp-block-social-links is-layout-flex wp-block-social-links-is-layout-flex"></ul>
+
+
+
+<p><a href="https://web.archive.org/web/20240625145843/mailto:qsantos@qsantos.fr">qsantos@qsantos.fr</a></p>
+</div></div>
+</aside><aside id="block-28" class="widget widget_block">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<h2 class="wp-block-heading">Latest Posts</h2>
+
+
+<ul class="wp-block-latest-posts__list wp-block-latest-posts has-small-font-size"><li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/08/25/linux-pipes-are-slow/">Linux Pipes are Slow</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/05/01/git-super-power-the-three-way-merge/">Git Super-Power: The Three-Way Merge</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/04/28/merging-responsibly/">Merging Responsibly</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/02/24/vihn-vim-for-hacker-news/">ViHN: Vim for Hacker News</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/01/13/rewriting-nhk-easier-in-rust/">Rewriting NHK Easier in Rust</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2024/01/04/dynamic-programming-is-not-black-magic/">Dynamic Programming is not Black Magic</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/11/08/the-secret-to-a-green-ci-efficient-pre-commit-hooks-with-checkout-index/">The Secret to a Green CI: Efficient Pre-commit Hooks with checkout-index</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/10/02/learning-morse-with-koch/">Learning Morse with Koch</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/09/25/tiny-docker-containers-with-rust/">Tiny Docker Containers with Rust</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/09/22/koch-dissertation-on-learning-morse-code/">Koch&#8217;s Dissertation on Learning Morse Code</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/09/03/where-to-start-with-rust/">Where to Start with Rust</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/09/03/client-side-password-hashing/">Client-Side Password Hashing</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/07/09/strongly-typed-web-apps/">Strongly Typed Web Apps</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/05/15/overkill-debugging/">Overkill Debugging</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/05/15/hamfox-forking-firefox-for-fun-and-no-profit/">HamFox: Forking Firefox for Fun and no Profit</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/04/18/https-without-encryption/">HTTPS Without Encryption</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/02/18/hamssh/">HamSSH</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2023/01/07/float-woes-in-c/">Float Woes in C</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2022/12/21/ham-crypto/">Ham Crypto</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2022/10/25/flexible-array-members-typical-c-shenanigans/">Flexible Array Members: Typical C Shenanigans</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2022/09/08/why-undefined-behavior-matter/">Why Undefined Behavior Matters</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/06/11/continuous-integration-and-delivery-made-easy/">Continuous Integration and Delivery Made Easy</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/05/28/building-for-windows-without-running-windows/">Building for Windows without Running Windows</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/03/22/astronomical-depth-buffer/">Astronomical Depth Buffer</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/03/07/solving-keplers-equation-5-million-times-a-second/">Solving Kepler&#8217;s Equation 5 Million Times a Second</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/02/21/floating-point-woes-in-three-dimensions/">Floating Point Woes in Three Dimensions</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/02/09/looking-up-close-at-orbits/">Looking Up-Close at Orbits</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2021/01/28/drawing-nice-orbits/">Drawing Nice Orbits</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2020/08/15/code-golfing-in-python-1/">Code Golfing in Python (1)</a></li>
+<li><a class="wp-block-latest-posts__post-title" href="https://qsantos.fr/2020/07/20/first-commit/">First Commit</a></li>
+</ul></div></div>
+</aside>			</div><!-- .widget-area -->
+		</div><!-- .sidebar-inner -->
+	</div><!-- #tertiary -->
+
+		</div><!-- #main -->
+		<footer id="colophon" class="site-footer">
+			
+			<div class="site-info">
+												<a href="https://wordpress.org/" class="imprint">
+					Proudly powered by WordPress				</a>
+			</div><!-- .site-info -->
+		</footer><!-- #colophon -->
+	</div><!-- #page -->
+
+	<script id="mkaz-code-syntax-prism-js-js-extra">
+var prism_settings = {"pluginUrl":"https:\/\/qsantos.fr\/wp-content\/plugins\/code-syntax-block\/"};
+</script>
+<script src="https://qsantos.fr/wp-content/plugins/code-syntax-block/assets/prism/prism.js?ver=1716237844" id="mkaz-code-syntax-prism-js-js"></script>
+<script src="https://qsantos.fr/wp-includes/js/comment-reply.min.js?ver=6.6.1" id="comment-reply-js" async data-wp-strategy="async"></script>
+<script src="https://stats.wp.com/e-202435.js" id="jetpack-stats-js" data-wp-strategy="defer"></script>
+<script id="jetpack-stats-js-after">
+_stq = window._stq || [];
+_stq.push([ "view", JSON.parse("{\"v\":\"ext\",\"blog\":\"208960048\",\"post\":\"4517\",\"tz\":\"2\",\"srv\":\"qsantos.fr\",\"j\":\"1:13.7\"}") ]);
+_stq.push([ "clickTrackerInit", "208960048", "4517" ]);
+</script>
+<script defer src="https://qsantos.fr/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1724600656" id="akismet-frontend-js"></script>
+</body>
+</html>
+
+<!-- Cached by WP-Optimize (gzip) - https://getwpo.com - Last modified: August 26, 2024 14:02 (Europe/Paris UTC:1) -->
