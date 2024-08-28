@@ -1,9 +1,9 @@
 parsers:
   doc_parser:
-    engine: "xml"
+    engine: "pandoc"
     langs: ["en", "zh"]
   docx_parser:
-    engine: "xml"
+    engine: "pandoc"
     langs: ["en", "zh"]
   epub_parser:
     engine: "unstructured"

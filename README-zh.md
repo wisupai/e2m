@@ -71,12 +71,12 @@ E2M 是一个能够把多种文件类型解析并转换成 Markdown 格式的 Py
     </tr>
     <tr>
       <td>DocParser</td>
-      <td>xml</td>
+      <td>pandoc, xml</td>
       <td>doc</td>
     </tr>
     <tr>
       <td>DocxParser</td>
-      <td>xml</td>
+      <td>pandoc, xml</td>
       <td>docx</td>
     </tr>
     <tr>
@@ -212,7 +212,7 @@ print(pdf_data.text)
 from wisup_e2m import DocParser
 
 doc_path = "./test.doc"
-parser = DocParser(engine="xml") # doc 引擎: xml
+parser = DocParser(engine="pandoc") # doc 引擎: pandoc, xml
 doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
@@ -223,7 +223,7 @@ print(doc_data.text)
 from wisup_e2m import DocxParser
 
 docx_path = "./test.docx"
-parser = DocxParser(engine="xml") # docx 引擎: xml
+parser = DocxParser(engine="pandoc") # docx 引擎: pandoc, xml
 docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
@@ -375,10 +375,10 @@ ec.convert(images=images)
 ```yaml
 parsers:
     doc_parser:
-        engine: "xml"
+        engine: "pandoc"
         langs: ["en", "zh"]
     docx_parser:
-        engine: "xml"
+        engine: "pandoc"
         langs: ["en", "zh"]
     epub_parser:
         engine: "unstructured"

@@ -73,12 +73,12 @@ Generally, for any type of file, the parser is run first to extract internal dat
     <tr>
       <td>DocParser</td>
       <td>xml</td>
-      <td>doc</td>
+      <td>pandoc, xml</td>
     </tr>
     <tr>
       <td>DocxParser</td>
       <td>xml</td>
-      <td>docx</td>
+      <td>pandoc, xml</td>
     </tr>
     <tr>
       <td>PptParser</td>
@@ -188,7 +188,7 @@ print(pdf_data.text)
 from wisup_e2m import DocParser
 
 doc_path = "./test.doc"
-parser = DocParser(engine="xml") # doc engines: xml
+parser = DocParser(engine="pandoc") # doc engines: pandoc, xml
 doc_data = parser.parse(doc_path)
 print(doc_data.text)
 ```
@@ -199,7 +199,7 @@ print(doc_data.text)
 from wisup_e2m import DocxParser
 
 docx_path = "./test.docx"
-parser = DocxParser(engine="xml") # docx engines: xml
+parser = DocxParser(engine="pandoc") # docx engines: pandoc, xml
 docx_data = parser.parse(docx_path)
 print(docx_data.text)
 ```
@@ -352,10 +352,10 @@ You can use a `config.yaml` file to specify the parsers and converters you want 
 ```yaml
 parsers:
     doc_parser:
-        engine: "xml"
+        engine: "pandoc"
         langs: ["en", "zh"]
     docx_parser:
-        engine: "xml"
+        engine: "pandoc"
         langs: ["en", "zh"]
     epub_parser:
         engine: "unstructured"
