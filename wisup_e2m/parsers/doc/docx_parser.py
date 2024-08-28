@@ -26,7 +26,7 @@ _docx_parser_params = [
 
 
 class DocxParser(BaseParser):
-    SUPPORTED_ENGINES = ["xml"]
+    SUPPORTED_ENGINES = ["xml", "pandoc"]
     SUPPERTED_FILE_TYPES = ["docx"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
@@ -42,11 +42,85 @@ class DocxParser(BaseParser):
         super().__init__(config, **config_kwargs)
 
         if not self.config.engine:
-            self.config.engine = "xml"  # xml
-            logger.info(f"No engine specified. Defaulting to {self.config.engine} engine.")
+            self.config.engine = "pandoc"  # pandoc, xml
+            logger.info(
+                f"No engine specified. Defaulting to {self.config.engine} engine."
+            )
 
         self._ensure_engine_exists()
         self._load_engine()
+
+    def _parse_by_pandoc(
+        self,
+        file_name: str,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = False,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+    ):
+        import pypandoc
+        import re
+        import html2text
+
+        # Step 1: Convert docx to initial markdown
+        result = pypandoc.convert_file(
+            file_name,
+            "markdown_phpextra",
+            extra_args=["--extract-media=" + image_dir],
+            verify_format=True
+        )
+
+        # Step 2: Convert HTML tables to markdown
+        table_pattern = re.compile(r"(<table>.*?</table>)", re.DOTALL)
+        for match in table_pattern.finditer(result):
+            table_html = match.group(1)
+            h = html2text.HTML2Text()
+            h.body_width = 0
+            table_md = h.handle(table_html)
+            result = result.replace(table_html, table_md)
+        
+        # Step 3: Standardize image format
+        image_pattern = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)\{[^}]*\}")
+        result = image_pattern.sub(r"![\1](\2)", result)
+        
+        # Step 4: Remove specific patterns
+        to_be_removed_pattern = {
+            r"\*\*\s*\n>\s*\*\*": "\n",
+            r"\*\*\s*>\s*\*\*": "",
+            r">\s*\n": "\n",
+        }
+        for pattern, replacement in to_be_removed_pattern.items():
+            result = re.sub(pattern, replacement, result, flags=re.MULTILINE)
+        
+        # Step 5: Ensure images are surrounded by empty lines
+        image_pattern = re.compile(r'(!\[.*?\]\(.*?\))')
+        result = re.sub(image_pattern, r'\n\n\1\n\n', result)
+        
+        # Step 6: Clean up excessive newlines
+        result = re.sub(r'\n{3,}', '\n\n', result)
+        result = re.sub(r'\n\s*\n', '\n\n', result)
+        
+        # Step 7: Strip whitespace from line beginnings and endings
+        result = '\n'.join(line.strip() for line in result.split('\n'))
+
+
+        attached_images = []
+        image_folder_path = Path(image_dir) / "media"
+        for image_file in image_folder_path.glob('*'):
+            if image_file.is_file():
+                attached_images.append(str(image_file))
+        
+        return E2MParsedData(
+            text=result,
+            attached_images=attached_images,
+            metadata={
+                "engine": "pandoc",
+            },
+        )
+        
+
 
     def _parse_by_xml(
         self,
@@ -121,7 +195,9 @@ class DocxParser(BaseParser):
 
                     logger.info(f"{tmp_target=}")
 
-                    if ignore_transparent_images and has_transparent_background(tmp_target):
+                    if ignore_transparent_images and has_transparent_background(
+                        tmp_target
+                    ):
                         logger.info(f"Ignore transparent image {tmp_target}")
                         continue
 
@@ -136,7 +212,9 @@ class DocxParser(BaseParser):
 
                     # 如果 type 的格式满足 http://schemas.openxmlformats.org/officeDocument/数字/relationships/image
 
-                    image_list.append(DocImage(id=id, target=target_image_path, type=type))
+                    image_list.append(
+                        DocImage(id=id, target=target_image_path, type=type)
+                    )
 
             except Exception as e:
                 logger.error(f"Error extracting images from docx file: {e}")
@@ -153,56 +231,41 @@ class DocxParser(BaseParser):
         attached_images = []
 
         for ele in doc.element.body:
-            # 如果是 bookmarkEnd 则跳过
-            print(ele.tag)
+            # test >
+            print(f"{ele.tag=} | {ele.text=}")
+            # test <
             if ele.tag.endswith("bookmarkEnd"):
-                text_list.append("---")
+                text_list.append("\n")
                 continue
+
             if ele.tag.endswith("tbl"):
-                row_list = []
-
-                for idx, tr in enumerate(ele.tr_lst):
-                    for tc in tr.tc_lst:
-                        for p in tc.p_lst:
-                            p_list = []
-                            for r in p.r_lst:
-                                r_list = []
-                                for t in r.t_lst:
-                                    r_list.append(t.text)
-                                p_list.append("".join(r_list))
-                            row_list.append("".join(p_list))
-
-                    text_list.append("|" + " | ".join(row_list) + "|")
-                    if idx == 0:
-                        text_list.append("|" + " | ".join(["---"] * len(row_list)) + "|")
-                    row_list = []
-                # 分隔符
-                text_list.append("---")
+                self._process_table(ele, text_list)
+                text_list.append("\n")
                 continue
 
-            xml = ele.xml
-            if ele.text:
-                text_list.append(ele.text)
+            if ele.tag.endswith("p"):
+                if not ele.text:
+                    text_list.append("\n")
+                    continue
+                if ele.text:
+                    if "<w:numPr>" in ele.xml:
+                        text_list.append("- " + ele.text)
+                    else:
+                        text_list.append(ele.text)
 
-            if include_image_link_in_text:
-                if "<w:drawing>" in xml:
-                    # <a:blip r:embed="rId8"> or <a:blip r:embed="R7aeea335d84042e6">
-                    img_ids = re.findall(r'r:embed="([^"]+)"', xml)
+                if include_image_link_in_text:
+                    self._process_images(
+                        ele,
+                        image_list,
+                        text_list,
+                        attached_images,
+                        relative_path,
+                        work_dir,
+                    )
 
-                    for img_id in img_ids:
-                        for img in image_list:
-                            if img.id == img_id:
-                                if relative_path:
-                                    text_list.append(
-                                        f"![{img.target.name}]({img.target.relative_to(Path(work_dir))})"
-                                    )
-                                    attached_images.append(
-                                        str(img.target.relative_to(Path(work_dir)))
-                                    )
-                                else:
-                                    text_list.append(f"![{img.target.name}]({img.target})")
-                                    attached_images.append(str(img.target.resolve()))
-                                    logger.info(f"Inserted image {img.target} in text")
+                text_list.append("\n")
+
+                continue
 
         return E2MParsedData(
             text="\n".join(text_list),
@@ -211,6 +274,55 @@ class DocxParser(BaseParser):
                 "engine": "xml",
             },
         )
+
+    def _process_table(self, ele, text_list):
+        """
+        Process Docx Table to markdown table
+        """
+        for idx, tr in enumerate(ele.tr_lst):
+            row_cells = [self._get_cell_text(tc) for tc in tr.tc_lst]
+            text_list.append("|" + " | ".join(row_cells) + "|")
+            if idx == 0:
+                text_list.append("|" + " | ".join(["---"] * len(row_cells)) + "|")
+
+    def _get_cell_text(self, tc):
+        """
+        Get the text of the cell
+        """
+        return "".join(
+            "".join(t.text for t in r.t_lst) for p in tc.p_lst for r in p.r_lst
+        )
+
+    def _process_images(
+        self, ele, image_list, text_list, attached_images, relative_path, work_dir
+    ):
+        """
+        Process the images in the element
+        """
+        xml = ele.xml
+        if "<w:drawing>" in xml:
+            img_ids = re.findall(r'r:embed="([^"]+)"', xml)
+            for img_id in img_ids:
+                for img in image_list:
+                    if img.id == img_id:
+                        self._add_image_to_text(
+                            img, text_list, attached_images, relative_path, work_dir
+                        )
+
+    def _add_image_to_text(
+        self, img, text_list, attached_images, relative_path, work_dir
+    ):
+        """
+        Add the image to the text
+        """
+        if relative_path:
+            rel_path = img.target.relative_to(Path(work_dir))
+            text_list.append(f"![{img.target.name}]({rel_path})")
+            attached_images.append(str(rel_path))
+        else:
+            text_list.append(f"![{img.target.name}]({img.target})")
+            attached_images.append(str(img.target.resolve()))
+            logger.info(f"Inserted image {img.target} in text")
 
     def get_parsed_data(
         self,
@@ -232,6 +344,16 @@ class DocxParser(BaseParser):
 
         if self.config.engine == "xml":
             return self._parse_by_xml(
+                file_name=file_name,
+                extract_images=extract_images,
+                include_image_link_in_text=include_image_link_in_text,
+                ignore_transparent_images=ignore_transparent_images,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
+        elif self.config.engine == "pandoc":
+            return self._parse_by_pandoc(
                 file_name=file_name,
                 extract_images=extract_images,
                 include_image_link_in_text=include_image_link_in_text,
