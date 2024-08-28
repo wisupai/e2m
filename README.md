@@ -72,13 +72,13 @@ Generally, for any type of file, the parser is run first to extract internal dat
     </tr>
     <tr>
       <td>DocParser</td>
-      <td>xml</td>
       <td>pandoc, xml</td>
+      <td>doc</td>
     </tr>
     <tr>
       <td>DocxParser</td>
-      <td>xml</td>
       <td>pandoc, xml</td>
+      <td>docx</td>
     </tr>
     <tr>
       <td>PptParser</td>
