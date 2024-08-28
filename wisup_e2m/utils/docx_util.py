@@ -52,11 +52,3 @@ def get_docx_images(
             image_count += 1
 
     return image_dict  # {image_number: [{'image_number': 0, 'image_file': 'extracted_images/0_0.png', 'image_name': '0_0.png'}]}
-
-
-# # main
-# if __name__ == "__main__":
-#     file_name = "./基于GAN的多模态对话情感识别特征融合网络-引言+相关工作.docx"
-#     image_dir = "extracted_images"
-#     image_dict = get_docx_images(file_name, None, image_dir)
-#     print(image_dict)
