@@ -106,7 +106,7 @@ When running PyTorch code, you might encounter a `fbgemm.dll` loading error (`OS
     Sometimes, directly installing via `pip` may cause dependency issues. Creating a new environment using `conda` and installing PyTorch might help resolve this. Here is an example:
 
     ```bash
-    conda create -n pytorch_env python=3.8
+    conda create -n pytorch_env python=3.10
     conda activate pytorch_env
     conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
     ```

@@ -106,7 +106,7 @@ nltk.download('all') # 最好直接下载所有资源,3.57G
     有时候直接使用 `pip` 安装可能会有一些依赖问题，使用 `conda` 创建新的环境并安装 PyTorch 可能会帮助解决这个问题。以下是一个例子：
 
     ```bash
-    conda create -n pytorch_env python=3.8
+    conda create -n pytorch_env python=3.10
     conda activate pytorch_env
     conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
     ```
