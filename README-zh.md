@@ -521,6 +521,34 @@ converters:
 
 如有任何问题或疑问，请在 [GitHub](https://github.com/wisupai/e2m) 上创建 issue 或通过 [team@wisup.ai](mailto:team@wisup.ai) 联系我们。
 
+商业合作联系: [team@wisup.ai](mailto:team@wisup.ai)
+
+## 💼 加入我们
+
+<p align="center">
+  <img src="./docs/images/wisup_logo.png" width="400px" alt="wisup_e2m Logo">
+</p>
+
+- Wisup是一家以数据和算法为核心的AI初创公司，我们专注于为企业提供高质量的数据和算法服务。我们采用线上工作的方式，欢迎全球各地的优秀人才加入我们。
+
+- 我们的理念: 从信息到数据，从数据到知识，从知识到价值。
+
+- 我们的理想: 用数据让世界变得更美好。
+
+- 我们需要: 志同道合的联合创始人
+  - 不限学历、年龄、地域、种族、性别
+  - 关注AI前沿，了解AI以及相关垂直行业
+  - 对AI、数据充满热情，满怀理想
+  - 有个人强势专长、负责任、有团队合作精神
+
+- 投递简历: [team@wisup.ai](mailto:team@wisup.ai)
+
+- 您还需要在邮件中回答3个问题：
+  - 您的不可替代性在哪里？
+  - 您曾经遇到过最困难的事，以及您如何解决？
+  - 您如何看待AI的未来发展？
+
+
 ## 🌟 贡献
 
 <a href="https://github.com/wisupai/e2m/graphs/contributors">

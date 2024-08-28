@@ -494,6 +494,33 @@ You can scan the QR code below to join our WeChat group:
 
 For any questions or inquiries, please open an issue on [GitHub](https://github.com/wisupai/e2m) or contact us at [team@wisup.ai](mailto:team@wisup.ai).
 
+Contact for business cooperation: [team@wisup.ai](mailto:team@wisup.ai)
+
+## 💼 Join Us
+
+<p align="center">
+  <img src="./docs/images/wisup_logo.png" width="400px" alt="wisup_e2m Logo">
+</p>
+
+- Wisup is an AI startup with a strong focus on data and algorithms. We specialize in providing high-quality data and algorithm services for enterprises. We embrace a remote working model and welcome talented individuals from around the world to join us.
+
+- Our philosophy: From information to data, from data to knowledge, from knowledge to value.
+
+- Our vision: To make the world a better place through data.
+
+- We are looking for: Like-minded Co-Founders
+  - No restrictions on education, age, location, race, or gender
+  - Keen interest in AI and familiarity with AI and related vertical industries
+  - Passionate about AI and data, with a strong sense of purpose
+  - Possess unique strengths, responsibility, and a team-oriented mindset
+
+- To apply, send your resume to: [team@wisup.ai](mailto:team@wisup.ai)
+
+- You also need to answer three questions in your email:
+  - What makes you irreplaceable?
+  - What is the most challenging situation you have faced, and how did you resolve it?
+  - How do you view the future development of AI?
+
 ## 🌟 Contributing
 
 <a href="https://github.com/wisupai/e2m/graphs/contributors">
