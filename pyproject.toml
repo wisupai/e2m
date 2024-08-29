@@ -37,6 +37,7 @@ html2text = "^2024.2.26"
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
 pytest-mock = "^3.14.0"
+pytest-html = "^4.1.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.8"
