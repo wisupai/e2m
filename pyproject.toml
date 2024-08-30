@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wisup_e2m"
-version = "0.1.6"
+version = "0.1.61"
 description = "Everything to Markdown."
 authors = ["Wisup Team <team@wisup.a>"]
 license = "MIT"
@@ -33,6 +33,10 @@ nltk = "^3.9"
 zhipuai = "^2.1.4.20230814"
 html2text = "^2024.2.26"
 
+[tool.poetry.group.api.dependencies]
+fastapi = "^0.110.0"
+uvicorn = "^0.30.0"
+aiofiles = "^24.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
