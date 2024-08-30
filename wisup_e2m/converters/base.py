@@ -103,7 +103,7 @@ class BaseConverter(ABC):
 
         if self.config.engine == "litellm":
             self._load_litellm_engine()
-        if self.config.engine == "zhipuai":
+        elif self.config.engine == "zhipuai":
             self._load_zhipuai_engine()
         else:
             raise ValueError(f"Unsupported engine: {self.config.engine}")
