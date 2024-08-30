@@ -158,7 +158,7 @@ Install E2M using pip:
 # Option 1: Install via git, most recommended
 pip install git+https://github.com/wisupai/e2m.git --index-url https://pypi.org/simple
 # Option 2: Install via pip
-pip install wisup_e2m
+pip install --upgrade wisup_e2m
 # Option 3: Manual installation
 git clone https://github.com/wisupai/e2m.git
 cd e2m
