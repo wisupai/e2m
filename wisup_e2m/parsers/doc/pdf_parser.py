@@ -58,7 +58,7 @@ class PdfParser(BaseParser):
                 "Unstructured engine not installed. Please install Unstructured by \
                     `pip install unstructured unstructured_pytesseract \
                         unstructured_inference pdfminer.six \
-                            matplotlib pillow-heif pillow`"
+                            matplotlib pi_heif pillow-heif pillow`"
             ) from None
 
         self.unstructured_parse_func = partition_pdf

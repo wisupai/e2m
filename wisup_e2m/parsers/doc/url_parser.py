@@ -60,7 +60,7 @@ class UrlParser(BaseParser):
             raise ImportError(
                 "Unstructured engine not installed. Please install Unstructured by \
                     `pip install unstructured unstructured_pytesseract \
-                        unstructured_inference pdfminer.six matplotlib pillow-heif pillow`"
+                        unstructured_inference pdfminer.six matplotlib pi_heif pillow-heif pillow`"
             ) from None
 
         self.unstructured_parse_func = partition_html

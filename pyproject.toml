@@ -32,6 +32,7 @@ platformdirs = "^4.2.2"
 nltk = "^3.9"
 zhipuai = "^2.1.4.20230814"
 html2text = "^2024.2.26"
+pi-heif = "^0.18.0"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.110.0"

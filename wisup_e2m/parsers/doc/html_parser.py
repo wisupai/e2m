@@ -52,7 +52,7 @@ class HtmlParser(BaseParser):
             from unstructured.partition.html import partition_html
         except ImportError:
             raise ImportError(
-                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif pillow`"
+                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pi_heif pillow-heif pillow`"
             ) from None
 
         self.unstructured_parse_func = partition_html
