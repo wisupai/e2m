@@ -76,9 +76,13 @@ class BaseConverterConfig(BaseModel):
         None,
         description="Base URL for the API",
     )
+    api_base: Optional[str] = Field(
+        None,
+        description="API base path",
+    )
     api_version: Optional[str] = Field(
         None,
-        description="API version",
+        description="Base URL for the API (default is None).",
     )
     api_key: Optional[str] = Field(
         None,
@@ -99,6 +103,11 @@ class BaseConverterConfig(BaseModel):
         None,
         description="Default headers for the request",
     )
+
+    
+    # allow for custom converters to be used
+    class Config:
+        extra = "allow"
 
     def to_dict(self):
         return self.model_dump()

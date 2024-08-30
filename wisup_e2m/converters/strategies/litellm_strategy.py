@@ -49,6 +49,8 @@ class LitellmStrategy(BaseStrategy):
                 max_tokens=completion_kwargs.get("max_tokens"),
                 presence_penalty=completion_kwargs.get("presence_penalty"),
                 frequency_penalty=completion_kwargs.get("frequency_penalty"),
+                api_base=completion_kwargs.get("api_base"),
+                api_version=completion_kwargs.get("api_version"),
                 api_key=completion_kwargs.get("api_key"),
                 base_url=completion_kwargs.get("base_url"),
                 caching=completion_kwargs.get("caching"),
@@ -87,9 +89,11 @@ class LitellmStrategy(BaseStrategy):
                 max_tokens=completion_kwargs.get("max_tokens"),
                 presence_penalty=completion_kwargs.get("presence_penalty"),
                 frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                caching=completion_kwargs.get("caching"),
+                api_base=completion_kwargs.get("api_base"),
+                api_version=completion_kwargs.get("api_version"),
                 api_key=completion_kwargs.get("api_key"),
                 base_url=completion_kwargs.get("base_url"),
+                caching=completion_kwargs.get("caching"),
                 stream=True,
             )
         else:
