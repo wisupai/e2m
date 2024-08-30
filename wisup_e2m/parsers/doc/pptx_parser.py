@@ -58,7 +58,7 @@ class PptxParser(BaseParser):
             from unstructured.partition.pptx import partition_pptx
         except ImportError:
             raise ImportError(
-                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif-image pillow python-pptx`"
+                "Unstructured engine not installed. Please install Unstructured by `pip install unstructured unstructured_pytesseract unstructured_inference pdfminer.six matplotlib pillow-heif pillow python-pptx`"
             ) from None
 
         self.unstructured_parse_func = partition_pptx
