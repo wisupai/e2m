@@ -9,8 +9,8 @@
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
     </a>
-    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.61">
-        <img src="https://img.shields.io/badge/version-0.1.61-blue" alt="E2M Version">
+    <a href="https://github.com/Jing-yilin/E2M/tags/0.1.61b">
+        <img src="https://img.shields.io/badge/version-0.1.61b-blue" alt="E2M Version">
     </a>
     <a href="https://www.python.org/downloads/">
         <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue" alt="Python Version">
@@ -164,7 +164,7 @@ git clone https://github.com/wisupai/e2m.git
 cd e2m
 pip install poetry
 poetry build
-pip install dist/wisup_e2m-0.1.61-py3-none-any.whl
+pip install dist/wisup_e2m-0.1.61b-py3-none-any.whl
 ```
 
 ## ⚡️ Parser Quick Start
