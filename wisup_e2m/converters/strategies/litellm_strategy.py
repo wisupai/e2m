@@ -18,6 +18,21 @@ from wisup_e2m.utils.llm_utils import LlmUtils
 
 logger = logging.getLogger(__name__)
 
+
+_client_completion_params = [
+    "model",
+    "temperature",
+    "top_p",
+    "n",
+    "max_tokens",
+    "presence_penalty",
+    "frequency_penalty",
+    "api_base",
+    "api_version",
+    "caching",
+]
+
+
 _completion_params = [
     "model",
     "temperature",
@@ -26,6 +41,8 @@ _completion_params = [
     "max_tokens",
     "presence_penalty",
     "frequency_penalty",
+    "api_base",
+    "api_version",
     "api_key",
     "base_url",
     "caching",
@@ -40,32 +57,18 @@ class LitellmStrategy(BaseStrategy):
 
     async def _query_async(self, messages, **completion_kwargs):
         if not self.litellm_client:
+            args = {k: v for k, v in completion_kwargs.items() if k in _completion_params}
             response = await acompletion(
                 messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                api_base=completion_kwargs.get("api_base"),
-                api_version=completion_kwargs.get("api_version"),
-                api_key=completion_kwargs.get("api_key"),
-                base_url=completion_kwargs.get("base_url"),
-                caching=completion_kwargs.get("caching"),
+                stream=True,
+                **args,
             )
         else:
+            args = {k: v for k, v in completion_kwargs.items() if k in _client_completion_params}
             response = await self.litellm_client.chat.completions.create(
                 messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
                 acompletion=True,
+                **args,
             )
 
         messages.append(
@@ -80,34 +83,18 @@ class LitellmStrategy(BaseStrategy):
     def _query(self, messages, verbose=True, **completion_kwargs):
         if not self.litellm_client:
             logging.info("Using the default LiteLLM client.")
+            args = {k: v for k, v in completion_kwargs.items() if k in _completion_params}
             response = completion(
                 messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                api_base=completion_kwargs.get("api_base"),
-                api_version=completion_kwargs.get("api_version"),
-                api_key=completion_kwargs.get("api_key"),
-                base_url=completion_kwargs.get("base_url"),
-                caching=completion_kwargs.get("caching"),
                 stream=True,
+                **args,
             )
         else:
+            args = {k: v for k, v in completion_kwargs.items() if k in _client_completion_params}
             response = self.litellm_client.chat.completions.create(
                 messages=messages,
-                model=completion_kwargs.get("model"),
-                temperature=completion_kwargs.get("temperature"),
-                top_p=completion_kwargs.get("top_p"),
-                n=completion_kwargs.get("n"),
-                max_tokens=completion_kwargs.get("max_tokens"),
-                presence_penalty=completion_kwargs.get("presence_penalty"),
-                frequency_penalty=completion_kwargs.get("frequency_penalty"),
-                cache=completion_kwargs.get("cache"),
                 stream=True,
+                **args,
             )
 
         full_text = []

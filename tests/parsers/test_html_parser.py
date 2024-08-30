@@ -12,6 +12,7 @@ test_html_path = str(pwd / "test.html")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @pytest.mark.parametrize("engine", ["unstructured"])
 def test_html_parser(engine):
     start_time = time.time()

@@ -104,7 +104,6 @@ class BaseConverterConfig(BaseModel):
         description="Default headers for the request",
     )
 
-    
     # allow for custom converters to be used
     class Config:
         extra = "allow"

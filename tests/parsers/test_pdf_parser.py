@@ -12,6 +12,7 @@ test_pdf_path = str(pwd / "test.pdf")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @pytest.mark.parametrize("engine", ["marker", "unstructured"])
 def test_pdf_parser(engine):
     start_time = time.time()

@@ -12,6 +12,7 @@ test_docx_path = str(pwd / "test.docx")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @pytest.mark.parametrize("engine", ["xml", "pandoc"])
 def test_docx_parser(engine):
     start_time = time.time()
