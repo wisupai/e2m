@@ -137,6 +137,11 @@ E2M 是一个能够把多种文件类型解析并转换成 Markdown 格式的 Py
   </tbody>
 </table>
 
+### 转换器支持的模型:
+
+1. Litellm: https://docs.litellm.ai/docs/providers/
+2. Zhipuai: https://open.bigmodel.cn/dev/howuse/model
+
 ## 📦 安装
 
 创建环境:

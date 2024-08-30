@@ -139,6 +139,11 @@ Generally, for any type of file, the parser is run first to extract internal dat
   </tbody>
 </table>
 
+### Supported Models
+
+1. Litellm: https://docs.litellm.ai/docs/providers/
+2. Zhipuai: https://open.bigmodel.cn/dev/howuse/model
+
 ## 📦 Installation
 
 Create Environment:
