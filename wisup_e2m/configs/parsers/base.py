@@ -10,7 +10,7 @@ class BaseParserConfig(BaseModel):
 
     # parser settings
     engine: str = Field(
-        "unstructured",
+        None,
         description="Parser engine to use, options are ['unstructured', 'surya_layout', 'marker']",
     )
     langs: List[str] = Field(

@@ -96,7 +96,7 @@ class BaseConverter(ABC):
             logger.error(
                 f"Engine {self.config.engine} not supported. Supported engines are {self.SUPPORTED_ENGINES}"
             )
-            raise
+            raise ValueError(f"Unsupported engine: {self.config.engine}")
         logger.info(f"Engine: {self.config.engine} is valid.")
 
     def _load_engine(self):
