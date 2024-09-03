@@ -178,6 +178,10 @@ pip install dist/wisup_e2m-0.1.63-py3-none-any.whl
 gunicorn wisup_e2m.api.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
+API Documentation:
+
+- http://127.0.0.1:8000/docs
+
 ## ⚡️ Parser Quick Start
 
 Here's simple examples demonstrating how to use E2M Parsers:
