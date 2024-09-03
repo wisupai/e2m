@@ -1,13 +1,14 @@
-from typing import Dict, List
+from typing import List
 
-from wisup_e2m.converters.base import BaseConverter
+from wisup_e2m.converters.base import BaseConverter, ConvertHelpfulInfo
+
 
 _image_converter_params = [
     "images",
-    "attached_images_map",
-    "verbose",
     "strategy",
     "image_batch_size",
+    "convert_helpful_info",
+    "verbose",
 ]
 
 
@@ -17,10 +18,10 @@ class ImageConverter(BaseConverter):
     def _convert_to_md_by_litellm(
         self,
         images: List[str],
-        attached_images_map: Dict[str, List[str]] = {},
-        verbose: bool = True,
         strategy: str = "default",
         image_batch_size: int = 5,
+        convert_helpful_info: ConvertHelpfulInfo = None,
+        verbose: bool = True,
         **kwargs,
     ) -> str:
         from wisup_e2m.converters.strategies.litellm_strategy import LitellmStrategy
@@ -28,17 +29,17 @@ class ImageConverter(BaseConverter):
         if strategy == "default":
             return LitellmStrategy().default_image_convert(
                 images=images,
-                attached_images_map=attached_images_map,
-                verbose=verbose,
                 image_batch_size=image_batch_size,
+                convert_helpful_info=convert_helpful_info,
+                verbose=verbose,
                 **self.config.to_dict(),
             )
         elif strategy == "with_toc":
             return LitellmStrategy().with_toc_image_convert(
                 images=images,
-                attached_images_map=attached_images_map,
-                verbose=verbose,
                 image_batch_size=image_batch_size,
+                convert_helpful_info=convert_helpful_info,
+                verbose=verbose,
                 **self.config.to_dict(),
             )
         else:
@@ -47,10 +48,10 @@ class ImageConverter(BaseConverter):
     def _convert_to_md_by_zhipuai(
         self,
         images: List[str],
-        attached_images_map: Dict[str, List[str]] = {},
-        verbose: bool = True,
         strategy: str = "default",
         image_batch_size: int = 5,
+        convert_helpful_info: ConvertHelpfulInfo = None,
+        verbose: bool = True,
         **kwargs,
     ) -> str:
         from wisup_e2m.converters.strategies.zhipuai_strategy import ZhipuaiStrategy
@@ -60,17 +61,17 @@ class ImageConverter(BaseConverter):
         if strategy == "default":
             return zhipuai_strategy.default_image_convert(
                 images=images,
-                attached_images_map=attached_images_map,
-                verbose=verbose,
                 image_batch_size=image_batch_size,
+                convert_helpful_info=convert_helpful_info,
+                verbose=verbose,
                 **self.config.to_dict(),
             )
         elif strategy == "with_toc":
             return zhipuai_strategy.with_toc_image_convert(
                 images=images,
-                attached_images_map=attached_images_map,
-                verbose=verbose,
                 image_batch_size=image_batch_size,
+                convert_helpful_info=convert_helpful_info,
+                verbose=verbose,
                 **self.config.to_dict(),
             )
         else:
@@ -79,10 +80,10 @@ class ImageConverter(BaseConverter):
     def convert(
         self,
         images: List[str],
-        attached_images_map: Dict[str, List[str]] = {},
-        verbose: bool = True,
         strategy: str = "default",
         image_batch_size: int = 5,
+        convert_helpful_info: ConvertHelpfulInfo = None,
+        verbose: bool = True,
         **kwargs,
     ) -> str:
         for k, v in locals().items():

@@ -2,6 +2,7 @@
 import logging
 import re
 import shutil
+from uuid import uuid4
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -18,22 +19,46 @@ from wisup_e2m.utils.web_util import download_internet_image, get_web_content
 logger = logging.getLogger(__name__)
 
 
-class E2MParsedData(BaseModel):
-    text: Optional[str] = Field(None, description="Parsed text")
-    images: Optional[List[str]] = Field([], description="Parsed image paths")
-    attached_images: Optional[List[str]] = Field(
-        [], description="Attached image paths, like 1_0.png, 1_1.png, etc."
+class E2MParsedImageData(BaseModel):
+    image_path: str = Field(..., description="Path to the image file")
+    page_index: Optional[int] = Field(
+        None, description="Index of the page where the image is located"
     )
-    attached_images_map: Optional[Dict[str, List[str]]] = Field(
-        {},
-        description="Attached image paths map, like {1.png: ['/path/to/1_0.png'], 2.png: [/path/to/2_1.png]}, only available for layout detection.",
+    base64: Optional[str] = Field(None, description="Base64 encoded image data")
+    parent_image_id: Optional[str] = Field(
+        None, description="Path or identifier of the parent image"
     )
-    metadata: Optional[List[Any] | Dict[str, Any]] = Field(
-        {}, description="Metadata of the parsed data, including engine, etc."
+    children_image_ids: List[str] = Field(
+        default_factory=list, description="List of paths or identifiers of child images"
     )
 
     def to_dict(self):
         return self.model_dump()
+
+
+class E2MParsedData(BaseModel):
+    text: Optional[str] = Field(None, description="Parsed text content")
+    images: Dict[str, E2MParsedImageData] = Field(
+        default_factory=dict, description="Dictionary of image_id to E2MParsedImageData"
+    )
+    attached_images: Dict[str, E2MParsedImageData] = Field(
+        default_factory=dict, description="Dictionary of attached image_id to E2MParsedImageData"
+    )
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict, description="Metadata of the parsed data, including engine, etc."
+    )
+
+    def to_dict(self):
+        return self.model_dump()
+
+    def add_image(self, image_path: str, image_data: E2MParsedImageData):
+        self.images[image_path] = image_data
+
+    def add_attached_image(self, image_path: str, image_data: E2MParsedImageData):
+        self.attached_images[image_path] = image_data
+
+    def set_metadata(self, key: str, value: Any):
+        self.metadata[key] = value
 
 
 class BaseParser(ABC):
@@ -42,7 +67,7 @@ class BaseParser(ABC):
     """
 
     SUPPORTED_ENGINES = []
-    SUPPERTED_FILE_TYPES = []
+    SUPPORTED_FILE_TYPES = []
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """Initialize a base parser class
@@ -115,18 +140,18 @@ class BaseParser(ABC):
             logger.error(
                 f"Engine {self.config.engine} not supported. Supported engines are {self.SUPPORTED_ENGINES}"
             )
-            raise
+            raise ValueError(f"Engine {self.config.engine} not supported")
         logger.info(f"Engine: {self.config.engine} is valid.")
 
     @classmethod
-    def _validate_input_flie(cls, file: str):
+    def _validate_input_file(cls, file: str):
         if not file:
             raise ValueError("File is empty!")
         if not Path(file).exists():
             raise FileNotFoundError(f"File not found: {file}")
-        if not any(file.endswith(ext) for ext in cls.SUPPERTED_FILE_TYPES):
+        if not any(file.endswith(ext) for ext in cls.SUPPORTED_FILE_TYPES):
             raise ValueError(
-                f"File type not supported. Supported file types: {cls.SUPPERTED_FILE_TYPES}"
+                f"File type not supported. Supported file types: {cls.SUPPORTED_FILE_TYPES}"
             )
 
     def _load_engine(self):
@@ -218,8 +243,8 @@ class BaseParser(ABC):
 
         def _parse_url_by_jina(url: str):
 
-            jian_base_url = "https://r.jina.ai/"
-            return get_web_content(jian_base_url + url, client=self.client)
+            jina_base_url = "https://r.jina.ai/"
+            return get_web_content(jina_base_url + url, client=self.client)
 
         self.jina_parse_func = _parse_url_by_jina
         logger.info("Jina engine loaded successfully.")
@@ -293,7 +318,7 @@ class BaseParser(ABC):
                 print("Pandoc is not installed.")
                 return False
 
-        if not is_pandoc_installed:
+        if not is_pandoc_installed():
             raise ImportError(
                 "Pandoc is not installed. Please install Pandoc from https://pandoc.org/installing.html"
             )
@@ -346,8 +371,8 @@ class BaseParser(ABC):
                 shutil.move(str(image_path), str(new_image_path))
                 element.metadata.image_path = str(new_image_path.resolve())
 
-        attached_images = []
-        # meerge text and image links
+        attached_images = {}
+        # merge text and image links
         text_chunks = []
         for element in data:
             if ignore_page_number and element.category == "PageNumber":
@@ -361,7 +386,10 @@ class BaseParser(ABC):
                     else:
                         image_name = str(image_path.resolve())
                     text_chunks.append(f"![]({image_name})")
-                    attached_images.append(image_name)
+
+                    attached_images[str(uuid4())] = E2MParsedImageData(
+                        image_path=image_name, page_index=element.metadata.page_number
+                    )
             elif element.text:
                 if not add_title_marker:
                     text_chunks.append(element.text)
@@ -428,9 +456,8 @@ class BaseParser(ABC):
         image_dir = Path(image_dir).resolve()
         image_dir.mkdir(parents=True, exist_ok=True)
 
-        layout_images = []
-        attached_images = []
-        attached_images_map = {}
+        layout_images = {}
+        attached_images = {}
 
         logger.debug(f"len of layout_predictions: {len(layout_predictions)}")
         logger.debug(f"len of images: {len(images)}")
@@ -506,7 +533,7 @@ class BaseParser(ABC):
                     continue
 
                 # 填充脚注
-                if label_type == ["Footnote"] and label_type in ignore_label_types:
+                if label_type == "Footnote" and label_type in ignore_label_types:
                     cv2.rectangle(
                         image,
                         (x1, y1),
@@ -566,7 +593,7 @@ class BaseParser(ABC):
 
                 roi = image[y1:y2, x1:x2]
 
-                cv2.imwrite(fig_name, roi)
+                cv2.imwrite(str(fig_name), roi)
                 logger.info(f"Saved figure to {fig_name}")
 
                 cv2.rectangle(
@@ -592,22 +619,28 @@ class BaseParser(ABC):
 
                 j += 1
 
-            # 保存图片
+            # 保存整页图片
             full_image_path = image_dir / f"{i}.png"
             full_image_path_name = str(full_image_path)
             cv2.imwrite(full_image_path_name, image)
-            layout_images.append(full_image_path_name)
-            attached_images.extend([img["image_path"] for img in page_attached_image_infos])
-            # image name -> attached image paths
-            attached_images_map[full_image_path.name] = [
-                img["image_path"] for img in page_attached_image_infos
-            ]
+            page_image_id = str(i)
+            layout_images[page_image_id] = E2MParsedImageData(
+                image_path=full_image_path_name, children_image_ids=[], page_index=i
+            )
+
+            # 处理页面上的附加图片
+            for img in page_attached_image_infos:
+                image_id = str(uuid4())
+                attached_images[image_id] = E2MParsedImageData(
+                    image_path=img["image_path"], parent_image_id=page_image_id, page_index=i
+                )
+                # 将附加图片ID添加到页面图片的children_image_ids中
+                layout_images[page_image_id].children_image_ids.append(image_id)
 
         return E2MParsedData(
             text="",
             images=layout_images,
             attached_images=attached_images,
-            attached_images_map=attached_images_map,
             metadata={
                 "engine": "surya_layout",
                 "surya_layout_metadata": layout_predictions,
@@ -629,7 +662,7 @@ class BaseParser(ABC):
         :param text: Full text
         :type text: str
         :param images: Images
-        :type images: Dict[str, Any]
+        :type images: Dict[str, Image.Image]
         :param metadata: Metadata
         :type metadata: Dict[str, Any]
         :return: Parsed data
@@ -639,7 +672,7 @@ class BaseParser(ABC):
         work_dir = Path(work_dir)
         image_dir = Path(image_dir)
 
-        attached_images = []
+        attached_images = {}
 
         if not include_image_link_in_text and images:
             # rm all !()[] like patterns
@@ -650,7 +683,6 @@ class BaseParser(ABC):
 
         else:
             if images:  # save figures to image_dir
-                # images: {'3_image_0.png': <PIL.Image.Image image mode=RGB size=183x235 at 0x38AB55FC0>, '3_image_1.png': <PIL.Image.Image image mode=RGB size=104x192 at 0x38AB55D80>}
                 image_dir.mkdir(parents=True, exist_ok=True)
 
                 for image_name, image in images.items():
@@ -664,8 +696,12 @@ class BaseParser(ABC):
 
                     # replace image path in text
                     text = text.replace(image_name, link_name)
-                    # attached_images.append(str(image_path.resolve()))
-                    attached_images.append(link_name)
+
+                    # Create E2MParsedImageData for each image
+                    image_id = str(uuid4())
+                    attached_images[image_id] = E2MParsedImageData(
+                        image_path=link_name,
+                    )
 
         metadata = {
             "engine": "marker",
@@ -704,19 +740,14 @@ class BaseParser(ABC):
         image_links = image_link_pattern.findall(text)
 
         def is_valid_image_link(link: str):
-            # start with https or http
-            # end with .png, .jpg, .jpeg, .gif .webp .bmp
-            # 可能后面带有参数，例如 https://private-user-images.githubusercontent.com/130414333/354840037-d984fb97-4b05-43d0-aa57-6cf34c962fd7.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwi
             return re.match(r"https?://.*\.(png|jpg|jpeg|gif|webp|bmp|svg)", link)
 
         image_links = [link for link in image_links if is_valid_image_link(link)]
         logger.info(f"Found {len(image_links)} image links in text")
 
-        attached_images = []
+        attached_images = {}
         if image_links:
-
             if not include_image_link_in_text:
-                # rm all image links like !()[]
                 text = image_link_pattern.sub("", text)
 
             if include_image_link_in_text and download_image:
@@ -724,7 +755,6 @@ class BaseParser(ABC):
                 image_dir = Path(image_dir)
                 image_dir.mkdir(parents=True, exist_ok=True)
 
-                # download images
                 logger.info(f"Downloading images to {image_dir}")
                 for image_link in tqdm(image_links):
                     logger.info(f"Downloading image: {image_link}")
@@ -741,15 +771,17 @@ class BaseParser(ABC):
                         continue
 
                     if relative_path:
-                        md_image_path = str(Path(image_path).relative_to(work_dir))
+                        md_image_path = str(image_path.relative_to(work_dir))
                     else:
                         md_image_path = str(image_path)
-                    # attached_images.append(str(image_path.resolve()))
-                    logging.info(f"{md_image_path=}")
-                    attached_images.append(md_image_path)
+
+                    image_id = str(uuid4())
+                    attached_images[image_id] = E2MParsedImageData(
+                        image_path=md_image_path,
+                    )
                     logger.info(f"Replaced image link {image_link} with {md_image_path}")
                     text = text.replace(image_link, md_image_path)
-                logger.info(f"Finihsed downloading {len(attached_images)} images to {image_dir}")
+                logger.info(f"Finished downloading {len(attached_images)} images to {image_dir}")
 
         return E2MParsedData(
             text=text,

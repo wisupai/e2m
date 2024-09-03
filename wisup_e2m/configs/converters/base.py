@@ -1,6 +1,11 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from typing import List
+
+
+class ConvertHelpfulInfo(BaseModel):
+    attach_image_names: Optional[List[List[str]]] = []  # 和每个image对应的附件名称
 
 
 class BaseConverterConfig(BaseModel):

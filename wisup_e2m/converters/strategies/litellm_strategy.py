@@ -1,8 +1,9 @@
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from litellm import LiteLLM, acompletion, completion, get_model_info
+from wisup_e2m.converters.base import ConvertHelpfulInfo
+
 
 from wisup_e2m.converters.strategies.base import BaseStrategy
 from wisup_e2m.converters.strategies.prompts import (
@@ -120,7 +121,7 @@ class LitellmStrategy(BaseStrategy):
     def text_format_inference(
         self,
         text: Optional[str] = None,
-        images: Optional[str] = None,
+        images: Optional[List[str]] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -232,10 +233,10 @@ class LitellmStrategy(BaseStrategy):
 
     def default_image_convert(
         self,
-        images: List[str],
-        attached_images_map: Dict[str, List[str]],
-        verbose: bool = True,
+        images: List[str],  # a list of image paths or urls or base64 strings
         image_batch_size: int = 5,
+        convert_helpful_info: ConvertHelpfulInfo = None,
+        verbose: bool = True,
         **kwargs,
     ) -> str:
 
@@ -278,9 +279,14 @@ class LitellmStrategy(BaseStrategy):
                 )
 
                 # 获取 attached_images
-                image_name = Path(image).name
-                if attached_images_map:
-                    tmp_attached_images = attached_images_map.get(image_name, [])
+                if convert_helpful_info and convert_helpful_info.attach_image_names:
+                    # attach_image_names ：List[List[str]]
+                    # 根据当前的id来获取对应的图片名称
+                    tmp_attached_images = convert_helpful_info.attach_image_names[
+                        idx : idx + image_batch_size
+                    ]
+
+                    logger.info(f"tmp_attached_images: {tmp_attached_images}")
 
                     # 添加content说明，你可以使用的图片
                     if tmp_attached_images:

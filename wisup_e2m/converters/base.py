@@ -2,6 +2,8 @@ import logging
 from abc import ABC
 from typing import Any, Dict, List, Optional
 
+from pydantic import BaseModel
+
 from wisup_e2m.configs.converters.base import BaseConverterConfig
 
 logger = logging.getLogger(__name__)
@@ -10,10 +12,14 @@ logger = logging.getLogger(__name__)
 _convert_params = [
     "text",
     "images",
-    "attached_images_map",
     "image_batch_size",
+    "convert_helpful_info",
     "verbose",
 ]
+
+
+class ConvertHelpfulInfo(BaseModel):
+    attach_image_names: Optional[List[List[str]]] = []  # 和每个image对应的附件名称
 
 
 class BaseConverter(ABC):
@@ -63,8 +69,8 @@ class BaseConverter(ABC):
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
-        attached_images_map: Optional[List[str]] = None,
         image_batch_size: int = 5,
+        convert_helpful_info: Optional[ConvertHelpfulInfo] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -193,8 +199,8 @@ class BaseConverter(ABC):
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
-        attached_images_map: Optional[Dict[str, List[str]]] = None,
         image_batch_size: int = 5,
+        convert_helpful_info: Optional[ConvertHelpfulInfo] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
@@ -205,8 +211,8 @@ class BaseConverter(ABC):
         self,
         text: Optional[str] = None,
         images: Optional[List[str]] = None,
-        attached_images_map: Optional[Dict[str, List[str]]] = None,
         image_batch_size: int = 5,
+        convert_helpful_info: Optional[ConvertHelpfulInfo] = None,
         verbose: bool = True,
         **kwargs,
     ) -> str:
