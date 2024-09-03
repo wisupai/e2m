@@ -42,6 +42,8 @@ class VoiceParser(BaseParser):
         self,
         file: str,
     ):
+        logger.info(f"Parsing {file} using openai-whisper-local engine")
+
         result = self.openai_whisper.transcribe(file)
 
         return E2MParsedData(
@@ -56,6 +58,8 @@ class VoiceParser(BaseParser):
         self,
         file: str,
     ):
+
+        logger.info(f"Parsing {file} using openai-whisper-api engine")
 
         audio_file = open(file, "rb")
 
@@ -90,6 +94,9 @@ class VoiceParser(BaseParser):
         """
         ref: https://github.com/Uberi/speech_recognition
         """
+
+        logger.info(f"Parsing {file} using SpeechRecognition engine")
+
         raise NotImplementedError("SpeechRecognition engine is not implemented yet")
 
     def get_parsed_data(

@@ -44,9 +44,9 @@ app.add_middleware(
 
 
 @app.post("/parse/", response_model=ParseResponse)
-async def parse_file(
-    file: UploadFile = File(...),
-    url: Optional[str] = Form(None),
+async def parse(
+    file: UploadFile = File(None),
+    url: str = Form(None),
     start_page: Optional[int] = Form(None),
     end_page: Optional[int] = Form(None),
     extract_images: bool = Form(True),
@@ -76,12 +76,12 @@ async def parse_file(
 
 
 @app.post("/convert/", response_model=ConvertResponse)
-async def convert_data(
+async def convert(
     text: Optional[str] = Form(None),
     images: Optional[List[str]] = Form(None),
     strategy: Optional[str] = Form("default"),
     image_batch_size: Optional[int] = Form(5),
-    convert_helpful_info: ConvertHelpfulInfo = Depends(ConvertHelpfulInfo),
+    convert_helpful_info: Optional[ConvertHelpfulInfo] = Depends(ConvertHelpfulInfo),
     converter=Depends(get_converter),
 ):
     request = ConvertRequest(

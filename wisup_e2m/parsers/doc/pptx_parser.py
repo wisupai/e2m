@@ -82,6 +82,9 @@ class PptxParser(BaseParser):
         """
         Parse the data using the unstructured engine
         """
+
+        logger.info(f"Parsing {file_name} using unstructured engine...")
+
         import unstructured
 
         unstructured_elements: List[unstructured.documents.elements.Element] = (

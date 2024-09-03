@@ -119,6 +119,9 @@ class DocxParser(BaseParser):
         image_dir: str = "./figures",
         relative_path: bool = True,
     ):
+
+        logger.info(f"Parsing {file_name} using pandoc engine")
+
         import pypandoc
         import re
         import html2text

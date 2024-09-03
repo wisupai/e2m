@@ -65,7 +65,7 @@ class PdfParser(BaseParser):
 
     def _parse_by_unstructured(
         self,
-        file: str,
+        file_name: str,
         start_page: int = None,
         end_page: int = None,
         extract_images: bool = True,
@@ -78,12 +78,15 @@ class PdfParser(BaseParser):
         """
         Parse the data using the unstructured engine
         """
+
+        logger.info(f"Parsing {file_name} using unstructured engine...")
+
         import unstructured
 
         if not extract_images:
             unstructured_elements: List[unstructured.documents.elements.Element] = (
                 self.unstructured_parse_func(
-                    filename=file,
+                    filename=file_name,
                     strategy="auto",
                     languages=self.config.langs,
                     extract_images_in_pdf=False,
@@ -93,7 +96,7 @@ class PdfParser(BaseParser):
         else:
             unstructured_elements: List[unstructured.documents.elements.Element] = (
                 self.unstructured_parse_func(
-                    filename=file,
+                    filename=file_name,
                     strategy="hi_res",
                     languages=self.config.langs,
                     extract_images_in_pdf=True,
@@ -134,6 +137,9 @@ class PdfParser(BaseParser):
         """
         Parse the data using the surya layout engine
         """
+
+        logger.info(f"Parsing {file} using surya layout engine...")
+
         import uuid
         from pathlib import Path
 
@@ -227,6 +233,8 @@ class PdfParser(BaseParser):
         :return: Full text, images, out meta
         :rtype: Tuple[str, List[Image], Dict]
         """
+
+        logger.info(f"Parsing {file_name} using marker engine...")
 
         marker_result = self.marker_parse_func(
             filename=file_name,

@@ -81,9 +81,13 @@ class UrlParser(BaseParser):
         """
         Parse the data using the unstructured engine
         """
+
         import unstructured
 
         if url:
+
+            logger.info(f"Parsing url: {url} using unstructured engine")
+
             text = ""
             try:
                 logger.info(f"Getting url content: {url}")
@@ -92,6 +96,10 @@ class UrlParser(BaseParser):
                 logger.info(f"Got url content from: {url}")
             except Exception as e:
                 logger.error(f"Error getting url content: {e}")
+
+        else:
+
+            logger.info(f"Parsing file: {file_name} using unstructured engine")
 
         unstructured_elements: List[unstructured.documents.elements.Element] = (
             self.unstructured_parse_func(
@@ -123,6 +131,9 @@ class UrlParser(BaseParser):
         image_dir: str = "./figures",
         relative_path: bool = True,
     ):
+
+        logger.info(f"Parsing url: {url} using jina engine")
+
         parsed_text = self.jina_parse_func(url)
 
         return self._prepare_jina_data_to_e2m_parsed_data(
@@ -157,6 +168,8 @@ class UrlParser(BaseParser):
             for result in crawl_result:
                 print(result["markdown"])
         """
+
+        logger.info(f"Parsing url: {url} using firecrawl engine")
 
         text = []
         parsed_text_list = self.firecrawl_app.crawl_url(url)
