@@ -26,7 +26,7 @@ jobs:
 
     - name: Generate requirements.txt
       run: |
-        poetry export -f requirements.txt --output requirements.txt --without-hashes
+        poetry export -f requirements.txt --output requirements.txt --without-hashes --with api
 
     - name: Install dependencies
       run: |
