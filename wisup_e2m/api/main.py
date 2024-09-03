@@ -27,7 +27,7 @@ static_dir = str(pwd / "static")
 app = FastAPI(
     title="E2M API",
     description="API for converting various file formats to Markdown using different parsers and converters.",
-    version="0.1.62",
+    version="0.1.63",
 )
 
 # 添加静态文件中间件

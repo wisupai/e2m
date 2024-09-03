@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wisup_e2m"
-version = "0.1.62"
+version = "0.1.63"
 description = "Everything to Markdown."
 authors = ["Wisup Team <team@wisup.a>"]
 license = "MIT"
@@ -38,6 +38,7 @@ pi-heif = "^0.18.0"
 fastapi = "^0.110.0"
 uvicorn = "^0.30.0"
 aiofiles = "^24.1.0"
+gunicorn = "^23.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
@@ -63,3 +64,4 @@ exclude = ["venv", ".venv", "env", ".env", "migrations", "__pycache__"]
 quote-style = "single"
 indent-style = "tab"
 docstring-code-format = true
+
