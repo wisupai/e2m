@@ -3,16 +3,15 @@ import logging
 from typing import Optional
 import re
 import shutil
+from uuid import uuid4
 from pathlib import Path
 import zipfile
 
 from wisup_e2m.configs.parsers.base import BaseParserConfig
-from wisup_e2m.parsers.base import BaseParser, E2MParsedData
+from wisup_e2m.parsers.base import BaseParser, E2MParsedData, E2MParsedImageData
 from wisup_e2m.utils.image_util import has_transparent_background
 
-
 logger = logging.getLogger(__name__)
-
 
 _docx_parser_params = [
     "file_name",
@@ -27,7 +26,7 @@ _docx_parser_params = [
 
 class DocxParser(BaseParser):
     SUPPORTED_ENGINES = ["xml", "pandoc"]
-    SUPPERTED_FILE_TYPES = ["docx"]
+    SUPPORTED_FILE_TYPES = ["docx"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -48,6 +47,68 @@ class DocxParser(BaseParser):
         self._ensure_engine_exists()
         self._load_engine()
 
+    def get_parsed_data(
+        self,
+        file_name: Optional[str] = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = False,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """
+        Parse the data and return the parsed data
+        """
+        if file_name:
+            DocxParser._validate_input_file(file_name)
+
+        if self.config.engine == "xml":
+            return self._parse_by_xml(
+                file_name=file_name,
+                extract_images=extract_images,
+                include_image_link_in_text=include_image_link_in_text,
+                ignore_transparent_images=ignore_transparent_images,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
+        elif self.config.engine == "pandoc":
+            return self._parse_by_pandoc(
+                file_name=file_name,
+                extract_images=extract_images,
+                include_image_link_in_text=include_image_link_in_text,
+                ignore_transparent_images=ignore_transparent_images,
+                work_dir=work_dir,
+                image_dir=image_dir,
+                relative_path=relative_path,
+            )
+        else:
+            raise NotImplementedError(f"Engine {self.config.engine} not supported")
+
+    def parse(
+        self,
+        file_name: Optional[str] = None,
+        extract_images: bool = True,
+        include_image_link_in_text: bool = True,
+        ignore_transparent_images: bool = False,
+        work_dir: str = "./",
+        image_dir: str = "./figures",
+        relative_path: bool = True,
+        **kwargs,
+    ) -> E2MParsedData:
+        """Parse the data and return the parsed data
+
+        :return: Parsed data
+        :rtype: E2MParsedData
+        """
+        for k, v in locals().items():
+            if k in _docx_parser_params:
+                kwargs[k] = v
+
+        return self.get_parsed_data(**kwargs)
+
     def _parse_by_pandoc(
         self,
         file_name: str,
@@ -62,11 +123,14 @@ class DocxParser(BaseParser):
         import re
         import html2text
 
+        work_dir = Path(work_dir).resolve()
+        image_dir = Path(image_dir).resolve()
+
         # Step 1: Convert docx to initial markdown
         result = pypandoc.convert_file(
             file_name,
             "markdown_phpextra",
-            extra_args=["--extract-media=" + image_dir],
+            extra_args=["--extract-media=" + str(image_dir)] if extract_images else [],
             verify_format=True,
         )
 
@@ -92,22 +156,56 @@ class DocxParser(BaseParser):
         for pattern, replacement in to_be_removed_pattern.items():
             result = re.sub(pattern, replacement, result, flags=re.MULTILINE)
 
-        # Step 5: Ensure images are surrounded by empty lines
-        image_pattern = re.compile(r"(!\[.*?\]\(.*?\))")
-        result = re.sub(image_pattern, r"\n\n\1\n\n", result)
+        # Step 5: Process images
+        attached_images = {}
+        auto_image_folder_path = image_dir / "media"
+        if extract_images and auto_image_folder_path.exists():
+            for image_file in auto_image_folder_path.glob("*"):
+                if image_file.is_file():
+                    # Move image to target folder
+                    target_image_path = image_dir / image_file.name
+                    image_file.rename(target_image_path)
 
-        # Step 6: Clean up excessive newlines
+                    image_path = target_image_path.resolve()
+                    if ignore_transparent_images and has_transparent_background(image_path):
+                        logger.info(f"Ignore transparent image {image_path}")
+                        continue
+
+                    if relative_path:
+                        try:
+                            image_path = image_path.relative_to(work_dir)
+                        except Exception:
+                            # If the image is not in a subdirectory of work_dir, use the absolute path
+                            logger.warning(
+                                f"Image {image_path} is not in a subdirectory of {work_dir}. Using absolute path."
+                            )
+
+                    image_id = str(uuid4())
+                    attached_images[image_id] = E2MParsedImageData(
+                        image_path=str(image_path),
+                    )
+
+                    if include_image_link_in_text:
+                        result = re.sub(
+                            rf"!\[([^\]]*)\]\({image_file.name}\)",
+                            f"![\\1]({image_path})",
+                            result,
+                        )
+
+        # Step 6: Ensure images are surrounded by empty lines
+        image_pattern = re.compile(r"(!\[.*?\]\(.*?\))")
+        if include_image_link_in_text:
+            result = re.sub(image_pattern, r"\n\n\1\n\n", result)
+        else:
+            # rm all image links
+            result = re.sub(image_pattern, "", result)
+
+        # Step 7: Clean up excessive newlines
         result = re.sub(r"\n{3,}", "\n\n", result)
         result = re.sub(r"\n\s*\n", "\n\n", result)
 
-        # Step 7: Strip whitespace from line beginnings and endings
+        # Step 8: Strip whitespace from line beginnings and endings
         result = "\n".join(line.strip() for line in result.split("\n"))
-
-        attached_images = []
-        image_folder_path = Path(image_dir) / "media"
-        for image_file in image_folder_path.glob("*"):
-            if image_file.is_file():
-                attached_images.append(str(image_file))
 
         return E2MParsedData(
             text=result,
@@ -219,12 +317,9 @@ class DocxParser(BaseParser):
         doc = Document(docx_path)
 
         text_list = []
-        attached_images = []
+        attached_images = {}
 
         for ele in doc.element.body:
-            # test >
-            print(f"{ele.tag=} | {ele.text=}")
-            # test <
             if ele.tag.endswith("bookmarkEnd"):
                 text_list.append("\n")
                 continue
@@ -244,7 +339,7 @@ class DocxParser(BaseParser):
                     else:
                         text_list.append(ele.text)
 
-                if include_image_link_in_text:
+                if extract_images and include_image_link_in_text:
                     self._process_images(
                         ele,
                         image_list,
@@ -290,7 +385,7 @@ class DocxParser(BaseParser):
         if "<w:drawing>" in xml:
             img_ids = re.findall(r'r:embed="([^"]+)"', xml)
             for img_id in img_ids:
-                for img in image_list:
+                for img in image_list:  # This could be inefficient for large image_list
                     if img.id == img_id:
                         self._add_image_to_text(
                             img, text_list, attached_images, relative_path, work_dir
@@ -300,74 +395,18 @@ class DocxParser(BaseParser):
         """
         Add the image to the text
         """
-        if relative_path:
-            rel_path = img.target.relative_to(Path(work_dir))
-            text_list.append(f"![{img.target.name}]({rel_path})")
-            attached_images.append(str(rel_path))
-        else:
-            text_list.append(f"![{img.target.name}]({img.target})")
-            attached_images.append(str(img.target.resolve()))
+        try:
+            if relative_path:
+                rel_path = img.target.relative_to(Path(work_dir))
+                text_list.append(f"![{img.target.name}]({rel_path})")
+                image_path = str(rel_path)
+            else:
+                text_list.append(f"![{img.target.name}]({img.target})")
+                image_path = str(img.target.resolve())
+
+            attached_images[str(uuid4())] = E2MParsedImageData(
+                image_path=image_path,
+            )
             logger.info(f"Inserted image {img.target} in text")
-
-    def get_parsed_data(
-        self,
-        file_name: Optional[str] = None,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = False,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        """
-        Parse the data and return the parsed data
-
-        """
-        if file_name:
-            DocxParser._validate_input_flie(file_name)
-
-        if self.config.engine == "xml":
-            return self._parse_by_xml(
-                file_name=file_name,
-                extract_images=extract_images,
-                include_image_link_in_text=include_image_link_in_text,
-                ignore_transparent_images=ignore_transparent_images,
-                work_dir=work_dir,
-                image_dir=image_dir,
-                relative_path=relative_path,
-            )
-        elif self.config.engine == "pandoc":
-            return self._parse_by_pandoc(
-                file_name=file_name,
-                extract_images=extract_images,
-                include_image_link_in_text=include_image_link_in_text,
-                ignore_transparent_images=ignore_transparent_images,
-                work_dir=work_dir,
-                image_dir=image_dir,
-                relative_path=relative_path,
-            )
-        else:
-            raise NotImplementedError(f"Engine {self.config.engine} not supported")
-
-    def parse(
-        self,
-        file_name: Optional[str] = None,
-        extract_images: bool = True,
-        include_image_link_in_text: bool = True,
-        ignore_transparent_images: bool = False,
-        work_dir: str = "./",
-        image_dir: str = "./figures",
-        relative_path: bool = True,
-        **kwargs,
-    ) -> E2MParsedData:
-        """Parse the data and return the parsed data
-
-        :return: Parsed data
-        :rtype: E2MParsedData
-        """
-        for k, v in locals().items():
-            if k in _docx_parser_params:
-                kwargs[k] = v
-
-        return self.get_parsed_data(**kwargs)
+        except Exception as e:
+            logger.error(f"Error adding image to text: {e}")
