@@ -1,0 +1,49 @@
+name: API Health Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'  # 根据 pyproject.toml 中的 Python 版本要求
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Generate requirements.txt
+      run: |
+        poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Start API server
+      run: |
+        python -m uvicorn wisup_e2m.api.main:app --host 0.0.0.0 --port 8000 &
+        sleep 5  # 给服务器一些启动时间
+
+    - name: Check API health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/)
+        if [ $response = "200" ]; then
+          echo "API is running and responding correctly"
+        else
+          echo "API is not responding as expected. HTTP status code: $response"
+          exit 1
+        fi
