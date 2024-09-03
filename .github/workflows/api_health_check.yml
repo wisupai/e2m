@@ -24,6 +24,11 @@ jobs:
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
 
+    - name: Build and install current library
+      run: |
+        poetry build
+        pip install dist/*.whl
+
     - name: Generate requirements.txt
       run: |
         poetry export -f requirements.txt --output requirements.txt --without-hashes --with api
