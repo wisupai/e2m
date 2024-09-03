@@ -25,7 +25,7 @@ _pdf_parser_params = [
 
 class PdfParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "surya_layout", "marker"]
-    SUPPERTED_FILE_TYPES = ["pdf"]
+    SUPPORTED_FILE_TYPES = ["pdf"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -294,7 +294,7 @@ class PdfParser(BaseParser):
         :rtype: E2MParsedData
         """
         if file_name:
-            PdfParser._validate_input_flie(file_name)
+            PdfParser._validate_input_file(file_name)
 
         if self.config.engine == "surya_layout":
             return self._parse_by_surya_layout(

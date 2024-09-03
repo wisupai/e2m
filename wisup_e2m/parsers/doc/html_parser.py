@@ -22,7 +22,7 @@ _html_parser_params = [
 
 class HtmlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
-    SUPPERTED_FILE_TYPES = ["html", "htm"]
+    SUPPORTED_FILE_TYPES = ["html", "htm"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -113,7 +113,7 @@ class HtmlParser(BaseParser):
 
         """
         if file_name:
-            HtmlParser._validate_input_flie(file_name)
+            HtmlParser._validate_input_file(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(

@@ -22,7 +22,7 @@ _doc_parser_params = [
 
 
 class DocParser(DocxParser):
-    SUPPERTED_FILE_TYPES = ["doc"]
+    SUPPORTED_FILE_TYPES = ["doc"]
 
     def get_parsed_data(
         self,
@@ -40,7 +40,7 @@ class DocParser(DocxParser):
 
         """
 
-        DocParser._validate_input_flie(file_name)
+        DocParser._validate_input_file(file_name)
 
         try:
             tmp_dir = Path(f"./.tmp/{uuid4()}")

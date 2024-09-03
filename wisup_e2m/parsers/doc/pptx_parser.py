@@ -28,7 +28,7 @@ _pptx_parser_params = [
 
 class PptxParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
-    SUPPERTED_FILE_TYPES = ["pptx"]
+    SUPPORTED_FILE_TYPES = ["pptx"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -161,7 +161,7 @@ class PptxParser(BaseParser):
 
         """
         if file_name:
-            PptxParser._validate_input_flie(file_name)
+            PptxParser._validate_input_file(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(

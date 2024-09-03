@@ -27,7 +27,7 @@ _ppt_parser_params = [
 
 
 class PptParser(PptxParser):
-    SUPPERTED_FILE_TYPES = ["ppt"]
+    SUPPORTED_FILE_TYPES = ["ppt"]
 
     def get_parsed_data(
         self,
@@ -49,7 +49,7 @@ class PptParser(PptxParser):
         Parse the data and return the parsed data
 
         """
-        PptParser._validate_input_flie(file_name)
+        PptParser._validate_input_file(file_name)
 
         try:
             tmp_dir = Path(f"./.tmp/{uuid4()}")

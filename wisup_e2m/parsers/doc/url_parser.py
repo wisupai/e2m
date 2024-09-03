@@ -25,7 +25,7 @@ _url_parser_params = [
 
 class UrlParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured", "jina", "firecrawl"]
-    SUPPERTED_FILE_TYPES = ["url"]
+    SUPPORTED_FILE_TYPES = ["url"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -194,7 +194,7 @@ class UrlParser(BaseParser):
 
         """
         if file_name:
-            UrlParser._validate_input_flie(file_name)
+            UrlParser._validate_input_file(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(

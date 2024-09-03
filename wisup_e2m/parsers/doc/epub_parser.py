@@ -23,7 +23,7 @@ _epub_parser_params = [
 
 class EpubParser(BaseParser):
     SUPPORTED_ENGINES = ["unstructured"]
-    SUPPERTED_FILE_TYPES = ["epub"]
+    SUPPORTED_FILE_TYPES = ["epub"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -123,7 +123,7 @@ class EpubParser(BaseParser):
 
         """
         if file_name:
-            EpubParser._validate_input_flie(file_name)
+            EpubParser._validate_input_file(file_name)
 
         if self.config.engine == "unstructured":
             return self._parse_by_unstructured(

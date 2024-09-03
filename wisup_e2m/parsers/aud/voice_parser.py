@@ -17,7 +17,7 @@ class VoiceParser(BaseParser):
         "openai_whisper_local",
         "SpeechRecognition",
     ]
-    SUPPERTED_FILE_TYPES = ["mp3", "m4a"]
+    SUPPORTED_FILE_TYPES = ["mp3", "m4a"]
 
     def __init__(self, config: Optional[BaseParserConfig] = None, **config_kwargs):
         """
@@ -107,7 +107,7 @@ class VoiceParser(BaseParser):
         """
 
         if file_name:
-            VoiceParser._validate_input_flie(file_name)
+            VoiceParser._validate_input_file(file_name)
 
         if self.config.engine == "openai_whisper_api":
             return self._parse_by_openai_whisper_api(file_name)
