@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://github.com/user/repo/blob/main/LICENSE">
-        <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+        <img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="License">
     </a>
     <a href="https://github.com/wisupai/e2m">
         <img src="https://img.shields.io/badge/e2m-repo-blue" alt="E2M Repo">
