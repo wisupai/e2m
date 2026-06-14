@@ -27,5 +27,11 @@ def test_url_parser(engine):
     logger.info(f"Test for engine '{engine}' took {run_time:.4f} seconds")
 
 
+def test_crw_engine_registered():
+    # fastCRW (crw) is a Firecrawl-compatible engine; like firecrawl it requires
+    # network/credentials, so only assert it is a registered, dispatchable engine.
+    assert "crw" in UrlParser.SUPPORTED_ENGINES
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
