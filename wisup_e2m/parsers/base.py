@@ -176,6 +176,8 @@ class BaseParser(ABC):
             self._load_pandoc_engine()
         elif self.config.engine == "firecrawl":
             self._load_firecrawl_engine()
+        elif self.config.engine == "crw":
+            self._load_crw_engine()
 
     def _load_surya_layout_engine(self):
         logger.info("Loading Surya engine...")
@@ -304,6 +306,44 @@ class BaseParser(ABC):
             ) from None
 
         self.firecrawl_app = FirecrawlApp(api_key=self.config.api_key)  # FIRECRAWL_API_KEY
+
+    def _load_crw_engine(self):
+        """
+        fastCRW (crw) engine: a Firecrawl-compatible web scraper shipped as a single
+        binary; self-host or use the managed cloud. Because the API is
+        Firecrawl-compatible, the FirecrawlApp client works as-is when pointed at the
+        fastCRW base URL.
+
+        from firecrawl import FirecrawlApp
+
+        app = FirecrawlApp(
+            api_url="https://fastcrw.com/api",
+            api_key="<CRW_API_KEY>",
+        )
+
+        crawl_result = app.crawl_url(
+            "https://alexyancey.com/lost-airpods"
+        )
+
+        # Get the markdown
+        for result in crawl_result:
+            print(result["markdown"])
+        """
+        import os
+
+        try:
+            from firecrawl import FirecrawlApp
+        except ImportError:
+            raise ImportError(
+                "Firecrawl client not installed. The crw engine reuses the "
+                "Firecrawl-compatible client; please install it by `pip install firecrawl`"
+            ) from None
+
+        # Default to the managed cloud; allow overriding for self-hosted servers.
+        api_url = self.config.api_url or "https://fastcrw.com/api"
+        api_key = self.config.api_key or os.environ.get("CRW_API_KEY")
+
+        self.crw_app = FirecrawlApp(api_url=api_url, api_key=api_key)
 
     def _load_pandoc_engine(self):
         import shutil
